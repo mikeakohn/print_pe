@@ -14,8 +14,11 @@ This code falls under the LGPL license.
 
 #include <stdint.h>
 
+#include "pe_section_headers.h"
+
 int rip_binary(FILE *in, char *filename, int address, int size);
 int read_unicode(FILE *in, int addr, char *s, int max_chars);
+int hex_dump(FILE *in, int address, int size, struct section_header_t *section_header);
 
 #endif
 

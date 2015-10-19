@@ -17,23 +17,23 @@ This code falls under the LGPL license.
 #include "fileio.h"
 #include "pe_imports.h"
 
-int print_imports(FILE *in, int addr, int size, struct section_header_t *section_header)
+int print_imports(FILE *in, int address, int size, struct section_header_t *section_header)
 {
   struct import_dir_t import_dir;
   char name[1024];
   long marker;
   int total_size;
-  int virtual_address,raw_ptr;
+  uint32_t virtual_address,raw_ptr;
   int func_addr;
   int t,ptr;
 
   virtual_address = section_header->VirtualAddress;
   raw_ptr = section_header->PointerToRawData;
 
-  addr = (addr - virtual_address) + raw_ptr;
+  address = (address - virtual_address) + raw_ptr;
 
   marker = ftell(in);
-  fseek(in, addr, SEEK_SET);
+  fseek(in, address, SEEK_SET);
 
   printf("  -- Imported Symbols --\n");
 

@@ -130,8 +130,7 @@ int main(int argc, char *argv[])
     if ((section_header.Characteristics & 0x20) != 0)
     {
       sprintf(filename, "win_code_%d.bin", t);
-      rip_binary(in, filename,section_header.PointerToRawData, section_header.SizeOfRawData);
-      //i = print_vb_info(in, &image_optional_header, &section_header);
+      rip_binary(in, filename, section_header.PointerToRawData, section_header.SizeOfRawData);
       print_vb_info(in, &image_optional_header, &section_header);
     }
       else
@@ -185,6 +184,22 @@ int main(int argc, char *argv[])
           in,
           image_optional_header.directory_entry[6].virtual_address,
           image_optional_header.directory_entry[6].size,
+          &section_header);
+      }
+    }
+
+    // COM Desc section
+    if (image_optional_header.directory_entry[14].size!= 0)
+    {
+      if (section_header.VirtualAddress <=
+          image_optional_header.directory_entry[14].virtual_address &&
+          image_optional_header.directory_entry[14].virtual_address <=
+          section_header.VirtualAddress + section_header.SizeOfRawData)
+      {
+        hex_dump(
+          in,
+          image_optional_header.directory_entry[14].virtual_address,
+          image_optional_header.directory_entry[14].size,
           &section_header);
       }
     }
