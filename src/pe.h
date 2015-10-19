@@ -165,68 +165,6 @@ struct export_dir_t
   uint32_t AddressOfNameOrdinals;
 };
 
-struct vb_header_t
-{
-  char szVbMagic[5];
-  uint16_t wRuntimeBuild;
-  char szLangDll[15];
-  char szSecLangDll[15];
-  uint16_t wRuntimeRevision;
-  uint32_t dwLCID;
-  uint32_t dwSecLCID;
-  uint32_t lpSubMain;
-  uint32_t lpProjectData;
-  uint32_t fMdlIntCtls;
-  uint32_t fMdlIntCtls2;
-  uint32_t dwThreadFlags;
-  uint32_t dwThreadCount;
-  uint16_t wFormCount;
-  uint16_t wExternalCount;
-  uint32_t dwThunkCount;
-  uint32_t lpGuiTable;
-  uint32_t lpExternalTable;
-  uint32_t lpComRegisterData;
-  uint32_t bSzProjectDescription;
-  uint32_t bSzProjectExeName;
-  uint32_t bSzProjectHelpFile;
-  uint32_t bSzProjectName;
-};
-
-struct com_reg_data_t
-{
-  uint32_t bRegInfo;
-  uint32_t bSZProjectName;
-  uint32_t bSZHelpDirectory;
-  uint32_t bSZProjectDescription;
-  uint8_t uuidProjectClsId[16];
-  uint32_t dwTlbLcid;
-  uint16_t wUnknown;
-  uint16_t wTlbVerMajor;
-  uint16_t wTlbVerMinor;
-};
-
-struct reg_info_t
-{
-  uint32_t bNextObject;
-  uint32_t bObjectName;
-  uint32_t bObjectDescription;
-  uint32_t dwInstancing;
-  uint32_t dwObjectId;
-  uint8_t uuidObject[16];
-  uint32_t fIsInterface;
-  uint32_t bUidObjectIFace;
-  uint32_t bUidEventsIFace;
-  uint32_t fHasEvents;
-  uint32_t dwMiscStatus;
-  uint32_t fClassType;
-  uint16_t fObjectType;
-  uint16_t wToolboxBitmap32;
-  uint16_t wDefaultIcon;
-  uint16_t fIsDesigner;
-  uint32_t bDesignerData;
-  uint8_t szObjectName[1024];
-};
-
 int read_dos_header(FILE *in, struct dos_header_t *dos_header);
 int print_dos_header(struct dos_header_t *dos_header);
 
@@ -242,7 +180,6 @@ int print_section_header(struct section_header_t *section_header,int count);
 int print_imports(FILE *in, int addr, int size, struct section_header_t *section_header);
 int print_exports(FILE *in, int addr, int size, struct section_header_t *section_header, struct funct_t *funct);
 
-int print_vb_info(FILE *in, struct image_optional_header_t *image_optional_header, struct section_header_t *section_header);
 
 int rip_binary(FILE *in, char *filename, int address, int size);
 int read_unicode(FILE *in, int addr, char *s, int max_chars);

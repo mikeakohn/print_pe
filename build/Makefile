@@ -5,7 +5,7 @@ CFLAGS=-Wall -O3
 #PATH=/opt/xmingw/bin:/usr/bin
 VPATH=../src
 
-OBJECTS=cil.o fileio.o pe.o pe_debug.o res.o table_cil_instr.o
+OBJECTS=cil.o fileio.o pe.o pe_com.o pe_debug.o pe_vb.o res.o table_cil_instr.o
 
 default: $(OBJECTS)
 	$(CC) -o ../print_pe ../src/print_pe.c \

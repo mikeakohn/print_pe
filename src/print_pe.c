@@ -17,6 +17,7 @@ This code falls under the LGPL license.
 #include "fileio.h"
 #include "pe.h"
 #include "pe_debug.h"
+#include "pe_vb.h"
 
 int main(int argc, char *argv[])
 {
