@@ -107,30 +107,25 @@ int print_image_file_header(struct image_file_header_t *image_file_header)
   printf("Image File Header\n");
   printf("---------------------------------------------\n");
 
-  printf("           Machine: ");
-  if (image_file_header->Machine == 0x14c) printf("i386");
-    else
-  if (image_file_header->Machine == 0x14d) printf("i486");
-    else
-  if (image_file_header->Machine == 0x14e) printf("i586");
-    else
-  if (image_file_header->Machine == 0x160) printf("MIPS R3000 Big Endian");
-    else
-  if (image_file_header->Machine == 0x162) printf("MIPS R3000 Little Endian");
-    else
-  if (image_file_header->Machine == 0x166) printf("MIPS R4000 Little Endian");
-    else
-  if (image_file_header->Machine == 0x168) printf("MIPS R10000 Little Endian");
-    else
-  if (image_file_header->Machine == 0x184) printf("Alpha");
-    else
-  if (image_file_header->Machine == 0x1f0) printf("PPC Little Endian");
-    else
-  if (image_file_header->Machine == 0x8664) printf("AMD64");
-    else
-  { printf("Unknown"); }
 
-  printf("\n");
+  const char *machine;
+
+  switch(image_file_header->Machine)
+  {
+    case 0x14c: machine = "i386"; break;
+    case 0x14d: machine = "i486"; break;
+    case 0x14e: machine = "i586"; break;
+    case 0x160: machine = "MIPS R3000 Big Endian"; break;
+    case 0x162: machine = "MIPS R3000 Little Endian"; break;
+    case 0x166: machine = "MIPS R4000 Little Endian"; break;
+    case 0x168: machine = "MIPS R10000 Little Endian"; break;
+    case 0x184: machine = "Alpha"; break;
+    case 0x1f0: machine = "PPC Little Endian"; break;
+    case 0x8664: machine = "AMD64"; break;
+    default: machine = "Unknown"; break;
+  }
+
+  printf("           Machine: 0x%04x (%s)\n", image_file_header->Machine, machine);
   printf("  NumberOfSections: %d\n", image_file_header->NumberOfSections);
   printf("     TimeDateStamp: %s", ctime((time_t *)&image_file_header->TimeDateStamp));
   printf("PointerToSymbolTbl: %d\n", image_file_header->PointerToSymbolTable);
@@ -220,23 +215,17 @@ int print_image_optional_header(struct image_optional_header_t *image_optional_h
   printf("Image Optional Header\n");
   printf("---------------------------------------------\n");
 
-  printf("             Magic: 0x%04x", image_optional_header->Magic);
+  const char *magic;
 
-  if (image_optional_header->Magic == 0x10b)
+  switch(image_optional_header->Magic)
   {
-    printf(" (32 Bit Exe)");
+    case 0x10b: magic = "32 Bit Exe"; break;
+    case 0x20b: magic = "64 Bit Exe"; break;
+    case 0x107: magic = "ROM"; break;
+    default: magic = "Unknown"; break;
   }
-    else
-  if (image_optional_header->Magic == 0x20b)
-  {
-    printf(" (64 Bit Exe)");
-  }
-    else
-  if (image_optional_header->Magic == 0x10b)
-  {
-    printf(" (ROM)");
-  }
-  printf("\n");
+
+  printf("             Magic: 0x%04x (%s)\n", image_optional_header->Magic, magic);
 
   printf("MajorLinkerVersion: %d\n", image_optional_header->MajorLinkerVersion);
   printf("MinorLinkerVersion: %d\n", image_optional_header->MinorLinkerVersion);
