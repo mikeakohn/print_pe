@@ -14,6 +14,7 @@ This code falls under the LGPL license.
 #include <string.h>
 
 #include "cil.h"
+#include "dos.h"
 #include "fileio.h"
 #include "pe.h"
 #include "pe_debug.h"
