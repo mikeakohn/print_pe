@@ -360,7 +360,6 @@ int print_dos_header(struct dos_header_t *dos_header)
   return 0;
 }
 
-
 int print_image_file_header(struct image_file_header_t *image_file_header)
 {
   printf("---------------------------------------------\n");
@@ -391,13 +390,83 @@ int print_image_file_header(struct image_file_header_t *image_file_header)
   { printf("Unknown"); }
 
   printf("\n");
-  printf("  NumberOfSections: %d\n",image_file_header->NumberOfSections);
-  printf("     TimeDateStamp: %s",ctime((time_t *)&image_file_header->TimeDateStamp));
-  printf("PointerToSymbolTbl: %d\n",image_file_header->PointerToSymbolTable);
-  printf("   NumberOfSymbols: %d\n",image_file_header->NumberOfSymbols);
-  printf(" SizeOfOptionalHdr: %d\n",image_file_header->SizeOfOptionalHeader);
-  printf("   Characteristics: %04x\n",image_file_header->Characteristics);
-  printf("\n");
+  printf("  NumberOfSections: %d\n", image_file_header->NumberOfSections);
+  printf("     TimeDateStamp: %s", ctime((time_t *)&image_file_header->TimeDateStamp));
+  printf("PointerToSymbolTbl: %d\n", image_file_header->PointerToSymbolTable);
+  printf("   NumberOfSymbols: %d\n", image_file_header->NumberOfSymbols);
+  printf(" SizeOfOptionalHdr: %d\n", image_file_header->SizeOfOptionalHeader);
+  printf("   Characteristics: %04x", image_file_header->Characteristics);
+  if ((image_file_header->Characteristics & 0x0001) != 0)
+  {
+    printf(" (Relocations Stripped)");
+  }
+
+  if ((image_file_header->Characteristics & 0x0002) != 0)
+  {
+    printf(" (Executable Image)");
+  }
+
+  if ((image_file_header->Characteristics & 0x0004) != 0)
+  {
+    printf(" (Line Numbers Stripped)");
+  }
+
+  if ((image_file_header->Characteristics & 0x0008) != 0)
+  {
+    printf(" (File Local Symbols Stripped)");
+  }
+
+  if ((image_file_header->Characteristics & 0x0010) != 0)
+  {
+    printf(" (Agressively Trim Working Set)");
+  }
+
+  if ((image_file_header->Characteristics & 0x0020) != 0)
+  {
+    printf(" (Large Address Aware)");
+  }
+
+  if ((image_file_header->Characteristics & 0x0080) != 0)
+  {
+    printf(" (File Bytes Reversed)");
+  }
+
+  if ((image_file_header->Characteristics & 0x0100) != 0)
+  {
+    printf(" (32 Bit Machine)");
+  }
+
+  if ((image_file_header->Characteristics & 0x0400) != 0)
+  {
+    printf(" (File Removable, Run From Swap)");
+  }
+
+  if ((image_file_header->Characteristics & 0x0800) != 0)
+  {
+    printf(" (File Networked, Run From Swap)");
+  }
+
+  if ((image_file_header->Characteristics & 0x1000) != 0)
+  {
+    printf(" (File System Image)");
+  }
+
+  if ((image_file_header->Characteristics & 0x2000) != 0)
+  {
+    printf(" (Dynamic Link Library)");
+  }
+
+  if ((image_file_header->Characteristics & 0x4000) != 0)
+  {
+    printf(" (Uniprocessor Only)");
+  }
+
+  if ((image_file_header->Characteristics & 0x8000) != 0)
+  {
+    printf(" (File Bytes Reversed Hi)");
+  }
+
+  printf("\n\n");
 
   return 0;
 }
