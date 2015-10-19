@@ -173,12 +173,19 @@ int main(int argc, char *argv[])
       }
     }
 
+    // Debug section
     if (image_optional_header.directory_entry[6].size!= 0)
     {
-      if (section_header.VirtualAddress <= image_optional_header.directory_entry[6].virtual_address &&
-          image_optional_header.directory_entry[6].virtual_address <= section_header.VirtualAddress+section_header.SizeOfRawData)
+      if (section_header.VirtualAddress <=
+          image_optional_header.directory_entry[6].virtual_address &&
+          image_optional_header.directory_entry[6].virtual_address <=
+          section_header.VirtualAddress + section_header.SizeOfRawData)
       {
-        print_debug_section(in, image_optional_header.directory_entry[6].virtual_address, image_optional_header.directory_entry[6].size, &section_header);
+        print_debug_section(
+          in,
+          image_optional_header.directory_entry[6].virtual_address,
+          image_optional_header.directory_entry[6].size,
+          &section_header);
       }
     }
   }
