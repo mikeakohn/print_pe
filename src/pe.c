@@ -336,25 +336,25 @@ int print_dos_header(struct dos_header_t *dos_header)
   printf("MS DOS Header\n");
   printf("---------------------------------------------\n");
 
-  printf("      Magic Number: %c%c\n",dos_header->e_magic&255,dos_header->e_magic>>8);
-  printf("Bytes On Last Page: %d\n",dos_header->e_cblp);
-  printf("     Pages In File: %d\n",dos_header->e_cp);
-  printf("       Relocations: %d\n",dos_header->e_crlc);
-  printf("    Size Of Header: %d\n",dos_header->e_cparhdr);
-  printf("    Min Extra Para: %d\n",dos_header->e_minalloc);
-  printf("    Max Extra Para: %d\n",dos_header->e_maxalloc);
-  printf("  Initial SS Value: %d\n",dos_header->e_ss);
-  printf("  Initial SP Value: %d\n",dos_header->e_sp);
-  printf("          Checksum: %d\n",dos_header->e_csum);
-  printf("  Initial IP Value: %d\n",dos_header->e_ip);
-  printf("  Initial CS Value: %d\n",dos_header->e_cs);
-  printf("  Addr Reloc Table: %d\n",dos_header->e_lfarlc);
-  printf("    Overlay Number: %d\n",dos_header->e_ovno);
+  printf("      Magic Number: %c%c\n", dos_header->e_magic & 0xff, dos_header->e_magic >> 8);
+  printf("Bytes On Last Page: %d\n", dos_header->e_cblp);
+  printf("     Pages In File: %d\n", dos_header->e_cp);
+  printf("       Relocations: %d\n", dos_header->e_crlc);
+  printf("    Size Of Header: %d\n", dos_header->e_cparhdr);
+  printf("    Min Extra Para: %d\n", dos_header->e_minalloc);
+  printf("    Max Extra Para: %d\n", dos_header->e_maxalloc);
+  printf("  Initial SS Value: %d\n", dos_header->e_ss);
+  printf("  Initial SP Value: %d\n", dos_header->e_sp);
+  printf("          Checksum: %d\n", dos_header->e_csum);
+  printf("  Initial IP Value: %d\n", dos_header->e_ip);
+  printf("  Initial CS Value: %d\n", dos_header->e_cs);
+  printf("  Addr Reloc Table: %d\n", dos_header->e_lfarlc);
+  printf("    Overlay Number: %d\n", dos_header->e_ovno);
   /* read_chars_bin(in,dos_header->e_res,4); */
-  printf("            OEM ID: %d\n",dos_header->e_oemid);
-  printf("          OEM Info: %d\n",dos_header->e_oeminfo);
+  printf("            OEM ID: %d\n", dos_header->e_oemid);
+  printf("          OEM Info: %d\n", dos_header->e_oeminfo);
   /* read_chars_bin(in,dos_header->e_res2,10); */
-  printf("Addr Of New Header: %d\n",dos_header->e_lfanew);
+  printf("Addr Of New Header: %d\n", dos_header->e_lfanew);
   printf("\n");
 
   return 0;
@@ -395,7 +395,7 @@ int print_image_file_header(struct image_file_header_t *image_file_header)
   printf("PointerToSymbolTbl: %d\n", image_file_header->PointerToSymbolTable);
   printf("   NumberOfSymbols: %d\n", image_file_header->NumberOfSymbols);
   printf(" SizeOfOptionalHdr: %d\n", image_file_header->SizeOfOptionalHeader);
-  printf("   Characteristics: %04x", image_file_header->Characteristics);
+  printf("   Characteristics: 0x%04x", image_file_header->Characteristics);
   if ((image_file_header->Characteristics & 0x0001) != 0)
   {
     printf(" (Relocations Stripped)");
@@ -480,42 +480,145 @@ int print_image_optional_header(struct image_optional_header_t *image_optional_h
   printf("Image Optional Header\n");
   printf("---------------------------------------------\n");
 
-  printf("             Magic: %d\n",image_optional_header->Magic);
-  printf("MajorLinkerVersion: %d\n",image_optional_header->MajorLinkerVersion);
-  printf("MinorLinkerVersion: %d\n",image_optional_header->MinorLinkerVersion);
-  printf("        SizeOfCode: %d\n",image_optional_header->SizeOfCode);
-  printf("SizeOfInitilzdData: %d\n",image_optional_header->SizeOfInitializedData);
-  printf("SizeOfUnintlzdData: %d\n",image_optional_header->SizeOfUninitializedData);
-  printf("  AddrOfEntryPoint: %d\n",image_optional_header->AddressOfEntryPoint);
-  printf("        BaseOfCode: %d\n",image_optional_header->BaseOfCode);
-  printf("        BaseOfData: %d\n",image_optional_header->BaseOfData);
-  printf("         ImageBase: %d\n",image_optional_header->ImageBase);
-  printf("  SectionAlignment: %d\n",image_optional_header->SectionAlignment);
-  printf("     FileAlignment: %d\n",image_optional_header->FileAlignment);
-  printf("    MajorOSVersion: %d\n",image_optional_header->MajorOperatingSystemVersion);
-  printf("    MinorOSVersion: %d\n",image_optional_header->MinorOperatingSystemVersion);
-  printf(" MajorImageVersion: %d\n",image_optional_header->MajorImageVersion);
-  printf(" MinorImageVersion: %d\n",image_optional_header->MinorImageVersion);
-  printf(" MajorSubsystemVer: %d\n",image_optional_header->MajorSubsystemVersion);
-  printf(" MinorSubsystemVer: %d\n",image_optional_header->MinorSubsystemVersion);
-  printf("         Reserved1: %d\n",image_optional_header->Reserved1);
-  printf("       SizeOfImage: %d\n",image_optional_header->SizeOfImage);
-  printf("     SizeOfHeaders: %d\n",image_optional_header->SizeOfHeaders);
-  printf("          CheckSum: %d\n",image_optional_header->CheckSum);
-  printf("         Subsystem: %d",image_optional_header->Subsystem);
-  if (image_optional_header->Subsystem == 2) printf(" (GUI)");
+  printf("             Magic: 0x%04x", image_optional_header->Magic);
+
+  if (image_optional_header->Magic == 0x10b)
+  {
+    printf(" (32 Bit Exe)");
+  }
     else
-  if (image_optional_header->Subsystem == 3) printf(" (Console)");
+  if (image_optional_header->Magic == 0x20b)
+  {
+    printf(" (64 Bit Exe)");
+  }
     else
-  if (image_optional_header->Subsystem == 3) printf(" (None)");
+  if (image_optional_header->Magic == 0x10b)
+  {
+    printf(" (ROM)");
+  }
   printf("\n");
-  printf("DllCharacteristics: %d\n",image_optional_header->DllCharacteristics);
-  printf("SizeOfStackReserve: %d\n",image_optional_header->SizeOfStackReserve);
-  printf(" SizeOfStackCommit: %d\n",image_optional_header->SizeOfStackCommit);
-  printf(" SizeOfHeapReserve: %d\n",image_optional_header->SizeOfHeapReserve);
-  printf("  SizeOfHeapCommit: %d\n",image_optional_header->SizeOfHeapCommit);
-  printf("       LoaderFlags: %d\n",image_optional_header->LoaderFlags);
-  printf("  NumOfRvaAndSizes: %d\n",image_optional_header->NumberOfRvaAndSizes);
+
+  printf("MajorLinkerVersion: %d\n", image_optional_header->MajorLinkerVersion);
+  printf("MinorLinkerVersion: %d\n", image_optional_header->MinorLinkerVersion);
+  printf("        SizeOfCode: %d\n", image_optional_header->SizeOfCode);
+  printf("SizeOfInitilzdData: %d\n", image_optional_header->SizeOfInitializedData);
+  printf("SizeOfUnintlzdData: %d\n", image_optional_header->SizeOfUninitializedData);
+  printf("  AddrOfEntryPoint: %d\n", image_optional_header->AddressOfEntryPoint);
+  printf("        BaseOfCode: %d\n", image_optional_header->BaseOfCode);
+  printf("        BaseOfData: %d\n", image_optional_header->BaseOfData);
+  printf("         ImageBase: %d\n", image_optional_header->ImageBase);
+  printf("  SectionAlignment: %d\n", image_optional_header->SectionAlignment);
+  printf("     FileAlignment: %d\n", image_optional_header->FileAlignment);
+  printf("    MajorOSVersion: %d\n", image_optional_header->MajorOperatingSystemVersion);
+  printf("    MinorOSVersion: %d\n", image_optional_header->MinorOperatingSystemVersion);
+  printf(" MajorImageVersion: %d\n", image_optional_header->MajorImageVersion);
+  printf(" MinorImageVersion: %d\n", image_optional_header->MinorImageVersion);
+  printf(" MajorSubsystemVer: %d\n", image_optional_header->MajorSubsystemVersion);
+  printf(" MinorSubsystemVer: %d\n", image_optional_header->MinorSubsystemVersion);
+  printf("         Reserved1: %d\n", image_optional_header->Reserved1);
+  printf("       SizeOfImage: %d\n", image_optional_header->SizeOfImage);
+  printf("     SizeOfHeaders: %d\n", image_optional_header->SizeOfHeaders);
+  printf("          CheckSum: %d\n", image_optional_header->CheckSum);
+  printf("         Subsystem: %d ", image_optional_header->Subsystem);
+
+  const char *subsystem = "(Unknown)";
+
+  if (image_optional_header->Subsystem == 1) { subsystem = "Native"; }
+    else
+  if (image_optional_header->Subsystem == 2) { subsystem = "GUI"; }
+    else
+  if (image_optional_header->Subsystem == 3) { subsystem = "Console"; }
+    else
+  if (image_optional_header->Subsystem == 5) { subsystem = "OS2 GUI"; }
+    else
+  if (image_optional_header->Subsystem == 7) { subsystem = "Posix Console"; }
+    else
+  if (image_optional_header->Subsystem == 9) { subsystem = "Windows CE GUI"; }
+    else
+  if (image_optional_header->Subsystem == 10) { subsystem = "EFI App"; }
+    else
+  if (image_optional_header->Subsystem == 11) { subsystem = "EFI Boot Service Driver"; }
+    else
+  if (image_optional_header->Subsystem == 12) { subsystem = "EFI Runtime Driver"; }
+    else
+  if (image_optional_header->Subsystem == 13) { subsystem = "EFI ROM"; }
+    else
+  if (image_optional_header->Subsystem == 14) { subsystem = "Xbox"; }
+    else
+  if (image_optional_header->Subsystem == 15) { subsystem = "Windows Boot Application"; }
+
+  printf("(%s)\n", subsystem);
+
+  printf("DllCharacteristics: 0x%04x", image_optional_header->DllCharacteristics);
+
+  if ((image_optional_header->DllCharacteristics & 1) != 0)
+  {
+    printf(" (Reserved_1)");
+  }
+
+  if ((image_optional_header->DllCharacteristics & 2) != 0)
+  {
+    printf(" (Reserved_2)");
+  }
+
+  if ((image_optional_header->DllCharacteristics & 4) != 0)
+  {
+    printf(" (Reserved_4)");
+  }
+
+  if ((image_optional_header->DllCharacteristics & 8) != 0)
+  {
+    printf(" (Reserved_8)");
+  }
+
+  if ((image_optional_header->DllCharacteristics & 0x40) != 0)
+  {
+    printf(" (Dyanamic Base)");
+  }
+
+  if ((image_optional_header->DllCharacteristics & 0x80) != 0)
+  {
+    printf(" (Force Integrity)");
+  }
+
+  if ((image_optional_header->DllCharacteristics & 0x100) != 0)
+  {
+    printf(" (NX Compatiblity)");
+  }
+
+  if ((image_optional_header->DllCharacteristics & 0x200) != 0)
+  {
+    printf(" (No Isolation)");
+  }
+
+  if ((image_optional_header->DllCharacteristics & 0x400) != 0)
+  {
+    printf(" (No Structure Exception Handling)");
+  }
+
+  if ((image_optional_header->DllCharacteristics & 0x800) != 0)
+  {
+    printf(" (No Bind)");
+  }
+
+  if ((image_optional_header->DllCharacteristics & 0x2000) != 0)
+  {
+    printf(" (WDM Driver)");
+  }
+
+  if ((image_optional_header->DllCharacteristics & 0x8000) != 0)
+  {
+    printf(" (Terminal Server Aware)");
+  }
+
+  printf("\n");
+
+  printf("SizeOfStackReserve: %d\n", image_optional_header->SizeOfStackReserve);
+  printf(" SizeOfStackCommit: %d\n", image_optional_header->SizeOfStackCommit);
+  printf(" SizeOfHeapReserve: %d\n", image_optional_header->SizeOfHeapReserve);
+  printf("  SizeOfHeapCommit: %d\n", image_optional_header->SizeOfHeapCommit);
+  printf("       LoaderFlags: %d\n", image_optional_header->LoaderFlags);
+  printf("  NumOfRvaAndSizes: %d\n", image_optional_header->NumberOfRvaAndSizes);
   printf("\n");
 
   if (image_optional_header->DataDirectoryCount != 0)
