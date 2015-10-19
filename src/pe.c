@@ -38,7 +38,7 @@ char dir_entries[16][21] = {
 int rip_binary(FILE *in, char *filename, int address, int size)
 {
   FILE *out;
-  int marker;
+  long marker;
   int t;
 
   out = fopen(filename,"wb");
@@ -65,7 +65,7 @@ int rip_binary(FILE *in, char *filename, int address, int size)
 
 int read_unicode(FILE *in, int addr, char *s, int max_chars)
 {
-  int marker;
+  long marker;
   int ch,t,len;
 
   marker = ftell(in);
@@ -177,7 +177,7 @@ int print_imports(FILE *in, int addr, int size, struct section_header_t *section
 {
   struct import_dir_t import_dir;
   char name[1024];
-  int marker;
+  long marker;
   int total_size;
   int virtual_address,raw_ptr;
   int func_addr;
@@ -241,7 +241,7 @@ int print_exports(FILE *in, int addr, int size, struct section_header_t *section
   char func_name[1024];
   int virtual_address,raw_ptr;
   int func_addr,name_ord;
-  int marker;
+  long marker;
   int t,ptr;
 
   virtual_address = section_header->VirtualAddress;
