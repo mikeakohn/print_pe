@@ -657,29 +657,3 @@ int print_section_header(struct section_header_t *section_header, int count)
   return 0;
 }
 
-int print_clsid(const uint8_t *clsid)
-{
-  int t;
-
-  for (t = 0; t < 16; t++)
-  {
-    printf("%02X", clsid[t]);
-    if (t == 3 || t == 5 || t == 7 || t == 9) printf("-");
-  }
-
-  return 0;
-}
-
-int read_clsid(FILE *in, char *clsid)
-{
-  int8_t transpose[16] = { 3,2,1,0, 5,4,7,6, 8,9,10,11, 12,13,14,15 };
-  int t;
-
-  for (t = 0; t < 16; t++)
-  {
-    clsid[(int)transpose[t]] = getc(in);
-  }
-
-  return 0;
-}
-
