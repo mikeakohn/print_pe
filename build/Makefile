@@ -1,5 +1,5 @@
 
-CC=gcc
+#CC=gcc
 CFLAGS=-Wall -O3
 #CC=i386-mingw32msvc-gcc
 #PATH=/opt/xmingw/bin:/usr/bin

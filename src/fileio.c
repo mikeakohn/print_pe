@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2014 by Michael Kohn
+print_pe - Copyright 2005-2015 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -16,7 +16,7 @@ This code falls under the LGPL license.
 
 int read_uint32(FILE *in)
 {
-int c;
+  int c;
 
   c = getc(in);
   c =c | (getc(in) << 8);
@@ -28,7 +28,7 @@ int c;
 
 int read_uint16(FILE *in)
 {
-int c;
+  int c;
 
   c = getc(in);
   c = c | (getc(in) << 8);
@@ -38,7 +38,7 @@ int c;
 
 int read_chars(FILE *in, char *s, int count)
 {
-int t;
+  int t;
 
   for (t = 0; t < count; t++)
   {
@@ -52,7 +52,7 @@ int t;
 
 int read_chars_bin(FILE *in, uint8_t *s, int count)
 {
-int t;
+  int t;
 
   for (t = 0; t < count; t++)
   {
@@ -64,8 +64,8 @@ int t;
 
 int print_string(FILE *in, int addr)
 {
-int marker;
-int ch;
+  int marker;
+  int ch;
 
   marker = ftell(in);
   fseek(in, addr, SEEK_SET);
@@ -84,9 +84,9 @@ int ch;
 
 int get_string(FILE *in, char *s, int addr)
 {
-int marker;
-int ch;
-int t;
+  int marker;
+  int ch;
+  int t;
 
   marker = ftell(in);
   fseek(in, addr, SEEK_SET);
@@ -108,8 +108,8 @@ int t;
 
 int get_ptr(FILE *in, int addr)
 {
-int marker;
-int i;
+  int marker;
+  int i;
 
   marker = ftell(in);
   fseek(in, addr, SEEK_SET);
@@ -122,8 +122,8 @@ int i;
 
 int get_ushort(FILE *in, int addr)
 {
-int marker;
-int i;
+  int marker;
+  int i;
 
   marker = ftell(in);
   fseek(in, addr, SEEK_SET);

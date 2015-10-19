@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2014 by Michael Kohn
+print_pe - Copyright 2005-2015 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -37,11 +37,12 @@ char dir_entries[16][21] = {
 
 int rip_binary(FILE *in, char *filename, int address, int size)
 {
-FILE *out;
-int marker;
-int t;
+  FILE *out;
+  int marker;
+  int t;
 
   out = fopen(filename,"wb");
+
   if (out == 0)
   {
     printf("Cannot open file %s for writing.\n\n",filename);
@@ -64,8 +65,8 @@ int t;
 
 int read_unicode(FILE *in, int addr, char *s, int max_chars)
 {
-int marker;
-int ch,t,len;
+  int marker;
+  int ch,t,len;
 
   marker = ftell(in);
   fseek(in, addr, SEEK_SET);
@@ -132,7 +133,7 @@ int read_image_file_header(FILE *in, struct image_file_header_t *image_file_head
 
 int read_image_optional_header(FILE *in, struct image_optional_header_t *image_optional_header, int header_size)
 {
-int t;
+  int t;
 
   image_optional_header->Magic = read_uint16(in);
   image_optional_header->MajorLinkerVersion = getc(in);
@@ -199,13 +200,13 @@ int read_section_header(FILE *in, struct section_header_t *section_header)
 
 int print_imports(FILE *in, int addr, int size, struct section_header_t *section_header)
 {
-struct import_dir_t import_dir;
-char name[1024];
-int marker;
-int total_size;
-int virtual_address,raw_ptr;
-int func_addr;
-int t,ptr;
+  struct import_dir_t import_dir;
+  char name[1024];
+  int marker;
+  int total_size;
+  int virtual_address,raw_ptr;
+  int func_addr;
+  int t,ptr;
 
   virtual_address = section_header->VirtualAddress;
   raw_ptr = section_header->PointerToRawData;
@@ -218,6 +219,7 @@ int t,ptr;
   printf("  -- Imported Symbols --\n");
 
   total_size = 0;
+
   while(total_size < size)
   {
     import_dir.FunctionNameList = read_uint32(in);
@@ -260,12 +262,12 @@ int t,ptr;
 
 int print_exports(FILE *in, int addr, int size, struct section_header_t *section_header, struct funct_t *funct)
 {
-struct export_dir_t export_dir;
-char func_name[1024];
-int virtual_address,raw_ptr;
-int func_addr,name_ord;
-int marker;
-int t,ptr;
+  struct export_dir_t export_dir;
+  char func_name[1024];
+  int virtual_address,raw_ptr;
+  int func_addr,name_ord;
+  int marker;
+  int t,ptr;
 
   virtual_address = section_header->VirtualAddress;
   raw_ptr = section_header->PointerToRawData;
@@ -403,7 +405,7 @@ int print_image_file_header(struct image_file_header_t *image_file_header)
 
 int print_image_optional_header(struct image_optional_header_t *image_optional_header)
 {
-int t;
+  int t;
 
   printf("---------------------------------------------\n");
   printf("Image Optional Header\n");
@@ -485,7 +487,7 @@ int print_section_header(struct section_header_t *section_header, int count)
 
 int print_clsid(unsigned char *clsid)
 {
-int t;
+  int t;
 
   for (t = 0; t < 16; t++)
   {
@@ -498,8 +500,8 @@ int t;
 
 int read_clsid(FILE *in, char *clsid)
 {
-int8_t transpose[16] = { 3,2,1,0, 5,4,7,6, 8,9,10,11, 12,13,14,15 };
-int t;
+  int8_t transpose[16] = { 3,2,1,0, 5,4,7,6, 8,9,10,11, 12,13,14,15 };
+  int t;
 
   for (t = 0; t < 16; t++)
   {
@@ -511,7 +513,7 @@ int t;
 
 int read_reg_info(FILE *in, struct reg_info_t *reg_info, int offset)
 {
-int marker;
+  int marker;
 
   marker = ftell(in);
   fseek(in, offset, SEEK_SET);
@@ -568,7 +570,7 @@ int print_reg_info(struct reg_info_t *reg_info)
 
 int read_com_reg_data(FILE *in, struct com_reg_data_t *com_reg_data, int offset)
 {
-int marker;
+  int marker;
 
   marker = ftell(in);
   fseek(in, offset, SEEK_SET);
@@ -609,12 +611,12 @@ int print_com_reg_data(struct com_reg_data_t *com_reg_data)
 
 int print_vb_info(FILE *in, struct image_optional_header_t *image_optional_header, struct section_header_t *section_header)
 {
-struct vb_header_t vb_header;
-struct com_reg_data_t com_reg_data;
-struct reg_info_t reg_info;
-int marker,ptr;
-int t;
-int addr;
+  struct vb_header_t vb_header;
+  struct com_reg_data_t com_reg_data;
+  struct reg_info_t reg_info;
+  int marker,ptr;
+  int t;
+  int addr;
 
   marker = ftell(in);
   fseek(in, (image_optional_header->AddressOfEntryPoint - section_header->VirtualAddress) + section_header->PointerToRawData, SEEK_SET);
@@ -768,10 +770,10 @@ int read_debug_directory(FILE *in, struct debug_directory_t *debug_directory)
 
 int print_debug_directory(struct debug_directory_t *debug_directory)
 {
-char *debug_types[] = {
-  "Unknown", "COFF", "CODEVIEW", "FPO", "MISC", "EXCEPTION", "FIXUP",
-  "OMAP_TO_SRC", "OMAP_FROM_SRC", "BORLAND", "RESERVED10"
-};
+  char *debug_types[] = {
+    "Unknown", "COFF", "CODEVIEW", "FPO", "MISC", "EXCEPTION", "FIXUP",
+    "OMAP_TO_SRC", "OMAP_FROM_SRC", "BORLAND", "RESERVED10"
+  };
 
   printf("-- Debug Directory --\n");
   printf("   Characteristics: %d\n",debug_directory->Characteristics);
@@ -796,8 +798,8 @@ char *debug_types[] = {
 
 int print_debug_section(FILE *in, int addr, int size, struct section_header_t *section_header)
 {
-struct debug_directory_t debug_directory;
-int marker,t,p,r;
+  struct debug_directory_t debug_directory;
+  int marker,t,p,r;
 
   marker = ftell(in);
   fseek(in,addr,SEEK_SET);

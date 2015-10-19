@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2014 by Michael Kohn
+print_pe - Copyright 2005-2015 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -19,16 +19,16 @@ This code falls under the LGPL license.
 
 int main(int argc, char *argv[])
 {
-FILE *in,*out;
-struct dos_header_t dos_header;
-struct image_file_header_t image_file_header;
-struct image_optional_header_t image_optional_header;
-struct section_header_t section_header;
-uint8_t signature[4];
-char filename[64];
-char pe_filename[1024];
-struct funct_t funct;
-int t,len;
+  FILE *in,*out;
+  struct dos_header_t dos_header;
+  struct image_file_header_t image_file_header;
+  struct image_optional_header_t image_optional_header;
+  struct section_header_t section_header;
+  uint8_t signature[4];
+  char filename[64];
+  char pe_filename[1024];
+  struct funct_t funct;
+  int t,len;
 
   printf("\nprint_pe (December 21, 2014) - The DLL, EXE, OCX Analyzer\n");
   printf("Copyright 2005-2014 - Michael Kohn  http://www.mikekohn.net/\n\n");

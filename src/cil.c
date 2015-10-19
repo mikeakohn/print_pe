@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2014 by Michael Kohn
+print_pe - Copyright 2005-2015 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -20,7 +20,7 @@ This code falls under the LGPL license.
 
 void disasm_cil(uint8_t *buffer, int len)
 {
-int pc = 0;
+  int pc = 0;
 
   while(pc < len)
   {
@@ -271,7 +271,7 @@ int pc = 0;
 
 int read_clr_header(FILE *in, struct _clr_header *clr_header, int offset)
 {
-int marker;
+  int marker;
 
   marker = ftell(in);
   fseek(in, offset, SEEK_SET);
