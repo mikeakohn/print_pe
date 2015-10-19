@@ -17,6 +17,7 @@ This code falls under the LGPL license.
 #include "fileio.h"
 #include "pe.h"
 #include "pe_debug.h"
+#include "pe_resource.h"
 #include "pe_vb.h"
 
 int main(int argc, char *argv[])
@@ -32,7 +33,7 @@ int main(int argc, char *argv[])
   struct funct_t funct;
   int t,len;
 
-  printf("\nprint_pe (December 21, 2014) - The DLL, EXE, OCX Analyzer\n");
+  printf("\nprint_pe (October 20, 2015) - The DLL, EXE, OCX Analyzer\n");
   printf("Copyright 2005-2014 - Michael Kohn  http://www.mikekohn.net/\n\n");
 
   if (argc < 2)

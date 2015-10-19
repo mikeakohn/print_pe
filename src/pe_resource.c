@@ -15,7 +15,7 @@ This code falls under the LGPL license.
 #include <time.h>
 
 #include "fileio.h"
-#include "pe.h"
+#include "pe_resource.h"
 
 #define RES_INDENT_MAX 100
 #define RES_INDENT_UNIT 4
