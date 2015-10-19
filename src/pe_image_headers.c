@@ -34,7 +34,6 @@ char *dir_entries[] =
   "Import Address Table",
   "Delay Import",
   "COM descriptor",
-  ""
 };
 
 
@@ -248,36 +247,27 @@ int print_image_optional_header(struct image_optional_header_t *image_optional_h
   printf("       SizeOfImage: %d\n", image_optional_header->SizeOfImage);
   printf("     SizeOfHeaders: %d\n", image_optional_header->SizeOfHeaders);
   printf("          CheckSum: %d\n", image_optional_header->CheckSum);
-  printf("         Subsystem: %d ", image_optional_header->Subsystem);
 
-  const char *subsystem = "(Unknown)";
+  const char *subsystem;
 
-  if (image_optional_header->Subsystem == 1) { subsystem = "Native"; }
-    else
-  if (image_optional_header->Subsystem == 2) { subsystem = "GUI"; }
-    else
-  if (image_optional_header->Subsystem == 3) { subsystem = "Console"; }
-    else
-  if (image_optional_header->Subsystem == 5) { subsystem = "OS2 GUI"; }
-    else
-  if (image_optional_header->Subsystem == 7) { subsystem = "Posix Console"; }
-    else
-  if (image_optional_header->Subsystem == 9) { subsystem = "Windows CE GUI"; }
-    else
-  if (image_optional_header->Subsystem == 10) { subsystem = "EFI App"; }
-    else
-  if (image_optional_header->Subsystem == 11) { subsystem = "EFI Boot Service Driver"; }
-    else
-  if (image_optional_header->Subsystem == 12) { subsystem = "EFI Runtime Driver"; }
-    else
-  if (image_optional_header->Subsystem == 13) { subsystem = "EFI ROM"; }
-    else
-  if (image_optional_header->Subsystem == 14) { subsystem = "Xbox"; }
-    else
-  if (image_optional_header->Subsystem == 15) { subsystem = "Windows Boot Application"; }
+  switch(image_optional_header->Subsystem)
+  {
+    case 1: subsystem = "Native"; break;
+    case 2: subsystem = "GUI"; break;
+    case 3: subsystem = "Console"; break;
+    case 5: subsystem = "OS2 GUI"; break;
+    case 7: subsystem = "Posix Console"; break;
+    case 9: subsystem = "Windows CE GUI"; break;
+    case 10: subsystem = "EFI App"; break;
+    case 11: subsystem = "EFI Boot Service Driver"; break;
+    case 12: subsystem = "EFI Runtime Driver"; break;
+    case 13: subsystem = "EFI ROM"; break;
+    case 14: subsystem = "Xbox"; break;
+    case 15: subsystem = "Windows Boot Application"; break;
+    default: subsystem = "Unknown"; break;
+  }
 
-  printf("(%s)\n", subsystem);
-
+  printf("         Subsystem: %d (%s)\n", image_optional_header->Subsystem, subsystem);
   printf("DllCharacteristics: 0x%04x", image_optional_header->DllCharacteristics);
 
   if ((image_optional_header->DllCharacteristics & 1) != 0)
@@ -353,9 +343,20 @@ int print_image_optional_header(struct image_optional_header_t *image_optional_h
   if (image_optional_header->DataDirectoryCount != 0)
   { 
     printf("   Directory Description             VirtualAddr  Size\n");
-    for (t=0; t<image_optional_header->DataDirectoryCount*2; t=t+2)
+    for (t = 0; t < image_optional_header->DataDirectoryCount * 2; t = t + 2)
     {
-      printf("%2d %-33s 0x%08x   0x%08x (%d)\n",t >> 1, dir_entries[t >> 1],
+      const char *desc;
+
+      if ((t >> 1) < sizeof(dir_entries) / sizeof(char *))
+      {
+        desc = dir_entries[t >> 1];
+      }
+        else
+      {
+        desc = "";
+      }
+
+      printf("%2d %-33s 0x%08x   0x%08x (%d)\n",t >> 1, desc,
                                 image_optional_header->image_data_dir[t],
                                 image_optional_header->image_data_dir[t + 1],
                                 image_optional_header->image_data_dir[t + 1]);
