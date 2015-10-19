@@ -14,6 +14,12 @@ This code falls under the LGPL license.
 
 #include <stdint.h>
 
+struct directory_entry_t
+{
+  uint32_t virtual_address;
+  uint32_t size;
+};
+
 struct image_file_header_t
 {
   uint16_t Machine;
@@ -58,7 +64,8 @@ struct image_optional_header_t
   uint32_t LoaderFlags;
   uint32_t NumberOfRvaAndSizes;
   int DataDirectoryCount;
-  int image_data_dir[32];
+  //int image_data_dir[32];
+  struct directory_entry_t directory_entry[16];
 };
 
 int read_image_file_header(FILE *in, struct image_file_header_t *image_file_header);

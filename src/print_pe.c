@@ -140,30 +140,45 @@ int main(int argc, char *argv[])
       parse_resource_dir(in, &section_header, 0, 0, 0);
     }
 
-    if (image_optional_header.image_data_dir[3] != 0)
+    // Print imports
+    if (image_optional_header.directory_entry[1].size != 0)
     {
-      if (section_header.VirtualAddress <= image_optional_header.image_data_dir[2] &&
-          image_optional_header.image_data_dir[2] <= section_header.VirtualAddress+section_header.SizeOfRawData)
+      if (section_header.VirtualAddress <=
+          image_optional_header.directory_entry[1].virtual_address &&
+          image_optional_header.directory_entry[1].virtual_address <=
+             section_header.VirtualAddress + section_header.SizeOfRawData)
       {
-        print_imports(in, image_optional_header.image_data_dir[2], image_optional_header.image_data_dir[3], &section_header);
+        print_imports(
+          in,
+          image_optional_header.directory_entry[1].virtual_address,
+          image_optional_header.directory_entry[1].size,
+          &section_header);
       }
     }
 
-    if (image_optional_header.image_data_dir[1] != 0)
+    // Print exports
+    if (image_optional_header.directory_entry[0].size != 0)
     {
-      if (section_header.VirtualAddress <= image_optional_header.image_data_dir[0] &&
-          image_optional_header.image_data_dir[0] <= section_header.VirtualAddress+section_header.SizeOfRawData)
+      if (section_header.VirtualAddress <=
+          image_optional_header.directory_entry[0].virtual_address &&
+          image_optional_header.directory_entry[0].virtual_address <=
+          section_header.VirtualAddress + section_header.SizeOfRawData)
       {
-        print_exports(in, image_optional_header.image_data_dir[0], image_optional_header.image_data_dir[1], &section_header, &funct);
+        print_exports(
+          in,
+          image_optional_header.directory_entry[0].virtual_address,
+          image_optional_header.directory_entry[0].size,
+          &section_header,
+          &funct);
       }
     }
 
-    if (image_optional_header.image_data_dir[13] != 0)
+    if (image_optional_header.directory_entry[6].size!= 0)
     {
-      if (section_header.VirtualAddress <= image_optional_header.image_data_dir[12] &&
-          image_optional_header.image_data_dir[12] <= section_header.VirtualAddress+section_header.SizeOfRawData)
+      if (section_header.VirtualAddress <= image_optional_header.directory_entry[6].virtual_address &&
+          image_optional_header.directory_entry[6].virtual_address <= section_header.VirtualAddress+section_header.SizeOfRawData)
       {
-        print_debug_section(in, image_optional_header.image_data_dir[12], image_optional_header.image_data_dir[13], &section_header);
+        print_debug_section(in, image_optional_header.directory_entry[6].virtual_address, image_optional_header.directory_entry[6].size, &section_header);
       }
     }
   }

@@ -35,11 +35,11 @@ int print_vb_info(FILE *in, struct image_optional_header_t *image_optional_heade
   /* 0x68, 0x90, 0x5A */
   switch(ptr)
   {
-    case 0x5A: /* 0x5A = POP EDX, this means the file might be a VB DLL or OCX. */
+    case 0x5a: /* 0x5A = POP EDX, this means the file might be a VB DLL or OCX. */
 	    /* The pointer to the VB5! data stuff is in the first exported function. Usually DllCanUnloadNow()
 	     * Once we get to that address it turns into case 0x68 again. */
 	    /* Get the address to the export directory */
-	    addr = (image_optional_header->image_data_dir[0] - section_header->VirtualAddress) + section_header->PointerToRawData;
+	    addr = (image_optional_header->directory_entry[0].virtual_address - section_header->VirtualAddress) + section_header->PointerToRawData;
 	    /* ExportDirectory->AddressOfFunctions = addr+28; */
 	    addr = get_ptr(in, get_ptr(in,(addr + 28)));
 	    fseek(in, addr + 2, SEEK_SET); /* read past 0x58, 0x68 */

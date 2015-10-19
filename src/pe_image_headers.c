@@ -64,7 +64,7 @@ int read_image_optional_header(FILE *in, struct image_optional_header_t *image_o
   image_optional_header->BaseOfCode = read_uint32(in);
   image_optional_header->BaseOfData = read_uint32(in);
 
-  if (header_size<=28) return 0;
+  if (header_size <= 28) { return 0; }
 
   image_optional_header->ImageBase = read_uint32(in);
   image_optional_header->SectionAlignment = read_uint32(in);
@@ -88,12 +88,13 @@ int read_image_optional_header(FILE *in, struct image_optional_header_t *image_o
   image_optional_header->LoaderFlags = read_uint32(in);
   image_optional_header->NumberOfRvaAndSizes = read_uint32(in);
 
-  if (header_size>96)
+  if (header_size > 96)
   {
     image_optional_header->DataDirectoryCount = (header_size - 96) / 8;
-    for (t = 0; t < image_optional_header->DataDirectoryCount * 2; t++)
+    for (t = 0; t < image_optional_header->DataDirectoryCount; t++)
     {
-      image_optional_header->image_data_dir[t] = read_uint32(in);
+      image_optional_header->directory_entry[t].virtual_address = read_uint32(in);
+      image_optional_header->directory_entry[t].size = read_uint32(in);
     }
   }
 
@@ -343,23 +344,23 @@ int print_image_optional_header(struct image_optional_header_t *image_optional_h
   if (image_optional_header->DataDirectoryCount != 0)
   { 
     printf("   Directory Description             VirtualAddr  Size\n");
-    for (t = 0; t < image_optional_header->DataDirectoryCount * 2; t = t + 2)
+    for (t = 0; t < image_optional_header->DataDirectoryCount; t++)
     {
       const char *desc;
 
-      if ((t >> 1) < sizeof(dir_entries) / sizeof(char *))
+      if (t < sizeof(dir_entries) / sizeof(char *))
       {
-        desc = dir_entries[t >> 1];
+        desc = dir_entries[t];
       }
         else
       {
         desc = "";
       }
 
-      printf("%2d %-33s 0x%08x   0x%08x (%d)\n",t >> 1, desc,
-                                image_optional_header->image_data_dir[t],
-                                image_optional_header->image_data_dir[t + 1],
-                                image_optional_header->image_data_dir[t + 1]);
+      printf("%2d %-33s 0x%08x   0x%08x (%d)\n", t, desc,
+        image_optional_header->directory_entry[t].virtual_address,
+        image_optional_header->directory_entry[t].size,
+        image_optional_header->directory_entry[t].size);
     }
     if (t != 0) printf("\n");
   }
