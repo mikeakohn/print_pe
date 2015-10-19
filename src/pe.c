@@ -716,25 +716,25 @@ int read_reg_info(FILE *in, struct reg_info_t *reg_info, int offset)
 int print_reg_info(struct reg_info_t *reg_info)
 {
   printf("  -- COM Reg Info --\n");
-  printf("       bNextObject: %d\n",reg_info->bNextObject);
-  printf("       bObjectName: %d (%s)\n",reg_info->bObjectName,reg_info->szObjectName);
-  printf("bObjectDescription: %d\n",reg_info->bObjectDescription);
-  printf("      dwInstancing: %d\n",reg_info->dwInstancing);
-  printf("        dwObjectId: %d\n",reg_info->dwObjectId);
+  printf("       bNextObject: %d\n", reg_info->bNextObject);
+  printf("       bObjectName: %d (%s)\n", reg_info->bObjectName,reg_info->szObjectName);
+  printf("bObjectDescription: %d\n", reg_info->bObjectDescription);
+  printf("      dwInstancing: %d\n", reg_info->dwInstancing);
+  printf("        dwObjectId: %d\n", reg_info->dwObjectId);
   printf("        uuidObject: ");
   print_clsid(reg_info->uuidObject);
   printf("\n");
-  printf("      fIsInterface: %d\n",reg_info->fIsInterface);
-  printf("   bUidObjectIFace: %d\n",reg_info->bUidObjectIFace);
-  printf("   bUidEventsIFace: %d\n",reg_info->bUidEventsIFace);
-  printf("        fHasEvents: %d\n",reg_info->fHasEvents);
-  printf("      dwMiscStatus: %d\n",reg_info->dwMiscStatus);
-  printf("        fClassType: %d\n",reg_info->fClassType);
-  printf("       fObjectType: %d\n",reg_info->fObjectType);
-  printf("  wToolboxBitmap32: %d\n",reg_info->wToolboxBitmap32);
-  printf("      wDefaultIcon: %d\n",reg_info->wDefaultIcon);
-  printf("       fIsDesigner: %d\n",reg_info->fIsDesigner);
-  printf("     bDesignerData: %d\n",reg_info->bDesignerData);
+  printf("      fIsInterface: %d\n", reg_info->fIsInterface);
+  printf("   bUidObjectIFace: %d\n", reg_info->bUidObjectIFace);
+  printf("   bUidEventsIFace: %d\n", reg_info->bUidEventsIFace);
+  printf("        fHasEvents: %d\n", reg_info->fHasEvents);
+  printf("      dwMiscStatus: %d\n", reg_info->dwMiscStatus);
+  printf("        fClassType: %d\n", reg_info->fClassType);
+  printf("       fObjectType: %d\n", reg_info->fObjectType);
+  printf("  wToolboxBitmap32: %d\n", reg_info->wToolboxBitmap32);
+  printf("      wDefaultIcon: %d\n", reg_info->wDefaultIcon);
+  printf("       fIsDesigner: %d\n", reg_info->fIsDesigner);
+  printf("     bDesignerData: %d\n", reg_info->bDesignerData);
   printf("\n");
 
   return 0;
@@ -765,17 +765,17 @@ int read_com_reg_data(FILE *in, struct com_reg_data_t *com_reg_data, int offset)
 int print_com_reg_data(struct com_reg_data_t *com_reg_data)
 {
   printf("  -- COM Reg Data --\n");
-  printf("          bRegInfo: %d\n",com_reg_data->bRegInfo);
-  printf("    bSZProjectName: %d\n",com_reg_data->bSZProjectName);
-  printf("  bSZHelpDirectory: %d\n",com_reg_data->bSZHelpDirectory);
-  printf("bSZProjectDescrptn: %d\n",com_reg_data->bSZProjectDescription);
+  printf("          bRegInfo: %d\n", com_reg_data->bRegInfo);
+  printf("    bSZProjectName: %d\n", com_reg_data->bSZProjectName);
+  printf("  bSZHelpDirectory: %d\n", com_reg_data->bSZHelpDirectory);
+  printf("bSZProjectDescrptn: %d\n", com_reg_data->bSZProjectDescription);
   printf("  uuidProjectClsId: ");
   print_clsid(com_reg_data->uuidProjectClsId);
   printf("\n");
-  printf("         dwTlbLcid: %d\n",com_reg_data->dwTlbLcid);
-  printf("          wUnknown: %d\n",com_reg_data->wUnknown);
-  printf("      wTlbVerMajor: %d\n",com_reg_data->wTlbVerMajor);
-  printf("      wTlbVerMinor: %d\n",com_reg_data->wTlbVerMinor);
+  printf("         dwTlbLcid: %d\n", com_reg_data->dwTlbLcid);
+  printf("          wUnknown: %d\n", com_reg_data->wUnknown);
+  printf("      wTlbVerMajor: %d\n", com_reg_data->wTlbVerMajor);
+  printf("      wTlbVerMinor: %d\n", com_reg_data->wTlbVerMinor);
   printf("\n");
 
   return 0;
@@ -862,18 +862,18 @@ int print_vb_info(FILE *in, struct image_optional_header_t *image_optional_heade
   vb_header.bSzProjectName = read_uint32(in);
 
   printf("  -- VB Header --\n");
-  printf("         szVbMagic: %s\n",vb_header.szVbMagic);
-  printf("     wRuntimeBuild: %d\n",vb_header.wRuntimeBuild);
-  printf("         szLangDll: %s\n",vb_header.szLangDll);
-  printf("      szSecLangDll: %s\n",vb_header.szSecLangDll);
-  printf("  wRuntimeRevision: %d\n",vb_header.wRuntimeRevision);
-  printf("            dwLCID: %d\n",vb_header.dwLCID);
-  printf("         dwSecLCID: %d\n",vb_header.dwSecLCID);
-  printf("         lpSubMain: %d\n",vb_header.lpSubMain);
-  printf("     lpProjectData: %d\n",vb_header.lpProjectData);
-  printf("       fMdlIntCtls: 0x%08x\n",vb_header.fMdlIntCtls);
-  printf("      fMdlIntCtls2: 0x%08x\n",vb_header.fMdlIntCtls2);
-  printf("     dwThreadFlags: %d",vb_header.dwThreadFlags);
+  printf("         szVbMagic: %s\n", vb_header.szVbMagic);
+  printf("     wRuntimeBuild: %d\n", vb_header.wRuntimeBuild);
+  printf("         szLangDll: %s\n", vb_header.szLangDll);
+  printf("      szSecLangDll: %s\n", vb_header.szSecLangDll);
+  printf("  wRuntimeRevision: %d\n", vb_header.wRuntimeRevision);
+  printf("            dwLCID: %d\n", vb_header.dwLCID);
+  printf("         dwSecLCID: %d\n", vb_header.dwSecLCID);
+  printf("         lpSubMain: %d\n", vb_header.lpSubMain);
+  printf("     lpProjectData: %d\n", vb_header.lpProjectData);
+  printf("       fMdlIntCtls: 0x%08x\n", vb_header.fMdlIntCtls);
+  printf("      fMdlIntCtls2: 0x%08x\n", vb_header.fMdlIntCtls2);
+  printf("     dwThreadFlags: %d", vb_header.dwThreadFlags);
   printf(" (");
   if ((vb_header.dwThreadFlags & 1) == 1) printf(" ApartmentModel");
   if ((vb_header.dwThreadFlags & 2) == 2) printf(" RequireLicense");
@@ -881,14 +881,14 @@ int print_vb_info(FILE *in, struct image_optional_header_t *image_optional_heade
   if ((vb_header.dwThreadFlags & 8) == 8) printf(" SingleThreaded");
   if ((vb_header.dwThreadFlags & 16) == 16) printf(" Retained");
   printf(" )\n");
-  printf("     dwThreadCount: %d\n",vb_header.dwThreadCount);
-  printf("        wFormCount: %d\n",vb_header.wFormCount);
-  printf("    wExternalCount: %d\n",vb_header.wExternalCount);
-  printf("      dwThunkCount: %d\n",vb_header.dwThunkCount);
-  printf("        lpGuiTable: %d\n",vb_header.lpGuiTable);
-  printf("   lpExternalTable: %d\n",vb_header.lpExternalTable);
-  printf(" lpComRegisterData: %d\n",vb_header.lpComRegisterData);
-  printf("    bSzProjectDesc: %d (",vb_header.bSzProjectDescription);
+  printf("     dwThreadCount: %d\n", vb_header.dwThreadCount);
+  printf("        wFormCount: %d\n", vb_header.wFormCount);
+  printf("    wExternalCount: %d\n", vb_header.wExternalCount);
+  printf("      dwThunkCount: %d\n", vb_header.dwThunkCount);
+  printf("        lpGuiTable: %d\n", vb_header.lpGuiTable);
+  printf("   lpExternalTable: %d\n", vb_header.lpExternalTable);
+  printf(" lpComRegisterData: %d\n", vb_header.lpComRegisterData);
+  printf("    bSzProjectDesc: %d (", vb_header.bSzProjectDescription);
   print_string(in, ((vb_header.bSzProjectDescription+ptr)-section_header->VirtualAddress)+section_header->PointerToRawData);
   printf(")\n");
   printf(" bSzProjectExeName: %d (",vb_header.bSzProjectExeName);
@@ -925,91 +925,4 @@ int print_vb_info(FILE *in, struct image_optional_header_t *image_optional_heade
 
   return 0;
 }
-
-int read_debug_directory(FILE *in, struct debug_directory_t *debug_directory)
-{
-  debug_directory->Characteristics = read_uint32(in);
-  debug_directory->TimeDateStamp = read_uint32(in);
-  debug_directory->MajorVersion = read_uint16(in);
-  debug_directory->MinorVersion = read_uint16(in);
-  debug_directory->Type = read_uint32(in);
-  debug_directory->SizeOfData = read_uint32(in);
-  debug_directory->AddressOfRawData = read_uint32(in);
-  debug_directory->PointerToRawData = read_uint32(in);
-
-  return 0;
-}
-
-int print_debug_directory(struct debug_directory_t *debug_directory)
-{
-  char *debug_types[] = {
-    "Unknown", "COFF", "CODEVIEW", "FPO", "MISC", "EXCEPTION", "FIXUP",
-    "OMAP_TO_SRC", "OMAP_FROM_SRC", "BORLAND", "RESERVED10"
-  };
-
-  printf("-- Debug Directory --\n");
-  printf("   Characteristics: %d\n",debug_directory->Characteristics);
-  printf("     TimeDateStamp: %s",ctime((time_t *)&debug_directory->TimeDateStamp));
-  printf("      MajorVersion: %d\n",debug_directory->MajorVersion);
-  printf("      MinorVersion: %d\n",debug_directory->MinorVersion);
-  printf("              Type: %d (",debug_directory->Type);
-
-  if (debug_directory->Type < 11)
-  { printf("%s", debug_types[debug_directory->Type]); }
-    else
-  { printf("???"); }
-
-  printf(")\n");
-  printf("        SizeOfData: %d\n",debug_directory->SizeOfData);
-  printf("  AddressOfRawData: %d\n",debug_directory->AddressOfRawData);
-  printf("  PointerToRawData: %d\n",debug_directory->PointerToRawData);
-  printf("\n");
-
-  return 0;
-}
-
-int print_debug_section(FILE *in, int addr, int size, struct section_header_t *section_header)
-{
-  struct debug_directory_t debug_directory;
-  int marker,t,p,r;
-
-  marker = ftell(in);
-  fseek(in,addr,SEEK_SET);
-
-  t = 0;
-  while (t < size)
-  {
-    read_debug_directory(in, &debug_directory);
-    print_debug_directory(&debug_directory);
-
-    if (debug_directory.Type == 2)
-    {
-      p = ftell(in);
-      fseek(in, debug_directory.PointerToRawData, SEEK_SET);
-      printf("Unknown Header: ");
-      for (r = 0; r < 4; r++)
-      {
-        printf("%08x ", read_uint32(in));
-      }
-      printf("\n");
-      printf("Debug Filename: ");
-
-      while(1)
-      {
-        r = getc(in);
-        if (r == 0) break;
-        printf("%c", r);
-      }
-      printf("\n\n");
-      fseek(in, p, SEEK_SET);
-    }
-    // rip_binary(in, "debug.bin", debug_directory.PointerToRawData, debug_directory.SizeOfData);
-    t = t + 28;
-  }
-
-  fseek(in, marker, SEEK_SET);
-
-  return 0;
-}
-
 

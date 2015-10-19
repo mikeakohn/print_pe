@@ -227,18 +227,6 @@ struct reg_info_t
   uint8_t szObjectName[1024];
 };
 
-struct debug_directory_t
-{
-  uint32_t Characteristics;
-  uint32_t TimeDateStamp;
-  uint16_t MajorVersion;
-  uint16_t MinorVersion;
-  uint32_t Type;
-  uint32_t SizeOfData;
-  uint32_t AddressOfRawData;
-  uint32_t PointerToRawData;
-};
-
 int read_dos_header(FILE *in, struct dos_header_t *dos_header);
 int print_dos_header(struct dos_header_t *dos_header);
 
@@ -253,7 +241,6 @@ int print_section_header(struct section_header_t *section_header,int count);
 
 int print_imports(FILE *in, int addr, int size, struct section_header_t *section_header);
 int print_exports(FILE *in, int addr, int size, struct section_header_t *section_header, struct funct_t *funct);
-int print_debug_section(FILE *in, int addr, int size, struct section_header_t *section_header);
 
 int print_vb_info(FILE *in, struct image_optional_header_t *image_optional_header, struct section_header_t *section_header);
 

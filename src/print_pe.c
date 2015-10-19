@@ -16,6 +16,7 @@ This code falls under the LGPL license.
 #include "cil.h"
 #include "fileio.h"
 #include "pe.h"
+#include "pe_debug.h"
 
 int main(int argc, char *argv[])
 {
