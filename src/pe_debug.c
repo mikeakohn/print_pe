@@ -15,7 +15,6 @@ This code falls under the LGPL license.
 #include <string.h>
 
 #include "fileio.h"
-#include "pe.h"
 #include "pe_debug.h"
 
 int read_debug_directory(FILE *in, struct debug_directory_t *debug_directory)

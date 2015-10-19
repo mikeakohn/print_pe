@@ -14,7 +14,7 @@ This code falls under the LGPL license.
 
 #include <stdint.h>
 
-#include "pe.h"
+#include "pe_section_headers.h"
 
 struct debug_directory_t
 {

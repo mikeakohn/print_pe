@@ -18,6 +18,8 @@ This code falls under the LGPL license.
 #include "fileio.h"
 #include "pe.h"
 #include "pe_debug.h"
+#include "pe_exports.h"
+#include "pe_imports.h"
 #include "pe_resource.h"
 #include "pe_vb.h"
 

@@ -14,8 +14,8 @@ This code falls under the LGPL license.
 
 #include <stdint.h>
 
-#include "pe.h"
 #include "pe_image_headers.h"
+#include "pe_section_headers.h"
 
 struct vb_header_t
 {
