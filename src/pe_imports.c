@@ -98,7 +98,7 @@ int pe_imports_find(FILE *in, int address, int size, struct section_header_t *se
   int total_size;
   uint32_t virtual_address, raw_ptr;
   int func_addr;
-  int t,ptr;
+  int t, ptr;
 
   virtual_address = section_header->VirtualAddress;
   raw_ptr = section_header->PointerToRawData;
@@ -126,7 +126,12 @@ int pe_imports_find(FILE *in, int address, int size, struct section_header_t *se
 
       ptr = get_ptr(in, (import_dir.FunctionNameList - virtual_address) + raw_ptr + t);
       get_string(in, name, (ptr - virtual_address) + raw_ptr + 2);
-      if (strcmp(name, search_name) == 0) { return 1; }
+
+      if (strcmp(name, search_name) == 0)
+      {
+        fseek(in, marker, SEEK_SET);
+        return 1;
+      }
 
       t = t + 4;
     }

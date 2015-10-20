@@ -188,34 +188,38 @@ int main(int argc, char *argv[])
       }
     }
 
-    int is_dot_net = pe_imports_find(
-      in,
-      image_optional_header.directory_entry[1].virtual_address,
-      image_optional_header.directory_entry[1].size,
-      &section_header,
-      "_CorExeMain");
-
     // COM Desc section
-    if (is_dot_net == 1 && image_optional_header.directory_entry[14].size != 0)
+    if (image_optional_header.directory_entry[14].size != 0)
     {
       if (section_header.VirtualAddress <=
           image_optional_header.directory_entry[14].virtual_address &&
           image_optional_header.directory_entry[14].virtual_address <=
           section_header.VirtualAddress + section_header.SizeOfRawData)
       {
-        printf("---------------------------------------------\n");
-        printf("COM Descriptor\n");
-        printf("---------------------------------------------\n");
 
-        hex_dump(
+        int is_dot_net = pe_imports_find(
           in,
-          image_optional_header.directory_entry[14].virtual_address,
-          image_optional_header.directory_entry[14].size,
-          &section_header);
+          image_optional_header.directory_entry[1].virtual_address,
+          image_optional_header.directory_entry[1].size,
+          &section_header,
+          "_CorExeMain");
 
-        struct _clr_header clr_header;
-        read_clr_header(in, &clr_header, image_optional_header.directory_entry[14].virtual_address, image_optional_header.directory_entry[14].size, &section_header);
-        print_clr_header(&clr_header);
+        if (is_dot_net == 1)
+        {
+          printf("---------------------------------------------\n");
+          printf("COM Descriptor\n");
+          printf("---------------------------------------------\n");
+
+          hex_dump(
+            in,
+            image_optional_header.directory_entry[14].virtual_address,
+            image_optional_header.directory_entry[14].size,
+            &section_header);
+
+          struct _clr_header clr_header;
+          read_clr_header(in, &clr_header, image_optional_header.directory_entry[14].virtual_address, image_optional_header.directory_entry[14].size, &section_header);
+          print_clr_header(&clr_header);
+        }
       }
     }
   }
