@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2014 by Michael Kohn
+print_pe - Copyright 2005-2015 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -15,7 +15,7 @@ This code falls under the LGPL license.
 #include <time.h>
 
 #include "fileio.h"
-#include "pe.h"
+#include "pe_resource.h"
 
 #define RES_INDENT_MAX 100
 #define RES_INDENT_UNIT 4
@@ -46,9 +46,9 @@ Resource Types:
 
 int parse_string_file_info(FILE *in)
 {
-int wLength,wValueLength,wType;
-int len;
-int ch,t;
+  int wLength,wValueLength,wType;
+  int len;
+  int ch,t;
 
   /* wValueLength is WRONG if it's a string and VB6 created this file..
      good job on quality control Microsoft.
@@ -60,9 +60,9 @@ int ch,t;
   len = 6;
 
 /*
-printf("wLength=%d\n",wLength);
-printf("wValueLength=%d\n",wValueLength);
-printf("wType=%d\n",wType);
+printf("wLength=%d\n", wLength);
+printf("wValueLength=%d\n", wValueLength);
+printf("wType=%d\n", wType);
 */
 
   if (wType != 1)
@@ -116,9 +116,9 @@ printf("wType=%d\n",wType);
 
 int parse_version_info(FILE *in, long offset, int size)
 {
-long marker;
-int wLength;
-int len;
+  long marker;
+  int wLength;
+  int len;
 
   marker = ftell(in);
   fseek(in, offset, SEEK_SET);
@@ -139,11 +139,11 @@ int len;
 
 int parse_resource_dir(FILE *in, struct section_header_t *section_header, int offset, int level, int res_type)
 {
-struct resource_dir_t resource_dir;
-struct resource_dir_entry_t resource_dir_entry;
-struct resource_data_t resource_data;
-int count,t;
-char filename[256];
+  struct resource_dir_t resource_dir;
+  struct resource_dir_entry_t resource_dir_entry;
+  struct resource_data_t resource_data;
+  int count,t;
+  char filename[256];
 
   read_resource_dir(in, section_header->PointerToRawData + offset, &resource_dir);
   print_resource_dir(&resource_dir, level);
@@ -193,7 +193,7 @@ char filename[256];
 
 int read_resource_dir(FILE *in, int addr, struct resource_dir_t *resource_dir)
 {
-int marker;
+  int marker;
 
   marker = ftell(in);
   fseek(in,addr,SEEK_SET);
@@ -211,8 +211,8 @@ int marker;
 
 int save_resource(FILE *in, char *filename, int addr)
 {
-int marker;
-unsigned OffsetToData,Size;
+  int marker;
+  unsigned OffsetToData,Size;
 
   marker = ftell(in);
   fseek(in, addr, SEEK_SET);
@@ -249,7 +249,7 @@ int marker;
 
 int read_resource_data(FILE *in, int addr, struct resource_data_t *resource_data, int offset)
 {
-int marker;
+  long marker;
 
   marker = ftell(in);
   fseek(in, addr + offset, SEEK_SET);
@@ -266,7 +266,7 @@ int marker;
 
 int print_resource_dir_entry(struct resource_dir_entry_t *resource_dir_entry, int level)
 {
-char indent[RES_INDENT_MAX];
+  char indent[RES_INDENT_MAX];
 
   memset(indent, ' ', RES_INDENT_MAX);
   if (level > RES_INDENT_LEVELS) level = RES_INDENT_LEVELS;
@@ -291,7 +291,7 @@ char indent[RES_INDENT_MAX];
 
 int print_resource_dir(struct resource_dir_t *resource_dir, int level)
 {
-char indent[RES_INDENT_MAX];
+  char indent[RES_INDENT_MAX];
 
   memset(indent, ' ', RES_INDENT_MAX);
   if (level > RES_INDENT_LEVELS) level = RES_INDENT_LEVELS;
@@ -312,13 +312,13 @@ char indent[RES_INDENT_MAX];
 
 int print_resource_type(int id, int level)
 {
-char indent[RES_INDENT_MAX];
-char *ids[] = {
-  "", "Cursor", "Bitmap", "Icon", "Menu", "Dialog", "String",
-  "Font Dir", "Font", "Accelerator", "RCData", "MessageTable",
-  "", "", "", "", "Version Info", "DlgInclude", "", "PlugPlay",
-  "VXD", "AniCursor", "AniIcon", "HTML", "Unknown"
-};
+  char indent[RES_INDENT_MAX];
+  char *ids[] = {
+    "", "Cursor", "Bitmap", "Icon", "Menu", "Dialog", "String",
+    "Font Dir", "Font", "Accelerator", "RCData", "MessageTable",
+    "", "", "", "", "Version Info", "DlgInclude", "", "PlugPlay",
+    "VXD", "AniCursor", "AniIcon", "HTML", "Unknown"
+  };
 
   memset(indent, ' ', RES_INDENT_MAX);
   if (level > RES_INDENT_LEVELS) level = RES_INDENT_LEVELS;
@@ -336,7 +336,7 @@ char *ids[] = {
 
 int print_resource_data(struct resource_data_t *resource_data, int level)
 {
-char indent[RES_INDENT_MAX];
+  char indent[RES_INDENT_MAX];
 
   memset(indent, ' ', RES_INDENT_MAX);
   if (level > RES_INDENT_LEVELS) level = RES_INDENT_LEVELS;

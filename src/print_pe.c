@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2014 by Michael Kohn
+print_pe - Copyright 2005-2015 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -14,23 +14,29 @@ This code falls under the LGPL license.
 #include <string.h>
 
 #include "cil.h"
+#include "dos.h"
 #include "fileio.h"
 #include "pe.h"
+#include "pe_debug.h"
+#include "pe_exports.h"
+#include "pe_imports.h"
+#include "pe_resource.h"
+#include "pe_vb.h"
 
 int main(int argc, char *argv[])
 {
-FILE *in,*out;
-struct dos_header_t dos_header;
-struct image_file_header_t image_file_header;
-struct image_optional_header_t image_optional_header;
-struct section_header_t section_header;
-uint8_t signature[4];
-char filename[64];
-char pe_filename[1024];
-struct funct_t funct;
-int t,len;
+  FILE *in,*out;
+  struct dos_header_t dos_header;
+  struct image_file_header_t image_file_header;
+  struct image_optional_header_t image_optional_header;
+  struct section_header_t section_header;
+  uint8_t signature[4];
+  char filename[64];
+  char pe_filename[1024];
+  struct funct_t funct;
+  int t,len;
 
-  printf("\nprint_pe (December 21, 2014) - The DLL, EXE, OCX Analyzer\n");
+  printf("\nprint_pe (October 20, 2015) - The DLL, EXE, OCX Analyzer\n");
   printf("Copyright 2005-2014 - Michael Kohn  http://www.mikekohn.net/\n\n");
 
   if (argc < 2)
@@ -124,8 +130,7 @@ int t,len;
     if ((section_header.Characteristics & 0x20) != 0)
     {
       sprintf(filename, "win_code_%d.bin", t);
-      rip_binary(in, filename,section_header.PointerToRawData, section_header.SizeOfRawData);
-      //i = print_vb_info(in, &image_optional_header, &section_header);
+      rip_binary(in, filename, section_header.PointerToRawData, section_header.SizeOfRawData);
       print_vb_info(in, &image_optional_header, &section_header);
     }
       else
@@ -134,30 +139,68 @@ int t,len;
       parse_resource_dir(in, &section_header, 0, 0, 0);
     }
 
-    if (image_optional_header.image_data_dir[3] != 0)
+    // Print imports
+    if (image_optional_header.directory_entry[1].size != 0)
     {
-      if (section_header.VirtualAddress <= image_optional_header.image_data_dir[2] &&
-          image_optional_header.image_data_dir[2] <= section_header.VirtualAddress+section_header.SizeOfRawData)
+      if (section_header.VirtualAddress <=
+          image_optional_header.directory_entry[1].virtual_address &&
+          image_optional_header.directory_entry[1].virtual_address <=
+             section_header.VirtualAddress + section_header.SizeOfRawData)
       {
-        print_imports(in, image_optional_header.image_data_dir[2], image_optional_header.image_data_dir[3], &section_header);
+        print_imports(
+          in,
+          image_optional_header.directory_entry[1].virtual_address,
+          image_optional_header.directory_entry[1].size,
+          &section_header);
       }
     }
 
-    if (image_optional_header.image_data_dir[1] != 0)
+    // Print exports
+    if (image_optional_header.directory_entry[0].size != 0)
     {
-      if (section_header.VirtualAddress <= image_optional_header.image_data_dir[0] &&
-          image_optional_header.image_data_dir[0] <= section_header.VirtualAddress+section_header.SizeOfRawData)
+      if (section_header.VirtualAddress <=
+          image_optional_header.directory_entry[0].virtual_address &&
+          image_optional_header.directory_entry[0].virtual_address <=
+          section_header.VirtualAddress + section_header.SizeOfRawData)
       {
-        print_exports(in, image_optional_header.image_data_dir[0], image_optional_header.image_data_dir[1], &section_header, &funct);
+        print_exports(
+          in,
+          image_optional_header.directory_entry[0].virtual_address,
+          image_optional_header.directory_entry[0].size,
+          &section_header,
+          &funct);
       }
     }
 
-    if (image_optional_header.image_data_dir[13] != 0)
+    // Debug section
+    if (image_optional_header.directory_entry[6].size!= 0)
     {
-      if (section_header.VirtualAddress <= image_optional_header.image_data_dir[12] &&
-          image_optional_header.image_data_dir[12] <= section_header.VirtualAddress+section_header.SizeOfRawData)
+      if (section_header.VirtualAddress <=
+          image_optional_header.directory_entry[6].virtual_address &&
+          image_optional_header.directory_entry[6].virtual_address <=
+          section_header.VirtualAddress + section_header.SizeOfRawData)
       {
-        print_debug_section(in, image_optional_header.image_data_dir[12], image_optional_header.image_data_dir[13], &section_header);
+        print_debug_section(
+          in,
+          image_optional_header.directory_entry[6].virtual_address,
+          image_optional_header.directory_entry[6].size,
+          &section_header);
+      }
+    }
+
+    // COM Desc section
+    if (image_optional_header.directory_entry[14].size!= 0)
+    {
+      if (section_header.VirtualAddress <=
+          image_optional_header.directory_entry[14].virtual_address &&
+          image_optional_header.directory_entry[14].virtual_address <=
+          section_header.VirtualAddress + section_header.SizeOfRawData)
+      {
+        hex_dump(
+          in,
+          image_optional_header.directory_entry[14].virtual_address,
+          image_optional_header.directory_entry[14].size,
+          &section_header);
       }
     }
   }
