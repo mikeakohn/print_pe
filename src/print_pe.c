@@ -203,6 +203,10 @@ int main(int argc, char *argv[])
           image_optional_header.directory_entry[14].virtual_address <=
           section_header.VirtualAddress + section_header.SizeOfRawData)
       {
+        printf("---------------------------------------------\n");
+        printf("COM Descriptor\n");
+        printf("---------------------------------------------\n");
+
         hex_dump(
           in,
           image_optional_header.directory_entry[14].virtual_address,
