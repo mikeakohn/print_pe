@@ -34,7 +34,7 @@ To change a function called blah in file.dll to always return the value 100:
 
 ./print_pe -modify blah 100 file.dll
 
-Highly recommended you make a backup of the DLL since it will overwrite
+Highly recommended to make a backup of the DLL since it will overwrite
 code that is already there.
 
 
