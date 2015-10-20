@@ -25,7 +25,8 @@ struct import_dir_t
   uint32_t FunctionAddressList;
 };
 
-int print_imports(FILE *in, int addr, int size, struct section_header_t *section_header);
+int pe_imports_print(FILE *in, int addr, int size, struct section_header_t *section_header);
+int pe_imports_find(FILE *in, int address, int size, struct section_header_t *section_header, const char *search_name);
 
 #endif
 
