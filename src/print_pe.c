@@ -212,6 +212,10 @@ int main(int argc, char *argv[])
           image_optional_header.directory_entry[14].virtual_address,
           image_optional_header.directory_entry[14].size,
           &section_header);
+
+        struct _clr_header clr_header;
+        read_clr_header(in, &clr_header, image_optional_header.directory_entry[14].virtual_address, image_optional_header.directory_entry[14].size, &section_header);
+        print_clr_header(&clr_header);
       }
     }
   }

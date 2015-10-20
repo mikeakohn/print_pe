@@ -269,12 +269,18 @@ void disasm_cil(uint8_t *buffer, int len)
   }
 }
 
-int read_clr_header(FILE *in, struct _clr_header *clr_header, int offset)
+int read_clr_header(FILE *in, struct _clr_header *clr_header, int address, int size, struct section_header_t *section_header)
 {
-  int marker;
+  long marker;
+  uint32_t virtual_address, raw_ptr;
+
+  virtual_address = section_header->VirtualAddress;
+  raw_ptr = section_header->PointerToRawData;
+
+  address = (address - virtual_address) + raw_ptr;
 
   marker = ftell(in);
-  fseek(in, offset, SEEK_SET);
+  fseek(in, address, SEEK_SET);
 
   clr_header->header_size = read_uint32(in);
   clr_header->major_runtime_version = read_uint16(in);

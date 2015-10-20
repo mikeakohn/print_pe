@@ -14,6 +14,8 @@ This code falls under the LGPL license.
 
 #include <stdint.h>
 
+#include "pe_section_headers.h"
+
 struct _clr_header
 {
   uint32_t header_size;
@@ -45,7 +47,7 @@ struct _code_section
 };
 
 void disasm_cil(uint8_t *buffer, int len);
-int read_clr_header(FILE *in, struct _clr_header *clr_header, int offset);
+int read_clr_header(FILE *in, struct _clr_header *clr_header, int address, int size, struct section_header_t *section_header);
 void print_clr_header(struct _clr_header *clr_header);
 
 #endif

@@ -71,7 +71,9 @@ int pe_imports_print(FILE *in, int address, int size, struct section_header_t *s
     while(1)
     {
       func_addr = get_ptr(in, (import_dir.FunctionAddressList - virtual_address) + raw_ptr + t);
-      if (func_addr == 0) break;
+
+      if (func_addr == 0) { break; }
+
       ptr = get_ptr(in, (import_dir.FunctionNameList - virtual_address) + raw_ptr + t);
       get_string(in, name, (ptr - virtual_address) + raw_ptr + 2);
       printf("     %-30s  0x%08x\n", name, func_addr);
@@ -112,14 +114,16 @@ int pe_imports_find(FILE *in, int address, int size, struct section_header_t *se
   {
     pe_imports_dir_read(in, &import_dir);
 
-    if (import_dir.FunctionNameList == 0) break;
+    if (import_dir.FunctionNameList == 0) { break; }
 
     t = 0;
 
     while(1)
     {
       func_addr = get_ptr(in, (import_dir.FunctionAddressList - virtual_address) + raw_ptr + t);
-      if (func_addr == 0) break;
+
+      if (func_addr == 0) { break; }
+
       ptr = get_ptr(in, (import_dir.FunctionNameList - virtual_address) + raw_ptr + t);
       get_string(in, name, (ptr - virtual_address) + raw_ptr + 2);
       if (strcmp(name, search_name) == 0) { return 1; }
