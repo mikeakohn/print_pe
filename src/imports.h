@@ -9,8 +9,8 @@ This code falls under the LGPL license.
 
 */
 
-#ifndef PE_IMPORTS_H
-#define PE_IMPORTS_H
+#ifndef IMPORTS_H
+#define IMPORTS_H
 
 #include <stdint.h>
 
@@ -25,13 +25,13 @@ struct import_dir_t
   uint32_t FunctionAddressList;
 };
 
-int pe_imports_print(
+int imports_print(
   FILE *in,
   int addr,
   int size,
   struct section_header_t *section_header);
 
-int pe_imports_find(
+int imports_find(
   FILE *in,
   int address,
   int size,

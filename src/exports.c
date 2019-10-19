@@ -15,9 +15,9 @@ This code falls under the LGPL license.
 #include <string.h>
 
 #include "fileio.h"
-#include "pe_exports.h"
+#include "exports.h"
 
-int print_exports(
+int exports_print(
   FILE *in,
   int addr,
   int size,
@@ -89,6 +89,7 @@ int print_exports(
   printf("\n");
 
   fseek(in, marker, SEEK_SET);
+
   return 0;
 }
 

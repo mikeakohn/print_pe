@@ -15,12 +15,12 @@ This code falls under the LGPL license.
 
 #include "cil.h"
 #include "dos.h"
+#include "exports.h"
 #include "file_header.h"
 #include "fileio.h"
+#include "imports.h"
 #include "pe.h"
 #include "pe_debug.h"
-#include "pe_exports.h"
-#include "pe_imports.h"
 #include "pe_vb.h"
 #include "resource.h"
 
@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
           optional_header.directory_entry[1].virtual_address <=
              section_header.VirtualAddress + section_header.SizeOfRawData)
       {
-        pe_imports_print(
+        imports_print(
           in,
           optional_header.directory_entry[1].virtual_address,
           optional_header.directory_entry[1].size,
@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
           optional_header.directory_entry[0].virtual_address <=
           section_header.VirtualAddress + section_header.SizeOfRawData)
       {
-        print_exports(
+        exports_print(
           in,
           optional_header.directory_entry[0].virtual_address,
           optional_header.directory_entry[0].size,
@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
           section_header.VirtualAddress + section_header.SizeOfRawData)
       {
 
-        int is_dot_net = pe_imports_find(
+        int is_dot_net = imports_find(
           in,
           optional_header.directory_entry[1].virtual_address,
           optional_header.directory_entry[1].size,

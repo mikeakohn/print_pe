@@ -9,8 +9,8 @@ This code falls under the LGPL license.
 
 */
 
-#ifndef PE_EXPORTS_H
-#define PE_EXPORTS_H
+#ifndef EXPORTS_H
+#define EXPORTS_H
 
 #include <stdint.h>
 
@@ -39,7 +39,7 @@ struct export_dir_t
   uint32_t AddressOfNameOrdinals;
 };
 
-int print_exports(
+int exports_print(
   FILE *in,
   int addr,
   int size,

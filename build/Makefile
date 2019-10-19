@@ -9,14 +9,14 @@ OBJECTS= \
   cil.o \
   clsid.o \
   dos.o \
+  exports.o \
   file_header.o \
   fileio.o \
+  imports.o \
   optional_header.o \
   pe.o \
   pe_com.o \
   pe_debug.o \
-  pe_exports.o \
-  pe_imports.o \
   pe_vb.o \
   resource.o \
   section_header.o \

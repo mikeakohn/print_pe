@@ -15,9 +15,9 @@ This code falls under the LGPL license.
 #include <string.h>
 
 #include "fileio.h"
-#include "pe_imports.h"
+#include "imports.h"
 
-static int pe_imports_dir_read(FILE *in, struct import_dir_t *import_dir)
+static int import_dir_read(struct import_dir_t *import_dir, FILE *in)
 {
   import_dir->FunctionNameList = read_uint32(in);
   import_dir->TimeDateStamp = read_uint32(in);
@@ -28,7 +28,7 @@ static int pe_imports_dir_read(FILE *in, struct import_dir_t *import_dir)
   return 0;
 }
 
-int pe_imports_print(FILE *in, int address, int size, struct section_header_t *section_header)
+int imports_print(FILE *in, int address, int size, struct section_header_t *section_header)
 {
   struct import_dir_t import_dir;
   char name[1024];
@@ -52,7 +52,7 @@ int pe_imports_print(FILE *in, int address, int size, struct section_header_t *s
 
   while(total_size < size)
   {
-    pe_imports_dir_read(in, &import_dir);
+    import_dir_read(&import_dir, in);
 
     if (import_dir.FunctionNameList == 0) break;
 
@@ -90,7 +90,12 @@ int pe_imports_print(FILE *in, int address, int size, struct section_header_t *s
   return 0;
 }
 
-int pe_imports_find(FILE *in, int address, int size, struct section_header_t *section_header, const char *search_name)
+int imports_find(
+  FILE *in,
+  int address,
+  int size,
+  struct section_header_t *section_header,
+  const char *search_name)
 {
   struct import_dir_t import_dir;
   char name[1024];
@@ -112,7 +117,7 @@ int pe_imports_find(FILE *in, int address, int size, struct section_header_t *se
 
   while(total_size < size)
   {
-    pe_imports_dir_read(in, &import_dir);
+    import_dir_read(&import_dir, in);
 
     if (import_dir.FunctionNameList == 0) { break; }
 
