@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2015 by Michael Kohn
+print_pe - Copyright 2005-2019 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -13,15 +13,30 @@ This code falls under the LGPL license.
 #include <stdlib.h>
 #include <stdint.h>
 
+uint64_t read_uint64(FILE *in)
+{
+  uint64_t c;
+
+  c = (uint64_t)getc(in);
+  c |= (uint64_t)getc(in) << 8;
+  c |= (uint64_t)getc(in) << 16;
+  c |= (uint64_t)getc(in) << 24;
+  c |= (uint64_t)getc(in) << 32;
+  c |= (uint64_t)getc(in) << 40;
+  c |= (uint64_t)getc(in) << 48;
+  c |= (uint64_t)getc(in) << 56;
+
+  return c;
+}
 
 int read_uint32(FILE *in)
 {
   int c;
 
   c = getc(in);
-  c =c | (getc(in) << 8);
-  c =c | (getc(in) << 16);
-  c =c | (getc(in) << 24);
+  c |= getc(in) << 8;
+  c |= getc(in) << 16;
+  c |= getc(in) << 24;
 
   return c;
 }
@@ -31,7 +46,7 @@ int read_uint16(FILE *in)
   int c;
 
   c = getc(in);
-  c = c | (getc(in) << 8);
+  c |= getc(in) << 8;
 
   return c;
 }

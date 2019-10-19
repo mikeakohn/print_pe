@@ -31,7 +31,7 @@ struct optional_header_t
   uint32_t AddressOfEntryPoint;
   uint32_t BaseOfCode;
   uint32_t BaseOfData;
-  uint32_t ImageBase;
+  uint64_t ImageBase;
   uint32_t SectionAlignment;
   uint32_t FileAlignment;
   uint16_t MajorOperatingSystemVersion;
@@ -46,10 +46,10 @@ struct optional_header_t
   uint32_t CheckSum;
   uint16_t Subsystem;
   uint16_t DllCharacteristics;
-  uint32_t SizeOfStackReserve;
-  uint32_t SizeOfStackCommit;
-  uint32_t SizeOfHeapReserve;
-  uint32_t SizeOfHeapCommit;
+  uint64_t SizeOfStackReserve;
+  uint64_t SizeOfStackCommit;
+  uint64_t SizeOfHeapReserve;
+  uint64_t SizeOfHeapCommit;
   uint32_t LoaderFlags;
   uint32_t NumberOfRvaAndSizes;
   int DataDirectoryCount;

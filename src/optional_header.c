@@ -51,11 +51,31 @@ int optional_header_read(
   optional_header->SizeOfUninitializedData = read_uint32(in);
   optional_header->AddressOfEntryPoint = read_uint32(in);
   optional_header->BaseOfCode = read_uint32(in);
-  optional_header->BaseOfData = read_uint32(in);
 
+  int bitsize = 32;
+
+  if (optional_header->Magic != 0x20b)
+  {
+    optional_header->BaseOfData = read_uint32(in);
+  }
+    else
+  {
+    bitsize = 64;
+  }
+
+  // FIXME: header_size for PE32 is 28, PE32+ is 24.  Is this really
+  //        needed anyway?
   if (header_size <= 28) { return 0; }
 
-  optional_header->ImageBase = read_uint32(in);
+  if (bitsize == 32)
+  {
+    optional_header->ImageBase = read_uint32(in);
+  }
+    else
+  {
+    optional_header->ImageBase = read_uint64(in);
+  }
+
   optional_header->SectionAlignment = read_uint32(in);
   optional_header->FileAlignment = read_uint32(in);
   optional_header->MajorOperatingSystemVersion = read_uint16(in);
@@ -70,10 +90,22 @@ int optional_header_read(
   optional_header->CheckSum = read_uint32(in);
   optional_header->Subsystem = read_uint16(in);
   optional_header->DllCharacteristics = read_uint16(in);
-  optional_header->SizeOfStackReserve = read_uint32(in);
-  optional_header->SizeOfStackCommit = read_uint32(in);
-  optional_header->SizeOfHeapReserve = read_uint32(in);
-  optional_header->SizeOfHeapCommit = read_uint32(in);
+
+  if (bitsize == 32)
+  {
+    optional_header->SizeOfStackReserve = read_uint32(in);
+    optional_header->SizeOfStackCommit = read_uint32(in);
+    optional_header->SizeOfHeapReserve = read_uint32(in);
+    optional_header->SizeOfHeapCommit = read_uint32(in);
+  }
+    else
+  {
+    optional_header->SizeOfStackReserve = read_uint64(in);
+    optional_header->SizeOfStackCommit = read_uint64(in);
+    optional_header->SizeOfHeapReserve = read_uint64(in);
+    optional_header->SizeOfHeapCommit = read_uint64(in);
+  }
+
   optional_header->LoaderFlags = read_uint32(in);
   optional_header->NumberOfRvaAndSizes = read_uint32(in);
 
@@ -103,8 +135,8 @@ int optional_header_print(struct optional_header_t *optional_header)
 
   switch(optional_header->Magic)
   {
-    case 0x10b: magic = "32 Bit Exe"; break;
-    case 0x20b: magic = "64 Bit Exe"; break;
+    case 0x10b: magic = "PE32 32 Bit Exe"; break;
+    case 0x20b: magic = "PE32+ 64 Bit Exe"; break;
     case 0x107: magic = "ROM"; break;
     default: magic = "Unknown"; break;
   }
@@ -119,7 +151,7 @@ int optional_header_print(struct optional_header_t *optional_header)
   printf("  AddrOfEntryPoint: %d\n", optional_header->AddressOfEntryPoint);
   printf("        BaseOfCode: %d\n", optional_header->BaseOfCode);
   printf("        BaseOfData: %d\n", optional_header->BaseOfData);
-  printf("         ImageBase: %d\n", optional_header->ImageBase);
+  printf("         ImageBase: 0x%llx\n", optional_header->ImageBase);
   printf("  SectionAlignment: %d\n", optional_header->SectionAlignment);
   printf("     FileAlignment: %d\n", optional_header->FileAlignment);
   printf("    MajorOSVersion: %d\n", optional_header->MajorOperatingSystemVersion);
@@ -217,10 +249,10 @@ int optional_header_print(struct optional_header_t *optional_header)
 
   printf("\n");
 
-  printf("SizeOfStackReserve: %d\n", optional_header->SizeOfStackReserve);
-  printf(" SizeOfStackCommit: %d\n", optional_header->SizeOfStackCommit);
-  printf(" SizeOfHeapReserve: %d\n", optional_header->SizeOfHeapReserve);
-  printf("  SizeOfHeapCommit: %d\n", optional_header->SizeOfHeapCommit);
+  printf("SizeOfStackReserve: %llu\n", optional_header->SizeOfStackReserve);
+  printf(" SizeOfStackCommit: %llu\n", optional_header->SizeOfStackCommit);
+  printf(" SizeOfHeapReserve: %llu\n", optional_header->SizeOfHeapReserve);
+  printf("  SizeOfHeapCommit: %llu\n", optional_header->SizeOfHeapCommit);
   printf("       LoaderFlags: %d\n", optional_header->LoaderFlags);
   printf("  NumOfRvaAndSizes: %d\n", optional_header->NumberOfRvaAndSizes);
   printf("\n");
