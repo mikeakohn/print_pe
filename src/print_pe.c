@@ -15,6 +15,7 @@ This code falls under the LGPL license.
 
 #include "cil.h"
 #include "dos.h"
+#include "file_header.h"
 #include "fileio.h"
 #include "pe.h"
 #include "pe_debug.h"
@@ -27,7 +28,7 @@ int main(int argc, char *argv[])
 {
   FILE *in,*out;
   struct dos_header_t dos_header;
-  struct image_file_header_t image_file_header;
+  struct file_header_t file_header;
   struct image_optional_header_t image_optional_header;
   struct section_header_t section_header;
   uint8_t signature[4];
@@ -37,7 +38,7 @@ int main(int argc, char *argv[])
   int t,len;
 
   printf("\nprint_pe (October 20, 2019) - The DLL, EXE, OCX Analyzer\n");
-  printf("Copyright 2005-2014 - Michael Kohn  http://www.mikekohn.net/\n\n");
+  printf("Copyright 2005-2019 - Michael Kohn  http://www.mikekohn.net/\n\n");
 
   if (argc < 2)
   {
@@ -106,16 +107,16 @@ int main(int argc, char *argv[])
 
   printf("Signature: PE00\n\n");
 
-  read_image_file_header(in, &image_file_header);
-  print_image_file_header(&image_file_header);
+  file_header_read(&file_header, in);
+  file_header_print(&file_header);
 
-  if (image_file_header.SizeOfOptionalHeader != 0)
+  if (file_header.SizeOfOptionalHeader != 0)
   {
-    read_image_optional_header(in, &image_optional_header, image_file_header.SizeOfOptionalHeader);
+    read_image_optional_header(in, &image_optional_header, file_header.SizeOfOptionalHeader);
     print_image_optional_header(&image_optional_header);
   }
 
-  for (t = 0; t < image_file_header.NumberOfSections; t++)
+  for (t = 0; t < file_header.NumberOfSections; t++)
   {
     read_section_header(in, &section_header);
     print_section_header(&section_header, t);

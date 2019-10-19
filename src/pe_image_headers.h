@@ -20,17 +20,6 @@ struct directory_entry_t
   uint32_t size;
 };
 
-struct image_file_header_t
-{
-  uint16_t Machine;
-  uint16_t NumberOfSections;
-  uint32_t TimeDateStamp;
-  uint32_t PointerToSymbolTable;
-  uint32_t NumberOfSymbols;
-  uint16_t SizeOfOptionalHeader;
-  uint16_t Characteristics;
-};
-
 struct image_optional_header_t
 {
   uint16_t Magic;
@@ -67,9 +56,6 @@ struct image_optional_header_t
   //int image_data_dir[32];
   struct directory_entry_t directory_entry[16];
 };
-
-int read_image_file_header(FILE *in, struct image_file_header_t *image_file_header);
-int print_image_file_header(struct image_file_header_t *image_file_header);
 
 int read_image_optional_header(FILE *in, struct image_optional_header_t *image_optional_header, int header_size);
 int print_image_optional_header(struct image_optional_header_t *image_optional_header);
