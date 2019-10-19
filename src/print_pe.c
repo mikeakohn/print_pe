@@ -14,15 +14,15 @@ This code falls under the LGPL license.
 #include <string.h>
 
 #include "cil.h"
+#include "debug_section.h"
 #include "dos.h"
 #include "exports.h"
 #include "file_header.h"
 #include "fileio.h"
 #include "imports.h"
 #include "pe.h"
-#include "pe_debug.h"
-#include "pe_vb.h"
 #include "resource.h"
+#include "vb.h"
 
 int main(int argc, char *argv[])
 {

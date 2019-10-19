@@ -9,12 +9,10 @@ This code falls under the LGPL license.
 
 */
 
-#ifndef PE_DEBUG_H
-#define PE_DEBUG_H
+#ifndef DEBUG_DIRECTORY_H
+#define DEBUG_DIRECTORY_H
 
 #include <stdint.h>
-
-#include "section_header.h"
 
 struct debug_directory_t
 {
@@ -30,7 +28,6 @@ struct debug_directory_t
 
 int debug_directory_read(struct debug_directory_t *debug_directory, FILE *in);
 int debug_directory_print(struct debug_directory_t *debug_directory);
-int debug_section_print(FILE *in, int addr, int size, struct section_header_t *section_header);
 
 #endif
 

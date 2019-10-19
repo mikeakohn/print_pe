@@ -14,9 +14,9 @@ This code falls under the LGPL license.
 #include <time.h>
 #include <string.h>
 
+#include "com.h"
 #include "fileio.h"
-#include "pe_com.h"
-#include "pe_vb.h"
+#include "vb.h"
 
 int vb_info_print(
   FILE *in,

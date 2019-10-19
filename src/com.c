@@ -15,8 +15,8 @@ This code falls under the LGPL license.
 #include <string.h>
 
 #include "clsid.h"
+#include "com.h"
 #include "fileio.h"
-#include "pe_com.h"
 
 int reg_info_read(struct reg_info_t *reg_info, FILE *in, int offset)
 {

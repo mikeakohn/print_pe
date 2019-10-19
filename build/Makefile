@@ -8,6 +8,9 @@ VPATH=../src
 OBJECTS= \
   cil.o \
   clsid.o \
+  com.o \
+  debug_directory.o \
+  debug_section.o \
   dos.o \
   exports.o \
   file_header.o \
@@ -15,12 +18,10 @@ OBJECTS= \
   imports.o \
   optional_header.o \
   pe.o \
-  pe_com.o \
-  pe_debug.o \
-  pe_vb.o \
   resource.o \
   section_header.o \
-  table_cil_instr.o
+  table_cil_instr.o \
+  vb.o
 
 default: $(OBJECTS)
 	$(CC) -o ../print_pe ../src/print_pe.c \
