@@ -18,7 +18,7 @@ This code falls under the LGPL license.
 #include "pe_com.h"
 #include "pe_vb.h"
 
-int print_vb_info(
+int vb_info_print(
   FILE *in,
   struct optional_header_t *optional_header,
   struct section_header_t *section_header)
@@ -146,9 +146,9 @@ int print_vb_info(
 
   if (vb_header.lpComRegisterData != 0)
   {
-    read_com_reg_data(in, &com_reg_data, vb_header.lpComRegisterData - optional_header->ImageBase);
+    com_reg_data_read(&com_reg_data, in, vb_header.lpComRegisterData - optional_header->ImageBase);
 
-    print_com_reg_data(&com_reg_data);
+    com_reg_data_print(&com_reg_data);
 
     if (com_reg_data.bRegInfo != 0)
     {
@@ -156,11 +156,11 @@ int print_vb_info(
 
       while(1)
       {
-        read_reg_info(in, &reg_info, vb_header.lpComRegisterData - optional_header->ImageBase + t);
+        reg_info_read(&reg_info, in, vb_header.lpComRegisterData - optional_header->ImageBase + t);
 
         get_string(in, (char *)reg_info.szObjectName, vb_header.lpComRegisterData - optional_header->ImageBase + reg_info.bObjectName);
 
-        print_reg_info(&reg_info);
+        reg_info_print(&reg_info);
 
         if (reg_info.bNextObject == 0) { break; }
 

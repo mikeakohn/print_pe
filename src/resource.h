@@ -9,8 +9,8 @@ This code falls under the LGPL license.
 
 */
 
-#ifndef PE_RESOURCE_H
-#define PE_RESOURCE_H
+#ifndef RESOURCE_H
+#define RESOURCE_H
 
 #include <stdint.h>
 
@@ -42,10 +42,27 @@ struct resource_data_t
   uint32_t Reserved;
 };
 
-int parse_resource_dir(FILE *in, struct section_header_t *section_header, int offset, int level, int res_type);
-int read_resource_data(FILE *in, int addr, struct resource_data_t *resource_data, int offset);
+int parse_resource_dir(
+  FILE *in,
+  struct section_header_t *section_header,
+  int offset,
+  int level,
+  int res_type);
+
+int read_resource_data(
+  FILE *in,
+  int addr,
+  struct resource_data_t *resource_data,
+  int offset);
+
 int read_resource_dir(FILE *in, int addr, struct resource_dir_t *resource_dir);
-int read_resource_dir_entry(FILE *in, int addr, struct resource_dir_entry_t *resource_dir_entry, int offset);
+
+int read_resource_dir_entry(
+  FILE *in,
+  int addr,
+  struct resource_dir_entry_t *resource_dir_entry,
+  int offset);
+
 int print_resource_data(struct resource_data_t *resource_data, int level);
 int print_resource_type(int id, int level);
 int print_resource_dir(struct resource_dir_t *resource_dir, int level);

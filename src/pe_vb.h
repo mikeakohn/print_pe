@@ -44,7 +44,7 @@ struct vb_header_t
   uint32_t bSzProjectName;
 };
 
-int print_vb_info(
+int vb_info_print(
   FILE *in,
   struct optional_header_t *optional_header,
   struct section_header_t *section_header);

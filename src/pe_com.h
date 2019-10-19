@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2015 by Michael Kohn
+print_pe - Copyright 2005-2019 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -49,10 +49,10 @@ struct reg_info_t
   uint8_t szObjectName[1024];
 };
 
-int read_reg_info(FILE *in, struct reg_info_t *reg_info, int offset);
-int print_reg_info(struct reg_info_t *reg_info);
-int read_com_reg_data(FILE *in, struct com_reg_data_t *com_reg_data, int offset);
-int print_com_reg_data(struct com_reg_data_t *com_reg_data);
+int reg_info_read(struct reg_info_t *reg_info, FILE *in, int offset);
+int reg_info_print(struct reg_info_t *reg_info);
+int com_reg_data_read(struct com_reg_data_t *com_reg_data, FILE *in, int offset);
+int com_reg_data_print(struct com_reg_data_t *com_reg_data);
 
 #endif
 

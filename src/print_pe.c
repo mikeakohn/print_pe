@@ -21,8 +21,8 @@ This code falls under the LGPL license.
 #include "pe_debug.h"
 #include "pe_exports.h"
 #include "pe_imports.h"
-#include "pe_resource.h"
 #include "pe_vb.h"
+#include "resource.h"
 
 int main(int argc, char *argv[])
 {
@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
     {
       sprintf(filename, "win_code_%d.bin", t);
       rip_binary(in, filename, section_header.PointerToRawData, section_header.SizeOfRawData);
-      print_vb_info(in, &optional_header, &section_header);
+      vb_info_print(in, &optional_header, &section_header);
     }
       else
     if (strcmp(section_header.name, ".rsrc") == 0)
