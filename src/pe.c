@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2015 by Michael Kohn
+print_pe - Copyright 2005-2019 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -63,7 +63,7 @@ int read_unicode(FILE *in, int address, char *s, int max_chars)
     if (ch == EOF || ch == 0) break;
     s[t++] = ch;
 
-    if (t == max_chars-1) break;
+    if (t == max_chars - 1) break;
   }
 
   s[t] = 0;

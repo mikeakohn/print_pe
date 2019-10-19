@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2015 by Michael Kohn
+print_pe - Copyright 2005-2019 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -30,11 +30,11 @@ struct dos_header_t
   uint16_t e_cs;            // Initial (relative) CS value
   uint16_t e_lfarlc;        // File address of relocation table
   uint16_t e_ovno;          // Overlay number
-  uint8_t e_res[8];             // Reserved words
+  uint8_t e_res[8];         // Reserved words
   uint16_t e_oemid;         // OEM identifier (for e_oeminfo)
   uint16_t e_oeminfo;       // OEM information; e_oemid specific
-  uint8_t e_res2[20];           // Reserved words
-  int e_lfanew;                       // File address of new exe header
+  uint8_t e_res2[20];       // Reserved words
+  int e_lfanew;             // File address of new exe header
 };
 
 int read_dos_header(FILE *in, struct dos_header_t *dos_header);

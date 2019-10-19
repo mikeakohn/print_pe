@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2015 by Michael Kohn
+print_pe - Copyright 2005-2019 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
   struct funct_t funct;
   int t,len;
 
-  printf("\nprint_pe (October 20, 2015) - The DLL, EXE, OCX Analyzer\n");
+  printf("\nprint_pe (October 20, 2019) - The DLL, EXE, OCX Analyzer\n");
   printf("Copyright 2005-2014 - Michael Kohn  http://www.mikekohn.net/\n\n");
 
   if (argc < 2)
@@ -65,6 +65,7 @@ int main(int argc, char *argv[])
   }
 
   in = fopen(pe_filename, "rb");
+
   if (in == 0)
   {
     printf("Cannot open file %s for reading.\n\n", argv[1]);
@@ -76,11 +77,12 @@ int main(int argc, char *argv[])
   read_dos_header(in, &dos_header);
   print_dos_header(&dos_header);
 
-  len = dos_header.e_lfanew-ftell(in);
+  len = dos_header.e_lfanew - ftell(in);
   out = fopen("dos_code.bin","wb");
+
   if (out != 0)
-  { 
-    for (t = 0; t < len; t++) putc(getc(in), out);
+  {
+    for (t = 0; t < len; t++) { putc(getc(in), out); }
     fclose(out);
   }
 
@@ -245,6 +247,7 @@ int main(int argc, char *argv[])
       printf("This is experimental and will modify your file.\nDo you really want to change this function to { return %d; } (y/n) ", funct.funct_retvalue);
 
       t = getchar();
+
       if (t == 'y')
       {
         FILE *out = fopen(pe_filename, "rb+");
@@ -267,5 +270,4 @@ int main(int argc, char *argv[])
 
   return 0;
 }
-
 

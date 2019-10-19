@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2015 by Michael Kohn
+print_pe - Copyright 2005-2019 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -71,5 +71,4 @@ int print_dos_header(struct dos_header_t *dos_header)
 
   return 0;
 }
-
 

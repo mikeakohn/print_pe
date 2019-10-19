@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2015 by Michael Kohn
+print_pe - Copyright 2005-2019 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -35,7 +35,6 @@ char *dir_entries[] =
   "Delay Import",
   "COM descriptor",
 };
-
 
 int read_image_file_header(FILE *in, struct image_file_header_t *image_file_header)
 {
@@ -107,7 +106,6 @@ int print_image_file_header(struct image_file_header_t *image_file_header)
   printf("Image File Header\n");
   printf("---------------------------------------------\n");
 
-
   const char *machine;
 
   switch(image_file_header->Machine)
@@ -119,9 +117,26 @@ int print_image_file_header(struct image_file_header_t *image_file_header)
     case 0x162: machine = "MIPS R3000 Little Endian"; break;
     case 0x166: machine = "MIPS R4000 Little Endian"; break;
     case 0x168: machine = "MIPS R10000 Little Endian"; break;
+    case 0x169: machine = "MIPS Little Endian WCE v2"; break;
     case 0x184: machine = "Alpha"; break;
+    case 0x1a2: machine = "Hitachi SH3"; break;
+    case 0x1a3: machine = "Hitachi SH3 DSP"; break;
+    case 0x1a8: machine = "Hitachi SH5"; break;
+    case 0x1c0: machine = "ARM Little Endian"; break;
+    case 0x1c2: machine = "Thumb"; break;
+    case 0x1c4: machine = "ARM Thumb-2 Little Endian"; break;
+    case 0x1d3: machine = "Matsushita AM33"; break;
     case 0x1f0: machine = "PPC Little Endian"; break;
-    case 0x8664: machine = "AMD64"; break;
+    case 0x1f1: machine = "PPC w/ FPU"; break;
+    case 0x266: machine = "MIPS16"; break;
+    case 0x366: machine = "MIPS w/ FPU"; break;
+    case 0x466: machine = "MIPS16 w/ FPU"; break;
+    case 0xebc: machine = "EFI Byte Code"; break;
+    case 0x5032: machine = "RISC-V 32 bit"; break;
+    case 0x5064: machine = "RISC-V 64 bit"; break;
+    case 0x5128: machine = "RISC-V 128 bit"; break;
+    case 0x8664: machine = "x64"; break;
+    case 0xaa64: machine = "ARM64 Little Endian"; break;
     default: machine = "Unknown"; break;
   }
 
@@ -342,7 +357,7 @@ int print_image_optional_header(struct image_optional_header_t *image_optional_h
   printf("\n");
 
   if (image_optional_header->DataDirectoryCount != 0)
-  { 
+  {
     printf("   Directory Description             VirtualAddr  Size\n");
     for (t = 0; t < image_optional_header->DataDirectoryCount; t++)
     {
@@ -362,7 +377,8 @@ int print_image_optional_header(struct image_optional_header_t *image_optional_h
         image_optional_header->directory_entry[t].size,
         image_optional_header->directory_entry[t].size);
     }
-    if (t != 0) printf("\n");
+
+    if (t != 0) { printf("\n"); }
   }
 
   return 0;
