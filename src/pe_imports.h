@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2015 by Michael Kohn
+print_pe - Copyright 2005-2019 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -14,7 +14,7 @@ This code falls under the LGPL license.
 
 #include <stdint.h>
 
-#include "pe_section_headers.h"
+#include "section_header.h"
 
 struct import_dir_t
 {
@@ -25,8 +25,18 @@ struct import_dir_t
   uint32_t FunctionAddressList;
 };
 
-int pe_imports_print(FILE *in, int addr, int size, struct section_header_t *section_header);
-int pe_imports_find(FILE *in, int address, int size, struct section_header_t *section_header, const char *search_name);
+int pe_imports_print(
+  FILE *in,
+  int addr,
+  int size,
+  struct section_header_t *section_header);
+
+int pe_imports_find(
+  FILE *in,
+  int address,
+  int size,
+  struct section_header_t *section_header,
+  const char *search_name);
 
 #endif
 

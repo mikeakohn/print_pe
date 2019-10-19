@@ -17,9 +17,9 @@ OBJECTS= \
   pe_debug.o \
   pe_exports.o \
   pe_imports.o \
-  pe_section_headers.o \
   pe_resource.o \
   pe_vb.o \
+  section_header.o \
   table_cil_instr.o
 
 default: $(OBJECTS)

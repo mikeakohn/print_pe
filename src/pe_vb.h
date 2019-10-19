@@ -15,7 +15,7 @@ This code falls under the LGPL license.
 #include <stdint.h>
 
 #include "optional_header.h"
-#include "pe_section_headers.h"
+#include "section_header.h"
 
 struct vb_header_t
 {

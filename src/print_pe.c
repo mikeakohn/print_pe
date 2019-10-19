@@ -97,8 +97,9 @@ int main(int argc, char *argv[])
   fseek(in, dos_header.e_lfanew, SEEK_SET);
 
   read_chars_bin(in, signature, 4);
+
   if (signature[0] != 'P' || signature[1] != 'E' ||
-      signature[2] != 0 || signature[3] != 0)
+      signature[2] != 0   || signature[3] != 0)
   {
     printf("This file is not a Microsoft PE format file\n\n");
     fclose(in);
@@ -120,8 +121,8 @@ int main(int argc, char *argv[])
 
   for (t = 0; t < file_header.NumberOfSections; t++)
   {
-    read_section_header(in, &section_header);
-    print_section_header(&section_header, t);
+    section_header_read(&section_header, in);
+    section_header_print(&section_header, t);
 
     if (strncmp(section_header.name, ".text", 5) == 0)
     {
@@ -185,7 +186,7 @@ int main(int argc, char *argv[])
           optional_header.directory_entry[6].virtual_address <=
           section_header.VirtualAddress + section_header.SizeOfRawData)
       {
-        print_debug_section(
+        debug_section_print(
           in,
           optional_header.directory_entry[6].virtual_address,
           optional_header.directory_entry[6].size,

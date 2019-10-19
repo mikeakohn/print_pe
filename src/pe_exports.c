@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2015 by Michael Kohn
+print_pe - Copyright 2005-2019 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -17,7 +17,12 @@ This code falls under the LGPL license.
 #include "fileio.h"
 #include "pe_exports.h"
 
-int print_exports(FILE *in, int addr, int size, struct section_header_t *section_header, struct funct_t *funct)
+int print_exports(
+  FILE *in,
+  int addr,
+  int size,
+  struct section_header_t *section_header,
+  struct funct_t *funct)
 {
   struct export_dir_t export_dir;
   char func_name[1024];

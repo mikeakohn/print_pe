@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2015 by Michael Kohn
+print_pe - Copyright 2005-2019 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -14,7 +14,7 @@ This code falls under the LGPL license.
 
 #include <stdint.h>
 
-#include "pe_section_headers.h"
+#include "section_header.h"
 
 struct debug_directory_t
 {
@@ -28,9 +28,9 @@ struct debug_directory_t
   uint32_t PointerToRawData;
 };
 
-int read_debug_directory(FILE *in, struct debug_directory_t *debug_directory);
-int print_debug_directory(struct debug_directory_t *debug_directory);
-int print_debug_section(FILE *in, int addr, int size, struct section_header_t *section_header);
+int debug_directory_read(struct debug_directory_t *debug_directory, FILE *in);
+int debug_directory_print(struct debug_directory_t *debug_directory);
+int debug_section_print(FILE *in, int addr, int size, struct section_header_t *section_header);
 
 #endif
 

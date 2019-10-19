@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2015 by Michael Kohn
+print_pe - Copyright 2005-2019 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -14,7 +14,7 @@ This code falls under the LGPL license.
 
 #include <stdint.h>
 
-#include "pe_section_headers.h"
+#include "section_header.h"
 
 struct _clr_header
 {

@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2015 by Michael Kohn
+print_pe - Copyright 2005-2019 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -15,9 +15,9 @@ This code falls under the LGPL license.
 #include <string.h>
 
 #include "fileio.h"
-#include "pe_section_headers.h"
+#include "section_header.h"
 
-int read_section_header(FILE *in, struct section_header_t *section_header)
+int section_header_read(struct section_header_t *section_header, FILE *in)
 {
   read_chars(in, section_header->name, 8);
   section_header->Misc.PhysicalAddress = read_uint32(in);
@@ -33,7 +33,7 @@ int read_section_header(FILE *in, struct section_header_t *section_header)
   return 0;
 }
 
-int print_section_header(struct section_header_t *section_header, int count)
+int section_header_print(struct section_header_t *section_header, int count)
 {
   printf("---------------------------------------------\n");
   printf("Section Header %d\n",count);
