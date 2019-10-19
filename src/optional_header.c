@@ -43,6 +43,8 @@ int optional_header_read(
 {
   int t;
 
+  long marker = ftell(in);
+
   optional_header->Magic = read_uint16(in);
   optional_header->MajorLinkerVersion = getc(in);
   optional_header->MinorLinkerVersion = getc(in);
@@ -109,9 +111,11 @@ int optional_header_read(
   optional_header->LoaderFlags = read_uint32(in);
   optional_header->NumberOfRvaAndSizes = read_uint32(in);
 
-  if (header_size > 96)
+  int used_length = (int)(ftell(in) - marker);
+
+  if (header_size > used_length)
   {
-    optional_header->DataDirectoryCount = (header_size - 96) / 8;
+    optional_header->DataDirectoryCount = (header_size - used_length) / 8;
 
     for (t = 0; t < optional_header->DataDirectoryCount; t++)
     {
