@@ -9,8 +9,8 @@ This code falls under the LGPL license.
 
 */
 
-#ifndef PE_IMAGE_HEADERS_H
-#define PE_IMAGE_HEADERS_H
+#ifndef OPTIONAL_HEADERS_H
+#define OPTIONAL_HEADERS_H
 
 #include <stdint.h>
 
@@ -20,7 +20,7 @@ struct directory_entry_t
   uint32_t size;
 };
 
-struct image_optional_header_t
+struct optional_header_t
 {
   uint16_t Magic;
   uint8_t MajorLinkerVersion;
@@ -57,8 +57,12 @@ struct image_optional_header_t
   struct directory_entry_t directory_entry[16];
 };
 
-int read_image_optional_header(FILE *in, struct image_optional_header_t *image_optional_header, int header_size);
-int print_image_optional_header(struct image_optional_header_t *image_optional_header);
+int optional_header_read(
+  struct optional_header_t *optional_header,
+  FILE *in,
+  int header_size);
+
+int optional_header_print(struct optional_header_t *optional_header);
 
 #endif
 

@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2015 by Michael Kohn
+print_pe - Copyright 2005-2019 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -14,7 +14,7 @@ This code falls under the LGPL license.
 
 #include <stdint.h>
 
-#include "pe_image_headers.h"
+#include "optional_header.h"
 #include "pe_section_headers.h"
 
 struct vb_header_t
@@ -44,7 +44,10 @@ struct vb_header_t
   uint32_t bSzProjectName;
 };
 
-int print_vb_info(FILE *in, struct image_optional_header_t *image_optional_header, struct section_header_t *section_header);
+int print_vb_info(
+  FILE *in,
+  struct optional_header_t *optional_header,
+  struct section_header_t *section_header);
 
 #endif
 

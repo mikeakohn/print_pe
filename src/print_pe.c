@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
   FILE *in,*out;
   struct dos_header_t dos_header;
   struct file_header_t file_header;
-  struct image_optional_header_t image_optional_header;
+  struct optional_header_t optional_header;
   struct section_header_t section_header;
   uint8_t signature[4];
   char filename[64];
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
     exit(0);
   }
 
-  memset(&image_optional_header, 0, sizeof(image_optional_header));
+  memset(&optional_header, 0, sizeof(optional_header));
 
   read_dos_header(in, &dos_header);
   print_dos_header(&dos_header);
@@ -112,8 +112,10 @@ int main(int argc, char *argv[])
 
   if (file_header.SizeOfOptionalHeader != 0)
   {
-    read_image_optional_header(in, &image_optional_header, file_header.SizeOfOptionalHeader);
-    print_image_optional_header(&image_optional_header);
+    const int length = file_header.SizeOfOptionalHeader;
+
+    optional_header_read(&optional_header, in, length);
+    optional_header_print(&optional_header);
   }
 
   for (t = 0; t < file_header.NumberOfSections; t++)
@@ -134,7 +136,7 @@ int main(int argc, char *argv[])
     {
       sprintf(filename, "win_code_%d.bin", t);
       rip_binary(in, filename, section_header.PointerToRawData, section_header.SizeOfRawData);
-      print_vb_info(in, &image_optional_header, &section_header);
+      print_vb_info(in, &optional_header, &section_header);
     }
       else
     if (strcmp(section_header.name, ".rsrc") == 0)
@@ -143,67 +145,67 @@ int main(int argc, char *argv[])
     }
 
     // Print imports
-    if (image_optional_header.directory_entry[1].size != 0)
+    if (optional_header.directory_entry[1].size != 0)
     {
       if (section_header.VirtualAddress <=
-          image_optional_header.directory_entry[1].virtual_address &&
-          image_optional_header.directory_entry[1].virtual_address <=
+          optional_header.directory_entry[1].virtual_address &&
+          optional_header.directory_entry[1].virtual_address <=
              section_header.VirtualAddress + section_header.SizeOfRawData)
       {
         pe_imports_print(
           in,
-          image_optional_header.directory_entry[1].virtual_address,
-          image_optional_header.directory_entry[1].size,
+          optional_header.directory_entry[1].virtual_address,
+          optional_header.directory_entry[1].size,
           &section_header);
       }
     }
 
     // Print exports
-    if (image_optional_header.directory_entry[0].size != 0)
+    if (optional_header.directory_entry[0].size != 0)
     {
       if (section_header.VirtualAddress <=
-          image_optional_header.directory_entry[0].virtual_address &&
-          image_optional_header.directory_entry[0].virtual_address <=
+          optional_header.directory_entry[0].virtual_address &&
+          optional_header.directory_entry[0].virtual_address <=
           section_header.VirtualAddress + section_header.SizeOfRawData)
       {
         print_exports(
           in,
-          image_optional_header.directory_entry[0].virtual_address,
-          image_optional_header.directory_entry[0].size,
+          optional_header.directory_entry[0].virtual_address,
+          optional_header.directory_entry[0].size,
           &section_header,
           &funct);
       }
     }
 
     // Debug section
-    if (image_optional_header.directory_entry[6].size!= 0)
+    if (optional_header.directory_entry[6].size!= 0)
     {
       if (section_header.VirtualAddress <=
-          image_optional_header.directory_entry[6].virtual_address &&
-          image_optional_header.directory_entry[6].virtual_address <=
+          optional_header.directory_entry[6].virtual_address &&
+          optional_header.directory_entry[6].virtual_address <=
           section_header.VirtualAddress + section_header.SizeOfRawData)
       {
         print_debug_section(
           in,
-          image_optional_header.directory_entry[6].virtual_address,
-          image_optional_header.directory_entry[6].size,
+          optional_header.directory_entry[6].virtual_address,
+          optional_header.directory_entry[6].size,
           &section_header);
       }
     }
 
     // COM Desc section
-    if (image_optional_header.directory_entry[14].size != 0)
+    if (optional_header.directory_entry[14].size != 0)
     {
       if (section_header.VirtualAddress <=
-          image_optional_header.directory_entry[14].virtual_address &&
-          image_optional_header.directory_entry[14].virtual_address <=
+          optional_header.directory_entry[14].virtual_address &&
+          optional_header.directory_entry[14].virtual_address <=
           section_header.VirtualAddress + section_header.SizeOfRawData)
       {
 
         int is_dot_net = pe_imports_find(
           in,
-          image_optional_header.directory_entry[1].virtual_address,
-          image_optional_header.directory_entry[1].size,
+          optional_header.directory_entry[1].virtual_address,
+          optional_header.directory_entry[1].size,
           &section_header,
           "_CorExeMain");
 
@@ -215,12 +217,12 @@ int main(int argc, char *argv[])
 
           hex_dump(
             in,
-            image_optional_header.directory_entry[14].virtual_address,
-            image_optional_header.directory_entry[14].size,
+            optional_header.directory_entry[14].virtual_address,
+            optional_header.directory_entry[14].size,
             &section_header);
 
           struct _clr_header clr_header;
-          read_clr_header(in, &clr_header, image_optional_header.directory_entry[14].virtual_address, image_optional_header.directory_entry[14].size, &section_header);
+          read_clr_header(in, &clr_header, optional_header.directory_entry[14].virtual_address, optional_header.directory_entry[14].size, &section_header);
           print_clr_header(&clr_header);
         }
       }

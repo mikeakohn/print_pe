@@ -10,12 +10,12 @@ OBJECTS= \
   dos.o \
   file_header.o \
   fileio.o \
+  optional_header.o \
   pe.o \
   pe_clsid.o \
   pe_com.o \
   pe_debug.o \
   pe_exports.o \
-  pe_image_headers.o \
   pe_imports.o \
   pe_section_headers.o \
   pe_resource.o \

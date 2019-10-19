@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2015 by Michael Kohn
+print_pe - Copyright 2005-2019 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -18,7 +18,10 @@ This code falls under the LGPL license.
 #include "pe_com.h"
 #include "pe_vb.h"
 
-int print_vb_info(FILE *in, struct image_optional_header_t *image_optional_header, struct section_header_t *section_header)
+int print_vb_info(
+  FILE *in,
+  struct optional_header_t *optional_header,
+  struct section_header_t *section_header)
 {
   struct vb_header_t vb_header;
   struct com_reg_data_t com_reg_data;
@@ -28,7 +31,7 @@ int print_vb_info(FILE *in, struct image_optional_header_t *image_optional_heade
   int addr;
 
   marker = ftell(in);
-  fseek(in, (image_optional_header->AddressOfEntryPoint - section_header->VirtualAddress) + section_header->PointerToRawData, SEEK_SET);
+  fseek(in, (optional_header->AddressOfEntryPoint - section_header->VirtualAddress) + section_header->PointerToRawData, SEEK_SET);
 
   ptr = getc(in);
   /* Compiled VB executables / DLLs have a couple of entry point signitures. */
@@ -39,7 +42,7 @@ int print_vb_info(FILE *in, struct image_optional_header_t *image_optional_heade
 	    /* The pointer to the VB5! data stuff is in the first exported function. Usually DllCanUnloadNow()
 	     * Once we get to that address it turns into case 0x68 again. */
 	    /* Get the address to the export directory */
-	    addr = (image_optional_header->directory_entry[0].virtual_address - section_header->VirtualAddress) + section_header->PointerToRawData;
+	    addr = (optional_header->directory_entry[0].virtual_address - section_header->VirtualAddress) + section_header->PointerToRawData;
 	    /* ExportDirectory->AddressOfFunctions = addr+28; */
 	    addr = get_ptr(in, get_ptr(in,(addr + 28)));
 	    fseek(in, addr + 2, SEEK_SET); /* read past 0x58, 0x68 */
@@ -112,11 +115,13 @@ int print_vb_info(FILE *in, struct image_optional_header_t *image_optional_heade
   printf("      fMdlIntCtls2: 0x%08x\n", vb_header.fMdlIntCtls2);
   printf("     dwThreadFlags: %d", vb_header.dwThreadFlags);
   printf(" (");
+
   if ((vb_header.dwThreadFlags & 1) == 1) printf(" ApartmentModel");
   if ((vb_header.dwThreadFlags & 2) == 2) printf(" RequireLicense");
   if ((vb_header.dwThreadFlags & 4) == 4) printf(" Unattended");
   if ((vb_header.dwThreadFlags & 8) == 8) printf(" SingleThreaded");
   if ((vb_header.dwThreadFlags & 16) == 16) printf(" Retained");
+
   printf(" )\n");
   printf("     dwThreadCount: %d\n", vb_header.dwThreadCount);
   printf("        wFormCount: %d\n", vb_header.wFormCount);
@@ -141,18 +146,24 @@ int print_vb_info(FILE *in, struct image_optional_header_t *image_optional_heade
 
   if (vb_header.lpComRegisterData != 0)
   {
-    read_com_reg_data(in, &com_reg_data, vb_header.lpComRegisterData - image_optional_header->ImageBase);
+    read_com_reg_data(in, &com_reg_data, vb_header.lpComRegisterData - optional_header->ImageBase);
+
     print_com_reg_data(&com_reg_data);
 
     if (com_reg_data.bRegInfo != 0)
     {
       t = com_reg_data.bRegInfo;
+
       while(1)
       {
-        read_reg_info(in, &reg_info, vb_header.lpComRegisterData - image_optional_header->ImageBase + t);
-        get_string(in, (char *)reg_info.szObjectName, vb_header.lpComRegisterData - image_optional_header->ImageBase + reg_info.bObjectName);
+        read_reg_info(in, &reg_info, vb_header.lpComRegisterData - optional_header->ImageBase + t);
+
+        get_string(in, (char *)reg_info.szObjectName, vb_header.lpComRegisterData - optional_header->ImageBase + reg_info.bObjectName);
+
         print_reg_info(&reg_info);
-        if (reg_info.bNextObject == 0) break;
+
+        if (reg_info.bNextObject == 0) { break; }
+
         t = reg_info.bNextObject;
       }
     }
