@@ -88,12 +88,13 @@ int print_string(FILE *in, int addr)
   while(1)
   {
     ch = getc(in);
-    if (ch == EOF || ch == 0) break;
+    if (ch == EOF || ch == 0) { break; }
 
     printf("%c",ch);
   }
 
   fseek(in, marker, SEEK_SET);
+
   return 0;
 }
 
@@ -107,10 +108,11 @@ int get_string(FILE *in, char *s, int addr)
   fseek(in, addr, SEEK_SET);
 
   t = 0;
+
   while(1)
   {
     ch = getc(in);
-    if (ch == EOF || ch == 0) break;
+    if (ch == EOF || ch == 0) { break; }
 
     s[t++] = ch;
   }
@@ -118,6 +120,7 @@ int get_string(FILE *in, char *s, int addr)
   s[t] = 0;
 
   fseek(in, marker, SEEK_SET);
+
   return 0;
 }
 
