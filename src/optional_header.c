@@ -13,6 +13,7 @@ This code falls under the LGPL license.
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include "fileio.h"
 #include "optional_header.h"
@@ -155,7 +156,7 @@ int optional_header_print(struct optional_header_t *optional_header)
   printf("  AddrOfEntryPoint: %d\n", optional_header->AddressOfEntryPoint);
   printf("        BaseOfCode: %d\n", optional_header->BaseOfCode);
   printf("        BaseOfData: %d\n", optional_header->BaseOfData);
-  printf("         ImageBase: 0x%llx\n", optional_header->ImageBase);
+  printf("         ImageBase: 0x%" PRIx64 "\n", optional_header->ImageBase);
   printf("  SectionAlignment: %d\n", optional_header->SectionAlignment);
   printf("     FileAlignment: %d\n", optional_header->FileAlignment);
   printf("    MajorOSVersion: %d\n", optional_header->MajorOperatingSystemVersion);
@@ -253,10 +254,10 @@ int optional_header_print(struct optional_header_t *optional_header)
 
   printf("\n");
 
-  printf("SizeOfStackReserve: %llu\n", optional_header->SizeOfStackReserve);
-  printf(" SizeOfStackCommit: %llu\n", optional_header->SizeOfStackCommit);
-  printf(" SizeOfHeapReserve: %llu\n", optional_header->SizeOfHeapReserve);
-  printf("  SizeOfHeapCommit: %llu\n", optional_header->SizeOfHeapCommit);
+  printf("SizeOfStackReserve: %" PRId64 "\n", optional_header->SizeOfStackReserve);
+  printf(" SizeOfStackCommit: %" PRId64 "\n", optional_header->SizeOfStackCommit);
+  printf(" SizeOfHeapReserve: %" PRId64 "\n", optional_header->SizeOfHeapReserve);
+  printf("  SizeOfHeapCommit: %" PRId64 "\n", optional_header->SizeOfHeapCommit);
   printf("       LoaderFlags: %d\n", optional_header->LoaderFlags);
   printf("  NumOfRvaAndSizes: %d\n", optional_header->NumberOfRvaAndSizes);
   printf("\n");
