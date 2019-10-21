@@ -35,7 +35,8 @@ int main(int argc, char *argv[])
   char filename[64];
   char pe_filename[1024];
   struct funct_t funct;
-  int t,len;
+  int address_size = 4;
+  int t, len;
 
   printf("\nprint_pe (October 20, 2019) - The DLL, EXE, OCX Analyzer\n");
   printf("Copyright 2005-2019 - Michael Kohn  http://www.mikekohn.net/\n\n");
@@ -119,6 +120,8 @@ int main(int argc, char *argv[])
     optional_header_print(&optional_header);
   }
 
+  if (optional_header.Magic == 0x20b) { address_size = 8; }
+
   for (t = 0; t < file_header.NumberOfSections; t++)
   {
     section_header_read(&section_header, in);
@@ -157,6 +160,7 @@ int main(int argc, char *argv[])
           in,
           optional_header.directory_entry[1].virtual_address,
           optional_header.directory_entry[1].size,
+          address_size,
           &section_header);
       }
     }
@@ -207,6 +211,7 @@ int main(int argc, char *argv[])
           in,
           optional_header.directory_entry[1].virtual_address,
           optional_header.directory_entry[1].size,
+          address_size,
           &section_header,
           "_CorExeMain");
 

@@ -71,10 +71,12 @@ int exports_print(
 
   for (t = 0; t < export_dir.NumberOfNames; t++)
   {
-    ptr = get_ptr(in,(export_dir.AddressOfNames-virtual_address)+raw_ptr+(t*4));
+    ptr = get_ptr(in, (export_dir.AddressOfNames-virtual_address) + raw_ptr + (t * 4));
     get_string(in, func_name, (ptr - virtual_address) + raw_ptr);
+
     func_addr = get_ptr(in, (export_dir.AddressOfFunctions - virtual_address) + raw_ptr + (t * 4));
     name_ord = get_ushort(in, (export_dir.AddressOfNameOrdinals - virtual_address) + raw_ptr + (t * 2));
+
     printf("     %-30s  0x%08x  0x%04x\n", func_name, func_addr, name_ord);
 
     if (funct->funct_name[0] != 0)

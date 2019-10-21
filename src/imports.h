@@ -29,12 +29,14 @@ int imports_print(
   FILE *in,
   int addr,
   int size,
+  int address_size,
   struct section_header_t *section_header);
 
 int imports_find(
   FILE *in,
   int address,
   int size,
+  int address_size,
   struct section_header_t *section_header,
   const char *search_name);
 
