@@ -28,7 +28,12 @@ static int import_dir_read(struct import_dir_t *import_dir, FILE *in)
   return 0;
 }
 
-int imports_print(FILE *in, int address, int size, struct section_header_t *section_header)
+int imports_print(
+  FILE *in,
+  int address,
+  int size,
+  int address_size,
+  struct section_header_t *section_header)
 {
   struct import_dir_t import_dir;
   char name[1024];
@@ -80,7 +85,7 @@ int imports_print(FILE *in, int address, int size, struct section_header_t *sect
       get_string(in, name, (ptr - virtual_address) + raw_ptr + 2);
       printf("     %-30s  0x%08x\n", name, func_addr);
 
-      t = t + 4;
+      t = t + address_size;
     }
 
     printf("\n");
@@ -96,6 +101,7 @@ int imports_find(
   FILE *in,
   int address,
   int size,
+  int address_size,
   struct section_header_t *section_header,
   const char *search_name)
 {
@@ -140,7 +146,7 @@ int imports_find(
         return 1;
       }
 
-      t = t + 4;
+      t = t + address_size;
     }
 
     total_size = total_size + sizeof(import_dir);
