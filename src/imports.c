@@ -54,13 +54,15 @@ int imports_print(FILE *in, int address, int size, struct section_header_t *sect
   {
     import_dir_read(&import_dir, in);
 
-    if (import_dir.FunctionNameList == 0) break;
+    if (import_dir.FunctionNameList == 0) { break; }
 
     printf("  FunctionNameList: %d\n", import_dir.FunctionNameList);
     printf("     TimeDateStamp: %s", ctime((time_t *)&import_dir.TimeDateStamp));
     printf("      ForwardChain: %d\n", import_dir.ForwardChain);
-    get_string(in, name,import_dir.ModuleName);
-    printf("        ModuleName: %s\n", name);
+    get_string(in, name, import_dir.ModuleName);
+    printf("        ModuleName: ");
+    print_string(in, (import_dir.ModuleName - virtual_address) + raw_ptr);
+    printf("\n");
     printf("FunctionAddresList: %d\n", import_dir.FunctionAddressList);
     printf("\n");
 
