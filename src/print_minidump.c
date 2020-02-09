@@ -20,6 +20,8 @@ int main(int argc, char *argv[])
 {
   FILE *in;
   struct minidump_header_t minidump_header;
+  struct minidump_dir_t minidump_dir;
+  uint32_t i;
 
   printf("\nprint_minidump (February 8, 2020) - MiniDump Crash Analyzer\n");
   printf("Copyright 2005-2020 - Michael Kohn  http://www.mikekohn.net/\n\n");
@@ -40,6 +42,14 @@ int main(int argc, char *argv[])
 
   read_minidump_header(&minidump_header, in);
   print_minidump_header(&minidump_header);
+
+  fseek(in, minidump_header.ofs_streams, SEEK_SET);
+
+  for (i = 0; i < minidump_header.num_streams; i++)
+  {
+    read_minidump_dir(&minidump_dir, in);
+    print_minidump_dir(&minidump_dir, i);
+  }
 
   fclose(in);
 

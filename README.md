@@ -4,13 +4,7 @@ print_pe
 Author: Michael Kohn
    Web: http://www.mikekohn.net/
 
-I started this program back in 2005 under a less "professional" sounding
-name, so I decided to rename it and put it on github.  I did a little bit
-of code clean-up on it as well.. still needs some more really.
-
-I recently started working on adding code to dump .NET info so I could add
-.NET support to Java Grinder (http://www.mikekohn.net/micro/java_grinder.php)
-but I haven't had time to finish it.
+Tool for dumping the contents of Window executables.
 
 Features:
 * Dump DOS header along with DOS binary.
@@ -36,9 +30,4 @@ To change a function called blah in file.dll to always return the value 100:
 
 Highly recommended to make a backup of the DLL since it will overwrite
 code that is already there.
-
-
-
-
-
 

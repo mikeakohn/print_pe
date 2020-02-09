@@ -26,8 +26,17 @@ struct minidump_header_t
   uint64_t flags;
 };
 
+struct minidump_dir_t
+{
+  uint32_t stream_type;
+  uint32_t len_data;
+  uint32_t ofs_data;
+};
+
 int read_minidump_header(struct minidump_header_t *minidump_header, FILE *in);
+int read_minidump_dir(struct minidump_dir_t *minidump_die, FILE *in);
 void print_minidump_header(struct minidump_header_t *minidump_header);
+void print_minidump_dir(struct minidump_dir_t *minidump_dir, int index);
 
 #endif
 

@@ -29,6 +29,15 @@ int read_minidump_header(struct minidump_header_t *minidump_header, FILE *in)
   return 0;
 }
 
+int read_minidump_dir(struct minidump_dir_t *minidump_dir, FILE *in)
+{
+  minidump_dir->stream_type = read_uint32(in);
+  minidump_dir->len_data = read_uint32(in);
+  minidump_dir->ofs_data = read_uint32(in);
+
+  return 0;
+}
+
 void print_minidump_header(struct minidump_header_t *minidump_header)
 {
   printf(" -------- MiniDump header -------\n");
@@ -41,5 +50,13 @@ void print_minidump_header(struct minidump_header_t *minidump_header)
   printf("   checksum: %d\n", minidump_header->checksum);
   printf("  timestamp: %d\n", minidump_header->timestamp);
   printf("      flags: 0x%lx\n", minidump_header->flags);
+}
+
+void print_minidump_dir(struct minidump_dir_t *minidump_dir, int index)
+{
+  printf(" -------- MiniDump dir %d -------\n", index);
+  printf("stream_type: %d\n", minidump_dir->stream_type);
+  printf("   len_data: %d\n", minidump_dir->len_data);
+  printf("   ofs_data: %d\n", minidump_dir->ofs_data);
 }
 
