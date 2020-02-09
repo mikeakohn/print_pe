@@ -98,6 +98,28 @@ static void print_minidump_location_descriptor(FILE *in)
 }
 #endif
 
+static void print_minidump_string(FILE *in, uint32_t offset)
+{
+  uint32_t n;
+  long marker = ftell(in);
+  fseek(in, offset, SEEK_SET);
+
+  uint32_t length = read_uint32(in);
+
+  printf(",length=%d\n", length);
+
+  for (n = 0; n < length; n += 2)
+  {
+    uint16_t c = read_uint16(in);
+
+    putchar(c);
+  }
+
+  fseek(in, marker, SEEK_SET);
+
+  printf("\n");
+}
+
 static void print_minidump_memory_descriptor(FILE *in)
 {
   struct minidump_location_desc_t minidump_location_desc;
@@ -148,10 +170,66 @@ void print_minidump_thread_list(FILE *in)
   printf("\n");
 }
 
+static void print_minidump_vs_fixed_file_info(FILE *in)
+{
+    printf("           Signature: 0x%x\n", read_uint32(in));
+    printf("       StructVersion: %u\n", read_uint32(in));
+    printf("       FileVersionMS: %u\n", read_uint32(in));
+    printf("       FileVersionLS: %u\n", read_uint32(in));
+    printf("    ProductVersionMS: %u\n", read_uint32(in));
+    printf("    ProductVersionLS: %u\n", read_uint32(in));
+    printf("       FileFlagsMask: %u\n", read_uint32(in));
+    printf("           FileFlags: %u\n", read_uint32(in));
+    printf("              FileOS: %u\n", read_uint32(in));
+    printf("            FileType: %u\n", read_uint32(in));
+    printf("         FileSubtype: %u\n", read_uint32(in));
+    printf("          FileDateMS: %u\n", read_uint32(in));
+    printf("          FileDateLS: %u\n", read_uint32(in));
+}
+
+void print_minidump_module_list(FILE *in)
+{
+  struct minidump_location_desc_t minidump_location_desc;
+  uint32_t n;
+  uint32_t num_modules = read_uint32(in);
+
+  printf("  - num_modules: %d\n", num_modules);
+
+  for (n = 0; n < num_modules; n++)
+  {
+    printf("  -- Module %d --\n", n);
+    printf("    base_of_image: 0x%" PRIx64 "\n", read_uint64(in));
+    printf("    size_of_image: %u\n", read_uint32(in));
+    printf("         checksum: %u\n", read_uint32(in));
+    printf("  time_date_stamp: %u\n", read_uint32(in));
+
+    uint32_t module_name_rva = read_uint32(in);
+    printf("      module_name: offset=%u", module_name_rva);
+    print_minidump_string(in, module_name_rva);
+
+    print_minidump_vs_fixed_file_info(in);
+
+    read_minidump_location_desc(&minidump_location_desc, in);
+
+    printf("        cv_record:\n");
+    printf("              [ len_data: %u, ofs_data: %u ]\n",
+       minidump_location_desc.len_data,
+       minidump_location_desc.ofs_data);
+
+    read_minidump_location_desc(&minidump_location_desc, in);
+
+    printf("      misc_record:\n");
+    printf("              [ len_data: %u, ofs_data: %u ]\n",
+       minidump_location_desc.len_data,
+       minidump_location_desc.ofs_data);
+
+    printf("        reserved0: %" PRId64 "\n", read_uint64(in));
+    printf("        reserved1: %" PRId64 "\n", read_uint64(in));
+  }
+}
+
 void print_minidump_system_info(FILE *in)
 {
-  uint32_t n;
-
   uint16_t cpu_arch = read_uint16(in);
   const char *cpu_arch_str = "???";
 
@@ -176,20 +254,9 @@ void print_minidump_system_info(FILE *in)
   printf("      os_platform: %u\n", read_uint32(in));
 
   uint32_t ofs_service_pack = read_uint32(in);
-  long marker = ftell(in);
-  fseek(in, ofs_service_pack, SEEK_SET);
-
-  uint32_t length = read_uint32(in);
-
-  for (n = 0; n < length; n++)
-  {
-    putchar(getc(in));
-  }
 
   printf(" ofs_service_pack: ");
-  printf("\n");
-
-  fseek(in, marker, SEEK_SET);
+  print_minidump_string(in, ofs_service_pack);
 
   printf("    os_suite_mask: %u\n", read_uint16(in));
   printf("        reserved2: %u\n", read_uint16(in));
@@ -209,5 +276,13 @@ void print_minidump_misc_info(FILE *in)
   printf("      cpu_limit_mhz: %u\n", read_uint32(in));
   printf(" cpu_max_idle_state: %u\n", read_uint32(in));
   printf(" cpu_cur_idle_state: %u\n", read_uint32(in));
+}
+
+void print_minidump_thread_info_list(FILE *in)
+{
+  printf("\n");
+  printf("     size_of_header: %u\n", read_uint32(in));
+  printf("      size_of_entry: %u\n", read_uint32(in));
+  printf("  number_of_entries: %u\n", read_uint32(in));
 }
 

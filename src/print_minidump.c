@@ -59,11 +59,17 @@ int main(int argc, char *argv[])
       case STREAM_THREAD_LIST:
         print_minidump_thread_list(in);
         break;
+      case STREAM_MODULE_LIST:
+        print_minidump_module_list(in);
+        break;
       case STREAM_SYSTEM_INFO:
         print_minidump_system_info(in);
         break;
       case STREAM_MISC_INFO:
         print_minidump_misc_info(in);
+        break;
+      case STREAM_THREAD_INFO_LIST:
+        print_minidump_thread_info_list(in);
         break;
       default:
         break;
