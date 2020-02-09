@@ -23,9 +23,16 @@ OBJECTS= \
   table_cil_instr.o \
   vb.o
 
-default: $(OBJECTS)
+OBJECTS_MINIDUMP= \
+  fileio.o \
+  minidump.o
+
+default: $(OBJECTS) $(OBJECTS_MINIDUMP)
 	$(CC) -o ../print_pe ../src/print_pe.c \
 	   $(OBJECTS) \
+	   $(CFLAGS)
+	$(CC) -o ../print_minidump ../src/print_minidump.c \
+	   $(OBJECTS_MINIDUMP) \
 	   $(CFLAGS)
 
 %.o: %.c %.h
