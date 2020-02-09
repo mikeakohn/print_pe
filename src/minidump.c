@@ -98,3 +98,19 @@ void print_minidump_system_info(FILE *in)
   printf("        reserved2: %d\n", read_uint16(in));
 }
 
+void print_minidump_misc_info(FILE *in)
+{
+  printf("\n");
+  printf("           len_info: %d\n", read_uint32(in));
+  printf("             flags1: %d\n", read_uint32(in));
+  printf("         process_id: %d\n", read_uint32(in));
+  printf("process_create_time: %d\n", read_uint32(in));
+  printf("  process_user_time: %d\n", read_uint32(in));
+  printf("process_kernel_time: %d\n", read_uint32(in));
+  printf("        cpu_max_mhz: %d\n", read_uint32(in));
+  printf("        cpu_cur_mhz: %d\n", read_uint32(in));
+  printf("      cpu_limit_mhz: %d\n", read_uint32(in));
+  printf(" cpu_max_idle_state: %d\n", read_uint32(in));
+  printf(" cpu_cur_idle_state: %d\n", read_uint32(in));
+}
+

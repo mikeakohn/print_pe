@@ -59,6 +59,9 @@ int main(int argc, char *argv[])
       case STREAM_SYSTEM_INFO:
         print_minidump_system_info(in);
         break;
+      case STREAM_MISC_INFO:
+        print_minidump_misc_info(in);
+        break;
       default:
         break;
     }
