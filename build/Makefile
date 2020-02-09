@@ -25,7 +25,8 @@ OBJECTS= \
 
 OBJECTS_MINIDUMP= \
   fileio.o \
-  minidump.o
+  minidump.o \
+  minidump_stream_type.o
 
 default: $(OBJECTS) $(OBJECTS_MINIDUMP)
 	$(CC) -o ../print_pe ../src/print_pe.c \

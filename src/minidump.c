@@ -14,6 +14,7 @@ This code falls under the LGPL license.
 
 #include "fileio.h"
 #include "minidump.h"
+#include "minidump_stream_type.h"
 
 int read_minidump_header(struct minidump_header_t *minidump_header, FILE *in)
 {
@@ -55,7 +56,9 @@ void print_minidump_header(struct minidump_header_t *minidump_header)
 void print_minidump_dir(struct minidump_dir_t *minidump_dir, int index)
 {
   printf(" -------- MiniDump dir %d -------\n", index);
-  printf("stream_type: %d\n", minidump_dir->stream_type);
+  printf("stream_type: %d (%s)\n",
+    minidump_dir->stream_type,
+    get_minidump_stream_type(minidump_dir->stream_type));
   printf("   len_data: %d\n", minidump_dir->len_data);
   printf("   ofs_data: %d\n", minidump_dir->ofs_data);
 }
