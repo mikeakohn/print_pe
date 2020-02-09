@@ -56,6 +56,9 @@ int main(int argc, char *argv[])
 
     switch (minidump_dir.stream_type)
     {
+      case STREAM_THREAD_LIST:
+        print_minidump_thread_list(in);
+        break;
       case STREAM_SYSTEM_INFO:
         print_minidump_system_info(in);
         break;

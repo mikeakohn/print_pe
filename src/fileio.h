@@ -14,7 +14,7 @@ This code falls under the LGPL license.
 
 #include <stdint.h>
 
-int read_uint64(FILE *in);
+uint64_t read_uint64(FILE *in);
 int read_uint32(FILE *in);
 int read_uint16(FILE *in);
 int read_uint8(FILE *in);

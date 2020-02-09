@@ -49,11 +49,19 @@ struct minidump_system_info_t
   uint16_t reserved2;
 };
 
+struct minidump_location_desc_t
+{
+  uint32_t len_data;
+  uint32_t ofs_data;
+};
+
 int read_minidump_header(struct minidump_header_t *minidump_header, FILE *in);
-int read_minidump_dir(struct minidump_dir_t *minidump_die, FILE *in);
+int read_minidump_dir(struct minidump_dir_t *minidump_dir, FILE *in);
+int read_minidump_location_desc(struct minidump_location_desc_t *minidump_location_desc, FILE *in);
 void print_minidump_header(struct minidump_header_t *minidump_header);
 void print_minidump_dir(struct minidump_dir_t *minidump_dir, int index);
 
+void print_minidump_thread_list(FILE *in);
 void print_minidump_system_info(FILE *in);
 void print_minidump_misc_info(FILE *in);
 

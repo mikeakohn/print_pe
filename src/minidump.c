@@ -11,6 +11,8 @@ This code falls under the LGPL license.
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <inttypes.h>
 
 #include "fileio.h"
 #include "minidump.h"
@@ -39,6 +41,14 @@ int read_minidump_dir(struct minidump_dir_t *minidump_dir, FILE *in)
   return 0;
 }
 
+int read_minidump_location_desc(struct minidump_location_desc_t *minidump_location_desc, FILE *in)
+{
+  minidump_location_desc->len_data = read_uint32(in);
+  minidump_location_desc->ofs_data = read_uint32(in);
+
+  return 0;
+}
+
 void print_minidump_header(struct minidump_header_t *minidump_header)
 {
   printf(" -------- MiniDump header -------\n");
@@ -59,24 +69,111 @@ void print_minidump_dir(struct minidump_dir_t *minidump_dir, int index)
   printf("stream_type: %d (%s)\n",
     minidump_dir->stream_type,
     get_minidump_stream_type(minidump_dir->stream_type));
-  printf("   len_data: %d\n", minidump_dir->len_data);
-  printf("   ofs_data: %d\n", minidump_dir->ofs_data);
+  printf("   len_data: %u\n", minidump_dir->len_data);
+  printf("   ofs_data: %u\n", minidump_dir->ofs_data);
+}
+
+#if 0
+static void print_minidump_location_descriptor(FILE *in)
+{
+  //uint32_t n;
+  uint32_t len_data = read_uint32(in);
+  uint32_t ofs_data = read_uint32(in);
+
+  printf("        len_data: %u\n", len_data);
+  printf("        ofs_data: 0x%u\n", ofs_data);
+
+  long marker = ftell(in);
+  fseek(in, ofs_data, SEEK_SET);
+
+  for (n = 0; n < len_data; n++)
+  {
+    if ((n % 16) == 0) { printf("\n"); }
+    printf(" %02x", read_uint8(in));
+  }
+
+  printf("\n");
+
+  fseek(in, marker, SEEK_SET);
+}
+#endif
+
+static void print_minidump_memory_descriptor(FILE *in)
+{
+  struct minidump_location_desc_t minidump_location_desc;
+
+  printf("    start_of_memory_range: 0x%" PRIx64 "\n", read_uint64(in));
+  printf("                   memory:\n");
+
+  read_minidump_location_desc(&minidump_location_desc, in);
+
+  printf("              [ len_data: %u, ofs_data: %u ]\n",
+     minidump_location_desc.len_data,
+     minidump_location_desc.ofs_data);
+}
+
+static void print_minidump_thread(FILE *in)
+{
+  struct minidump_location_desc_t minidump_location_desc;
+
+  read_minidump_location_desc(&minidump_location_desc, in);
+
+  printf("              [ len_data: %u, ofs_data: %u ]\n",
+     minidump_location_desc.len_data,
+     minidump_location_desc.ofs_data);
+}
+
+void print_minidump_thread_list(FILE *in)
+{
+  uint32_t n;
+  uint32_t num_threads = read_uint32(in);
+
+  printf("  - num_threads: %d\n", num_threads);
+
+  for (n = 0; n < num_threads; n++)
+  {
+    printf("  -- Thread %d --\n", n);
+
+    printf("        thread_id: %u\n", read_uint32(in));
+    printf("    suspend_count: %u\n", read_uint32(in));
+    printf("   priority_class: %u\n", read_uint32(in));
+    printf("         priority: %u\n", read_uint32(in));
+    printf("              teb: %" PRIx64 "\n", read_uint64(in));
+    printf("            stack:\n");
+    print_minidump_memory_descriptor(in);
+    printf("   thread_context:\n");
+    print_minidump_thread(in);
+  }
+
+  printf("\n");
 }
 
 void print_minidump_system_info(FILE *in)
 {
-  int n;
+  uint32_t n;
+
+  uint16_t cpu_arch = read_uint16(in);
+  const char *cpu_arch_str = "???";
+
+  switch (cpu_arch)
+  {
+    case 9: cpu_arch_str = "x64"; break;
+    case 5: cpu_arch_str = "ARM"; break;
+    case 6: cpu_arch_str = "Itanium"; break;
+    case 0: cpu_arch_str = "x86"; break;
+    case 0xffff: cpu_arch_str = "Unknown"; break;
+  }
 
   printf("\n");
-  printf("         cpu_arch: %d\n", read_uint16(in));
-  printf("        cpu_level: %d\n", read_uint16(in));
-  printf("     cpu_revision: %d\n", read_uint16(in));
-  printf("         num_cpus: %d\n", read_uint8(in));
-  printf("          os_type: %d\n", read_uint8(in));
-  printf("     os_ver_major: %d\n", read_uint32(in));
-  printf("     os_ver_minor: %d\n", read_uint32(in));
-  printf("         os_build: %d\n", read_uint32(in));
-  printf("      os_platform: %d\n", read_uint32(in));
+  printf("         cpu_arch: %u (%s)\n", cpu_arch, cpu_arch_str);
+  printf("        cpu_level: %u\n", read_uint16(in));
+  printf("     cpu_revision: %u\n", read_uint16(in));
+  printf("         num_cpus: %u\n", read_uint8(in));
+  printf("          os_type: %u\n", read_uint8(in));
+  printf("     os_ver_major: %u\n", read_uint32(in));
+  printf("     os_ver_minor: %u\n", read_uint32(in));
+  printf("         os_build: %u\n", read_uint32(in));
+  printf("      os_platform: %u\n", read_uint32(in));
 
   uint32_t ofs_service_pack = read_uint32(in);
   long marker = ftell(in);
@@ -94,23 +191,23 @@ void print_minidump_system_info(FILE *in)
 
   fseek(in, marker, SEEK_SET);
 
-  printf("    os_suite_mask: %d\n", read_uint16(in));
-  printf("        reserved2: %d\n", read_uint16(in));
+  printf("    os_suite_mask: %u\n", read_uint16(in));
+  printf("        reserved2: %u\n", read_uint16(in));
 }
 
 void print_minidump_misc_info(FILE *in)
 {
   printf("\n");
-  printf("           len_info: %d\n", read_uint32(in));
-  printf("             flags1: %d\n", read_uint32(in));
-  printf("         process_id: %d\n", read_uint32(in));
-  printf("process_create_time: %d\n", read_uint32(in));
-  printf("  process_user_time: %d\n", read_uint32(in));
-  printf("process_kernel_time: %d\n", read_uint32(in));
-  printf("        cpu_max_mhz: %d\n", read_uint32(in));
-  printf("        cpu_cur_mhz: %d\n", read_uint32(in));
-  printf("      cpu_limit_mhz: %d\n", read_uint32(in));
-  printf(" cpu_max_idle_state: %d\n", read_uint32(in));
-  printf(" cpu_cur_idle_state: %d\n", read_uint32(in));
+  printf("           len_info: %u\n", read_uint32(in));
+  printf("             flags1: %u\n", read_uint32(in));
+  printf("         process_id: %u\n", read_uint32(in));
+  printf("process_create_time: %u\n", read_uint32(in));
+  printf("  process_user_time: %u\n", read_uint32(in));
+  printf("process_kernel_time: %u\n", read_uint32(in));
+  printf("        cpu_max_mhz: %u\n", read_uint32(in));
+  printf("        cpu_cur_mhz: %u\n", read_uint32(in));
+  printf("      cpu_limit_mhz: %u\n", read_uint32(in));
+  printf(" cpu_max_idle_state: %u\n", read_uint32(in));
+  printf(" cpu_cur_idle_state: %u\n", read_uint32(in));
 }
 
