@@ -15,6 +15,7 @@ This code falls under the LGPL license.
 
 #include "fileio.h"
 #include "minidump.h"
+#include "minidump_stream_type.h"
 
 int main(int argc, char *argv[])
 {
@@ -49,6 +50,20 @@ int main(int argc, char *argv[])
   {
     read_minidump_dir(&minidump_dir, in);
     print_minidump_dir(&minidump_dir, i);
+
+    long marker = ftell(in); 
+    fseek(in, minidump_dir.ofs_data, SEEK_SET);
+
+    switch (minidump_dir.stream_type)
+    {
+      case STREAM_SYSTEM_INFO:
+        print_minidump_system_info(in);
+        break;
+      default:
+        break;
+    }
+
+    fseek(in, marker, SEEK_SET);
   }
 
   fclose(in);

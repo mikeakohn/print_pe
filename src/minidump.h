@@ -33,10 +33,28 @@ struct minidump_dir_t
   uint32_t ofs_data;
 };
 
+struct minidump_system_info_t
+{
+  uint16_t cpu_arch;
+  uint16_t cpu_level;
+  uint16_t cpu_revision;
+  uint8_t num_cpus;
+  uint8_t os_type;
+  uint32_t os_ver_major;
+  uint32_t os_ver_minor;
+  uint32_t os_build;
+  uint32_t os_platform;
+  uint32_t ofs_service_pack;
+  uint16_t os_suite_mask;
+  uint16_t reserved2;
+};
+
 int read_minidump_header(struct minidump_header_t *minidump_header, FILE *in);
 int read_minidump_dir(struct minidump_dir_t *minidump_die, FILE *in);
 void print_minidump_header(struct minidump_header_t *minidump_header);
 void print_minidump_dir(struct minidump_dir_t *minidump_dir, int index);
+
+void print_minidump_system_info(FILE *in);
 
 #endif
 

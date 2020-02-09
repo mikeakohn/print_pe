@@ -63,3 +63,38 @@ void print_minidump_dir(struct minidump_dir_t *minidump_dir, int index)
   printf("   ofs_data: %d\n", minidump_dir->ofs_data);
 }
 
+void print_minidump_system_info(FILE *in)
+{
+  int n;
+
+  printf("\n");
+  printf("         cpu_arch: %d\n", read_uint16(in));
+  printf("        cpu_level: %d\n", read_uint16(in));
+  printf("     cpu_revision: %d\n", read_uint16(in));
+  printf("         num_cpus: %d\n", read_uint8(in));
+  printf("          os_type: %d\n", read_uint8(in));
+  printf("     os_ver_major: %d\n", read_uint32(in));
+  printf("     os_ver_minor: %d\n", read_uint32(in));
+  printf("         os_build: %d\n", read_uint32(in));
+  printf("      os_platform: %d\n", read_uint32(in));
+
+  uint32_t ofs_service_pack = read_uint32(in);
+  long marker = ftell(in);
+  fseek(in, ofs_service_pack, SEEK_SET);
+
+  uint32_t length = read_uint32(in);
+
+  for (n = 0; n < length; n++)
+  {
+    putchar(getc(in));
+  }
+
+  printf(" ofs_service_pack: ");
+  printf("\n");
+
+  fseek(in, marker, SEEK_SET);
+
+  printf("    os_suite_mask: %d\n", read_uint16(in));
+  printf("        reserved2: %d\n", read_uint16(in));
+}
+

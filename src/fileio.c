@@ -51,6 +51,15 @@ int read_uint16(FILE *in)
   return c;
 }
 
+int read_uint8(FILE *in)
+{
+  int c;
+
+  c = getc(in);
+
+  return c;
+}
+
 int read_chars(FILE *in, char *s, int count)
 {
   int t;

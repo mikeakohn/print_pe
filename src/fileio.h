@@ -17,6 +17,7 @@ This code falls under the LGPL license.
 int read_uint64(FILE *in);
 int read_uint32(FILE *in);
 int read_uint16(FILE *in);
+int read_uint8(FILE *in);
 int read_chars(FILE *in, char *s, int count);
 int read_chars_bin(FILE *in, uint8_t *s, int count);
 
