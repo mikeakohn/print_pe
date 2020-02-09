@@ -187,6 +187,42 @@ static void print_minidump_vs_fixed_file_info(FILE *in)
     printf("          FileDateLS: %u\n", read_uint32(in));
 }
 
+void print_minidump_memory_list(FILE *in)
+{
+  uint64_t n;
+  uint32_t size_of_headers = read_uint32(in);
+  uint32_t size_of_entry = read_uint32(in);
+  uint64_t number_of_entries = read_uint64(in);
+
+  printf("   size_of_headers: %u\n", size_of_headers);
+  printf("     size_of_entry: %u\n", size_of_entry);
+
+  for (n = 0; n < number_of_entries; n++)
+  {
+    uint64_t marker = ftell(in);
+
+    printf("  -- Memory Info %ld --\n", n);
+
+    printf("      base_address: 0x%" PRIx64 "\n", read_uint64(in));
+    printf("   allocation_base: 0x%" PRIx64 "\n", read_uint64(in));
+    printf("allocation_protect: 0x%x\n", read_uint32(in));
+    printf("      __alignment1: %d\n", read_uint32(in));
+    printf("       region_size: %" PRId64 "\n", read_uint64(in));
+    printf("             state: %d\n", read_uint32(in));
+    printf("           protect: %d\n", read_uint32(in));
+    printf("              type: %d\n", read_uint32(in));
+    printf("      __alignment2: %d\n", read_uint32(in));
+
+    uint64_t length = ftell(in) - marker;
+
+    if (length < size_of_entry)
+    {
+printf("seek\n");
+      fseek(in, size_of_entry - marker, SEEK_CUR);
+    }
+  }
+}
+
 void print_minidump_module_list(FILE *in)
 {
   struct minidump_location_desc_t minidump_location_desc;

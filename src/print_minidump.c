@@ -59,6 +59,9 @@ int main(int argc, char *argv[])
       case STREAM_THREAD_LIST:
         print_minidump_thread_list(in);
         break;
+      case STREAM_MEMORY_LIST:
+        print_minidump_memory_list(in);
+        break;
       case STREAM_MODULE_LIST:
         print_minidump_module_list(in);
         break;
