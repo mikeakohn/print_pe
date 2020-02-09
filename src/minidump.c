@@ -53,7 +53,7 @@ void print_minidump_header(struct minidump_header_t *minidump_header)
 {
   printf(" -------- MiniDump header -------\n");
   printf("     magic1: %.4s\n", minidump_header->magic1);
-  printf(     "magic2: 0x%02x 0x%02x\n", minidump_header->magic2[0],
+  printf("     magic2: 0x%02x 0x%02x\n", minidump_header->magic2[0],
                                          minidump_header->magic2[1]);
   printf("    version: %d\n", minidump_header->version);
   printf("num_streams: %d\n", minidump_header->num_streams);
@@ -134,7 +134,76 @@ static void print_minidump_memory_descriptor(FILE *in)
      minidump_location_desc.ofs_data);
 }
 
-static void print_minidump_thread(FILE *in)
+static void print_minidump_thread_context_x86(FILE *in)
+{
+  int n;
+
+  printf("    context_flags: 0x%x\n", read_uint32(in));
+  printf("    dr0: 0x%08x  dr1: 0x%08x  dr2: 0x%08x\n",
+    read_uint32(in), read_uint32(in), read_uint32(in));
+  printf("    dr3: 0x%08x  dr6: 0x%08x  dr7: 0x%08x\n",
+    read_uint32(in), read_uint32(in), read_uint32(in));
+  printf("    fcw: 0x%04x  reserved_1: 0x%04x\n",
+    read_uint16(in), read_uint16(in));
+  printf("    fsw: 0x%04x  reserved_2: 0x%04x\n",
+    read_uint16(in), read_uint16(in));
+  printf("    ftw: 0x%04x  reserved_3: 0x%04x\n",
+    read_uint16(in), read_uint16(in));
+  printf(" fpu_ip: 0x%08x  fpu_cs: 0x%04x  fop: 0x%04x\n",
+    read_uint32(in), read_uint16(in), read_uint16(in));
+  printf(" fpu_dp: 0x%08x  fpu_ds: 0x%04x  reserved_4: 0x%04x\n",
+    read_uint32(in), read_uint16(in), read_uint16(in));
+
+  printf("  ");
+
+  for (n = 0; n < 8; n++)
+  {
+    if (n == 4) { printf("\n  "); }
+    printf("  st%d: 0x%08x", n, read_uint32(in));
+  }
+
+  printf("\n");
+
+  printf("     gs: 0x%08x   fs: 0x%08x   es: 0x%08x   ds: 0x%08x\n",
+    read_uint32(in), read_uint32(in), read_uint32(in), read_uint32(in));
+  printf("    edi: 0x%08x  esi: 0x%08x  ebx: 0x%08x  edx: 0x%08x\n",
+    read_uint32(in), read_uint32(in), read_uint32(in), read_uint32(in));
+  printf("    ecx: 0x%08x  eax: 0x%08x  ebp: 0x%08x  eip: 0x%08x\n",
+    read_uint32(in), read_uint32(in), read_uint32(in), read_uint32(in));
+  printf("     cs: 0x%08x eflg: 0x%08x  esp: 0x%08x   ss: 0x%08x\n",
+    read_uint32(in), read_uint32(in), read_uint32(in), read_uint32(in));
+
+  printf("    fcw: 0x%04x  fsw: 0x%04x ftw: 0x%02x reserved_1: 0x%02x\n",
+    read_uint16(in), read_uint16(in), read_uint8(in), read_uint8(in));
+  printf("    fop: 0x%04x  fpu_ip: 0x%08x\n",
+    read_uint16(in), read_uint32(in));
+  printf(" fpu_cs: 0x%04x  reversed_2: 0x%08x\n",
+    read_uint16(in), read_uint16(in));
+  printf(" fpu_dp: 0x%08x  fpu_ds: 0x%04x  reserved_3: 0x%04d\n",
+    read_uint32(in), read_uint16(in), read_uint16(in));
+  printf("  mxcsr: 0x%08x  mxcsr_mask: 0x%08x\n",
+    read_uint32(in), read_uint32(in));
+
+  for (n = 0; n < 8; n++)
+  {
+    printf("  mm%d: 0x%016" PRIx64, n, read_uint64(in));
+    if ((n % 2) == 1) { printf("\n"); }
+  }
+
+  for (n = 0; n < 8; n++)
+  {
+    printf(" xmm%d: 0x%08x 0x%08x 0x%08x 0x%08x\n", n,
+      read_uint32(in), read_uint32(in), read_uint32(in), read_uint32(in));
+  }
+
+  printf("\n");
+}
+
+static void print_minidump_thread_context_x86_64(FILE *in)
+{
+}
+
+static void print_minidump_thread(FILE *in, uint32_t cpu_arch)
 {
   struct minidump_location_desc_t minidump_location_desc;
 
@@ -143,9 +212,23 @@ static void print_minidump_thread(FILE *in)
   printf("              [ len_data: %u, ofs_data: %u ]\n",
      minidump_location_desc.len_data,
      minidump_location_desc.ofs_data);
+
+  long marker = ftell(in);
+  fseek(in, minidump_location_desc.ofs_data, SEEK_SET);
+
+  if (cpu_arch == 0)
+  {
+    print_minidump_thread_context_x86(in);
+  }
+    else
+  {
+    print_minidump_thread_context_x86_64(in);
+  }
+
+  fseek(in, marker, SEEK_SET);
 }
 
-void print_minidump_thread_list(FILE *in)
+void print_minidump_thread_list(FILE *in, uint32_t cpu_arch)
 {
   uint32_t n;
   uint32_t num_threads = read_uint32(in);
@@ -164,7 +247,7 @@ void print_minidump_thread_list(FILE *in)
     printf("            stack:\n");
     print_minidump_memory_descriptor(in);
     printf("   thread_context:\n");
-    print_minidump_thread(in);
+    print_minidump_thread(in, cpu_arch);
   }
 
   printf("\n");
@@ -217,7 +300,6 @@ void print_minidump_memory_list(FILE *in)
 
     if (length < size_of_entry)
     {
-printf("seek\n");
       fseek(in, size_of_entry - marker, SEEK_CUR);
     }
   }
@@ -291,7 +373,7 @@ void print_minidump_system_info(FILE *in)
 
   uint32_t ofs_service_pack = read_uint32(in);
 
-  printf(" ofs_service_pack: ");
+  printf(" ofs_service_pack: %u", ofs_service_pack);
   print_minidump_string(in, ofs_service_pack);
 
   printf("    os_suite_mask: %u\n", read_uint16(in));

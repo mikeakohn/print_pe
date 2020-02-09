@@ -23,6 +23,7 @@ int main(int argc, char *argv[])
   struct minidump_header_t minidump_header;
   struct minidump_dir_t minidump_dir;
   uint32_t i;
+  uint32_t cpu_arch = 0;
 
   printf("\nprint_minidump (February 8, 2020) - MiniDump Crash Analyzer\n");
   printf("Copyright 2005-2020 - Michael Kohn  http://www.mikekohn.net/\n\n");
@@ -44,6 +45,23 @@ int main(int argc, char *argv[])
   read_minidump_header(&minidump_header, in);
   print_minidump_header(&minidump_header);
 
+  // Need to find cpu_arch in order to parse ThreadContext.
+  fseek(in, minidump_header.ofs_streams, SEEK_SET);
+  for (i = 0; i < minidump_header.num_streams; i++)
+  {
+    read_minidump_dir(&minidump_dir, in);
+
+    if (minidump_dir.stream_type == STREAM_SYSTEM_INFO)
+    {
+      long marker = ftell(in); 
+      fseek(in, minidump_dir.ofs_data, SEEK_SET);
+
+      cpu_arch = read_uint16(in);
+
+      fseek(in, marker, SEEK_SET);
+    }
+  }
+
   fseek(in, minidump_header.ofs_streams, SEEK_SET);
 
   for (i = 0; i < minidump_header.num_streams; i++)
@@ -57,7 +75,7 @@ int main(int argc, char *argv[])
     switch (minidump_dir.stream_type)
     {
       case STREAM_THREAD_LIST:
-        print_minidump_thread_list(in);
+        print_minidump_thread_list(in, cpu_arch);
         break;
       case STREAM_MEMORY_LIST:
         print_minidump_memory_list(in);
