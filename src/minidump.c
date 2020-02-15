@@ -165,6 +165,7 @@ static void print_minidump_thread_context_x86(FILE *in)
 
   printf(" spare_0: 0x%08x\n", read_uint32(in));
 
+#if 0
   printf("     gs: 0x%08x   fs: 0x%08x   es: 0x%08x   ds: 0x%08x\n",
     read_uint32(in), read_uint32(in), read_uint32(in), read_uint32(in));
   printf("    edi: 0x%08x  esi: 0x%08x  ebx: 0x%08x  edx: 0x%08x\n",
@@ -172,6 +173,25 @@ static void print_minidump_thread_context_x86(FILE *in)
   printf("    ecx: 0x%08x  eax: 0x%08x  ebp: 0x%08x  eip: 0x%08x\n",
     read_uint32(in), read_uint32(in), read_uint32(in), read_uint32(in));
   printf("     cs: 0x%08x eflg: 0x%08x  esp: 0x%08x   ss: 0x%08x\n",
+    read_uint32(in), read_uint32(in), read_uint32(in), read_uint32(in));
+#endif
+
+  // This section seems to be undocumented.  I got some information
+  // from Chromium's Crashpad, but their information seems to be wrong.
+  // I got these values by taking their information, writing a program
+  // in VisualStudio 2015 that in an _asm section sets an x87 float
+  // register, xmm1, and ecx and made it dereference a NULL pointer.
+  // In VisualStudio I dumped all the registers and rearranged these
+  // based on those values.  Unfortunately, ds, gs, es, and ss were
+  // the same so I'm not sure if those are mixed up.  Actually, it
+  // looks like from left to right it was a mirror image.
+  printf("     ds: 0x%08x   es: 0x%08x   fs: 0x%08x   gs: 0x%08x\n",
+    read_uint32(in), read_uint32(in), read_uint32(in), read_uint32(in));
+  printf("    edx: 0x%08x  ebx: 0x%08x  esi: 0x%08x  edi: 0x%08x\n",
+    read_uint32(in), read_uint32(in), read_uint32(in), read_uint32(in));
+  printf("    eip: 0x%08x  ebp: 0x%08x  eax: 0x%08x  ecx: 0x%08x\n",
+    read_uint32(in), read_uint32(in), read_uint32(in), read_uint32(in));
+  printf("     ss: 0x%08x  esp: 0x%08x eflg: 0x%08x   cs: 0x%08x\n",
     read_uint32(in), read_uint32(in), read_uint32(in), read_uint32(in));
 
   printf("    fcw: 0x%04x  fsw: 0x%04x ftw: 0x%02x reserved_1: 0x%02x\n",
