@@ -143,6 +143,8 @@ static void print_minidump_thread_context_x86(FILE *in)
     read_uint32(in), read_uint32(in), read_uint32(in));
   printf("    dr3: 0x%08x  dr6: 0x%08x  dr7: 0x%08x\n",
     read_uint32(in), read_uint32(in), read_uint32(in));
+
+  // Fsave flags.
   printf("    fcw: 0x%04x  reserved_1: 0x%04x\n",
     read_uint16(in), read_uint16(in));
   printf("    fsw: 0x%04x  reserved_2: 0x%04x\n",
@@ -154,15 +156,14 @@ static void print_minidump_thread_context_x86(FILE *in)
   printf(" fpu_dp: 0x%08x  fpu_ds: 0x%04x  reserved_4: 0x%04x\n",
     read_uint32(in), read_uint16(in), read_uint16(in));
 
-  printf("  ");
-
   for (n = 0; n < 8; n++)
   {
-    if (n == 4) { printf("\n  "); }
-    printf("  st%d: 0x%08x", n, read_uint32(in));
+    printf("  st%d: 0x%08" PRIx64 " 0x%02x 0x%02x", n,
+      read_uint64(in), read_uint8(in), read_uint8(in));
+    if ((n & 1) == 1) { printf("\n"); }
   }
 
-  printf("\n");
+  printf(" spare_0: 0x%08x\n", read_uint32(in));
 
   printf("     gs: 0x%08x   fs: 0x%08x   es: 0x%08x   ds: 0x%08x\n",
     read_uint32(in), read_uint32(in), read_uint32(in), read_uint32(in));
@@ -177,7 +178,7 @@ static void print_minidump_thread_context_x86(FILE *in)
     read_uint16(in), read_uint16(in), read_uint8(in), read_uint8(in));
   printf("    fop: 0x%04x  fpu_ip: 0x%08x\n",
     read_uint16(in), read_uint32(in));
-  printf(" fpu_cs: 0x%04x  reversed_2: 0x%08x\n",
+  printf(" fpu_cs: 0x%04x  reserved_2: 0x%08x\n",
     read_uint16(in), read_uint16(in));
   printf(" fpu_dp: 0x%08x  fpu_ds: 0x%04x  reserved_3: 0x%04d\n",
     read_uint32(in), read_uint16(in), read_uint16(in));
@@ -187,6 +188,9 @@ static void print_minidump_thread_context_x86(FILE *in)
   for (n = 0; n < 8; n++)
   {
     printf("  mm%d: 0x%016" PRIx64, n, read_uint64(in));
+
+    read_uint64(in);
+
     if ((n % 2) == 1) { printf("\n"); }
   }
 
