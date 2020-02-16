@@ -101,6 +101,13 @@ static void print_minidump_location_descriptor(FILE *in)
 static void print_minidump_string(FILE *in, uint32_t offset)
 {
   uint32_t n;
+
+  if (offset == 0)
+  {
+    printf("length=0\n");
+    return;
+  }
+
   long marker = ftell(in);
   fseek(in, offset, SEEK_SET);
 
@@ -294,41 +301,6 @@ static void print_minidump_vs_fixed_file_info(FILE *in)
     printf("          FileDateLS: %u\n", read_uint32(in));
 }
 
-void print_minidump_memory_list(FILE *in)
-{
-  uint64_t n;
-  uint32_t size_of_headers = read_uint32(in);
-  uint32_t size_of_entry = read_uint32(in);
-  uint64_t number_of_entries = read_uint64(in);
-
-  printf("   size_of_headers: %u\n", size_of_headers);
-  printf("     size_of_entry: %u\n", size_of_entry);
-
-  for (n = 0; n < number_of_entries; n++)
-  {
-    uint64_t marker = ftell(in);
-
-    printf("  -- Memory Info %ld --\n", n);
-
-    printf("      base_address: 0x%" PRIx64 "\n", read_uint64(in));
-    printf("   allocation_base: 0x%" PRIx64 "\n", read_uint64(in));
-    printf("allocation_protect: 0x%x\n", read_uint32(in));
-    printf("      __alignment1: %d\n", read_uint32(in));
-    printf("       region_size: %" PRId64 "\n", read_uint64(in));
-    printf("             state: %d\n", read_uint32(in));
-    printf("           protect: %d\n", read_uint32(in));
-    printf("              type: %d\n", read_uint32(in));
-    printf("      __alignment2: %d\n", read_uint32(in));
-
-    uint64_t length = ftell(in) - marker;
-
-    if (length < size_of_entry)
-    {
-      fseek(in, size_of_entry - marker, SEEK_CUR);
-    }
-  }
-}
-
 void print_minidump_module_list(FILE *in)
 {
   struct minidump_location_desc_t minidump_location_desc;
@@ -370,6 +342,66 @@ void print_minidump_module_list(FILE *in)
   }
 }
 
+void print_minidump_memory_list(FILE *in)
+{
+  uint64_t n;
+  uint32_t size_of_headers = read_uint32(in);
+  uint32_t size_of_entry = read_uint32(in);
+  uint64_t number_of_entries = read_uint64(in);
+
+  printf("   size_of_headers: %u\n", size_of_headers);
+  printf("     size_of_entry: %u\n", size_of_entry);
+
+  for (n = 0; n < number_of_entries; n++)
+  {
+    uint64_t marker = ftell(in);
+
+    printf("  -- Memory Info %ld --\n", n);
+
+    printf("      base_address: 0x%" PRIx64 "\n", read_uint64(in));
+    printf("   allocation_base: 0x%" PRIx64 "\n", read_uint64(in));
+    printf("allocation_protect: 0x%x\n", read_uint32(in));
+    printf("      __alignment1: %d\n", read_uint32(in));
+    printf("       region_size: %" PRId64 "\n", read_uint64(in));
+    printf("             state: %d\n", read_uint32(in));
+    printf("           protect: %d\n", read_uint32(in));
+    printf("              type: %d\n", read_uint32(in));
+    printf("      __alignment2: %d\n", read_uint32(in));
+
+    uint64_t length = ftell(in) - marker;
+
+    if (length < size_of_entry)
+    {
+      fseek(in, size_of_entry - marker, SEEK_CUR);
+    }
+  }
+}
+
+void print_minidump_exception(FILE *in)
+{
+  uint32_t n;
+
+  printf("         thread_id: %d\n", read_uint32(in));
+  printf("            unused: %d\n", read_uint32(in));
+  printf("    exception_code: 0x%08x\n", read_uint32(in));
+  printf("   exception_flags: 0x%08x\n", read_uint32(in));
+  printf("  exception_record: 0x%" PRIx64 "\n", read_uint64(in));
+  printf(" exception_address: 0x%" PRIx64 "\n", read_uint64(in));
+
+  uint32_t number_parameters = read_uint32(in);
+  printf("  number_paramters: %d\n", number_parameters);
+  printf("            unused: %d\n", read_uint32(in));
+  printf("       information:\n");
+
+  for (n = 0; n < number_parameters; n++)
+  {
+    printf("      ---- %d ----\n", n);
+    printf("            thread_id: %d\n", read_uint32(in));
+    printf("    excpetion_pointer: %d\n", read_uint32(in));
+    printf("      client_pointers: %d\n", read_uint32(in));
+  }
+}
+
 void print_minidump_system_info(FILE *in)
 {
   uint16_t cpu_arch = read_uint16(in);
@@ -402,6 +434,72 @@ void print_minidump_system_info(FILE *in)
 
   printf("    os_suite_mask: %u\n", read_uint16(in));
   printf("        reserved2: %u\n", read_uint16(in));
+}
+
+void print_minidump_memory64_list(FILE *in)
+{
+  uint64_t number_of_memory_ranges = read_uint64(in);
+  uint64_t n;
+
+  printf("\n");
+  printf("  num_memory_ranges: %" PRId64 "\n", number_of_memory_ranges);
+  printf("             offset: %" PRIx64 "\n", read_uint64(in));
+
+  for (n = 0; n < number_of_memory_ranges; n++)
+  {
+    printf("           0x%08" PRIx64 ": size=%" PRId64 "\n",
+      read_uint64(in), read_uint64(in));
+  }
+}
+
+void print_minidump_handle_data(FILE *in)
+{
+  uint32_t n;
+
+  printf("\n");
+  printf("     size_of_header: %u\n", read_uint32(in));
+
+  uint32_t size_of_descriptor = read_uint32(in);
+  uint32_t number_of_descriptors = read_uint32(in);
+
+  printf(" size_of_descriptor: %u\n", size_of_descriptor);
+  printf(" number_descriptors: %u\n", number_of_descriptors);
+  printf("           reserved: %u\n", read_uint32(in));
+
+  for (n = 0; n < number_of_descriptors; n++)
+  {
+    printf("       --- handle descriptor %d ---\n", n);
+    long marker = ftell(in);
+
+    printf("               handle: 0x%" PRIx64 "\n", read_uint64(in));
+
+    uint32_t type_name_offset = read_uint32(in);
+    uint32_t object_name_offset = read_uint32(in);
+
+    printf("            type_name: offset=%d,", type_name_offset);
+    print_minidump_string(in, type_name_offset);
+
+    printf("          object_name: offset=%d,", object_name_offset);
+    print_minidump_string(in, object_name_offset);
+
+    printf("           attributes: 0x%x\n", read_uint32(in));
+    printf("       granted_access: 0x%x\n", read_uint32(in));
+    printf("         handle_count: %u\n", read_uint32(in));
+    printf("        pointer_count: %u\n", read_uint32(in));
+
+    if (size_of_descriptor > 32)
+    {
+      printf("          object_info: offset=%u\n", read_uint32(in));
+      printf("             reserved: %u\n", read_uint32(in));
+    }
+
+    long end = ftell(in);
+
+    if (end - marker < size_of_descriptor)
+    {
+      fseek(in, end - marker - size_of_descriptor, SEEK_CUR);
+    }
+  }
 }
 
 void print_minidump_misc_info(FILE *in)

@@ -62,9 +62,12 @@ void print_minidump_header(struct minidump_header_t *minidump_header);
 void print_minidump_dir(struct minidump_dir_t *minidump_dir, int index);
 
 void print_minidump_thread_list(FILE *in, uint32_t cpu_arch);
-void print_minidump_memory_list(FILE *in);
 void print_minidump_module_list(FILE *in);
+void print_minidump_memory_list(FILE *in);
+void print_minidump_exception(FILE *in);
 void print_minidump_system_info(FILE *in);
+void print_minidump_memory64_list(FILE *in);
+void print_minidump_handle_data(FILE *in);
 void print_minidump_misc_info(FILE *in);
 void print_minidump_thread_info_list(FILE *in);
 

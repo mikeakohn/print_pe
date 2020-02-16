@@ -77,14 +77,23 @@ int main(int argc, char *argv[])
       case STREAM_THREAD_LIST:
         print_minidump_thread_list(in, cpu_arch);
         break;
-      case STREAM_MEMORY_LIST:
-        print_minidump_memory_list(in);
-        break;
       case STREAM_MODULE_LIST:
         print_minidump_module_list(in);
         break;
+      case STREAM_MEMORY_LIST:
+        print_minidump_memory_list(in);
+        break;
+      case STREAM_EXCEPTION:
+        print_minidump_exception(in);
+        break;
       case STREAM_SYSTEM_INFO:
         print_minidump_system_info(in);
+        break;
+      case STREAM_MEMORY64_LIST:
+        print_minidump_memory64_list(in);
+        break;
+      case STREAM_HANDLE_DATA:
+        print_minidump_handle_data(in);
         break;
       case STREAM_MISC_INFO:
         print_minidump_misc_info(in);
