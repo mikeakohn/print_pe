@@ -4,7 +4,7 @@ print_pe
 Author: Michael Kohn
    Web: http://www.mikekohn.net/
 
-Tool for dumping the contents of Window executables.
+Tools for dumping the contents of Window executables and MiniDumps.
 
 Features:
 * Dump DOS header along with DOS binary.

@@ -232,6 +232,83 @@ static void print_minidump_thread_context_x86(FILE *in)
 
 static void print_minidump_thread_context_x86_64(FILE *in)
 {
+  int n;
+
+  printf("This currently isn't correct for x86_64\n");
+
+  printf("    context_flags: 0x%x\n", read_uint32(in));
+  printf("           mx_csr: 0x%x\n", read_uint32(in));
+  printf("     cs: 0x%04x   ds: 0x%04x   es: 0x%04x   fs: 0x%04x\n",
+   read_uint16(in), read_uint16(in), read_uint16(in), read_uint16(in));
+  printf("     gs: 0x%04x   ss: 0x%04x   eflags: 0x%08x\n",
+   read_uint16(in), read_uint16(in), read_uint32(in));
+  printf("    dr0: 0x%016" PRIx64 "   dr1: 0x%016" PRIx64 "\n",
+   read_uint64(in), read_uint64(in));
+  printf("    dr2: 0x%016" PRIx64 "   dr3: 0x%016" PRIx64 "\n",
+   read_uint64(in), read_uint64(in));
+  printf("    dr6: 0x%016" PRIx64 "   dr7: 0x%016" PRIx64 "\n",
+   read_uint64(in), read_uint64(in));
+  printf("    rax: 0x%016" PRIx64 "   rcx: 0x%016" PRIx64 "\n",
+   read_uint64(in), read_uint64(in));
+  printf("    rdx: 0x%016" PRIx64 "   rbx: 0x%016" PRIx64 "\n",
+   read_uint64(in), read_uint64(in));
+  printf("    rsp: 0x%016" PRIx64 "   rbp: 0x%016" PRIx64 "\n",
+   read_uint64(in), read_uint64(in));
+  printf("    rsi: 0x%016" PRIx64 "   rdi: 0x%016" PRIx64 "\n",
+   read_uint64(in), read_uint64(in));
+  printf("     r8: 0x%016" PRIx64 "    r9: 0x%016" PRIx64 "\n",
+   read_uint64(in), read_uint64(in));
+  printf("    r10: 0x%016" PRIx64 "   r11: 0x%016" PRIx64 "\n",
+   read_uint64(in), read_uint64(in));
+  printf("    r12: 0x%016" PRIx64 "   r13: 0x%016" PRIx64 "\n",
+   read_uint64(in), read_uint64(in));
+  printf("    r14: 0x%016" PRIx64 "   r15: 0x%016" PRIx64 "\n",
+   read_uint64(in), read_uint64(in));
+  printf("    rip: 0x%016" PRIx64 "\n", read_uint64(in));
+
+  // Fxsave
+  printf("    fcw: 0x%04x  fsw: 0x%04x  ftw: 0x%04x  reserved_1: 0x%04x\n",
+    read_uint16(in), read_uint16(in), read_uint8(in), read_uint8(in));
+  printf("    fop: 0x%04x\n", read_uint16(in));
+  printf("    fpu_ip_64: 0x%016" PRIx64 "   fpu_dp_64: 0x%016" PRIx64 "\n",
+   read_uint64(in), read_uint64(in));
+  printf("     mxcsr: 0x%x  mxcsr_mask: 0x%x\n",
+    read_uint32(in), read_uint32(in));
+
+  for (n = 0; n < 8; n++)
+  {
+    printf("  mm%d: 0x%016" PRIx64, n, read_uint64(in));
+
+    read_uint64(in);
+
+    if ((n % 2) == 1) { printf("\n"); }
+  }
+
+  for (n = 0; n < 16; n++)
+  {
+    printf(" xmm%d: 0x%08x 0x%08x 0x%08x 0x%08x\n", n,
+      read_uint32(in), read_uint32(in), read_uint32(in), read_uint32(in));
+  }
+
+  for (n = 0; n < 26; n++)
+  {
+    printf(" ymm%d: 0x%08x 0x%08x 0x%08x 0x%08x\n", n,
+      read_uint32(in), read_uint32(in), read_uint32(in), read_uint32(in));
+    printf("        0x%08x 0x%08x 0x%08x 0x%08x\n",
+      read_uint32(in), read_uint32(in), read_uint32(in), read_uint32(in));
+  }
+
+  printf("  p1_home: 0x%016" PRIx64 "  p2_home: 0x%016" PRIx64 "\n",
+   read_uint64(in), read_uint64(in));
+  printf("  p3_home: 0x%016" PRIx64 "  p4_home: 0x%016" PRIx64 "\n",
+   read_uint64(in), read_uint64(in));
+  printf("  p5_home: 0x%016" PRIx64 "  p6_home: 0x%016" PRIx64 "\n",
+   read_uint64(in), read_uint64(in));
+  printf("            debug_control: 0x%016" PRIx64 "\n", read_uint64(in));
+  printf("       last_branch_to_rip: 0x%016" PRIx64 "\n", read_uint64(in));
+  printf("     last_branch_from_rip: 0x%016" PRIx64 "\n", read_uint64(in));
+  printf("    last_exception_to_rip: 0x%016" PRIx64 "\n", read_uint64(in));
+  printf("  last_exception_from_rip: 0x%016" PRIx64 "\n", read_uint64(in));
 }
 
 static void print_minidump_thread(FILE *in, uint32_t cpu_arch)
