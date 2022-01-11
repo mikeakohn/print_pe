@@ -1,5 +1,5 @@
 
-print_pe
+print_pe / print_minidump
 
 Author: Michael Kohn
    Web: http://www.mikekohn.net/
@@ -14,6 +14,7 @@ Features:
 * Dump COM info including CLSID's.
 * Limited ability to modify functions (make it return a value every time
   instead of running code.
+* Dump information from Windows minidump (core) crash file.
 
 TODO:
 * Dump .NET headers

@@ -55,6 +55,17 @@ struct minidump_location_desc_t
   uint32_t ofs_data;
 };
 
+struct memory_print_t
+{
+  uint64_t file_offset;
+  uint64_t start;
+  uint64_t end;
+  uint64_t count;
+  uint64_t region_start;
+  uint64_t region_end;
+  uint8_t word_size;
+};
+
 int read_minidump_header(struct minidump_header_t *minidump_header, FILE *in);
 int read_minidump_dir(struct minidump_dir_t *minidump_dir, FILE *in);
 int read_minidump_location_desc(struct minidump_location_desc_t *minidump_location_desc, FILE *in);
@@ -66,7 +77,7 @@ void print_minidump_module_list(FILE *in);
 void print_minidump_memory_list(FILE *in);
 void print_minidump_exception(FILE *in);
 void print_minidump_system_info(FILE *in);
-void print_minidump_memory64_list(FILE *in);
+void print_minidump_memory64_list(FILE *in, struct memory_print_t *memory_print);
 void print_minidump_handle_data(FILE *in);
 void print_minidump_misc_info(FILE *in);
 void print_minidump_thread_info_list(FILE *in);

@@ -1,6 +1,6 @@
 /*
 
-print_minidump / print_pe - Copyright 2005-2020 by Michael Kohn
+print_minidump / print_pe - Copyright 2005-2022 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -521,19 +521,34 @@ void print_minidump_system_info(FILE *in)
   printf("        reserved2: %u\n", read_uint16(in));
 }
 
-void print_minidump_memory64_list(FILE *in)
+void print_minidump_memory64_list(FILE *in, struct memory_print_t *memory_print)
 {
   uint64_t number_of_memory_ranges = read_uint64(in);
+  uint64_t offset = read_uint64(in);
   uint64_t n;
 
   printf("\n");
   printf("  num_memory_ranges: %" PRId64 "\n", number_of_memory_ranges);
-  printf("             offset: %" PRIx64 "\n", read_uint64(in));
+  printf("             offset: 0x%" PRIx64 "\n", offset);
 
   for (n = 0; n < number_of_memory_ranges; n++)
   {
-    printf("           0x%08" PRIx64 ": size=%" PRId64 "\n",
-      read_uint64(in), read_uint64(in));
+    uint64_t start = read_uint64(in);
+    uint64_t size = read_uint64(in);
+    char mark = ' ';
+
+    if (memory_print->start >= start &&
+        memory_print->start < start + size)
+    {
+      memory_print->file_offset = offset + (memory_print->start - start);
+      memory_print->region_start = start;
+      memory_print->region_end = start + size - 1;
+      mark = '*';
+    }
+
+    printf("         %c  0x%08" PRIx64 ": size=%" PRId64 "\n", mark, start, size);
+
+    offset += size;
   }
 }
 
