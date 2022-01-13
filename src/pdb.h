@@ -65,8 +65,40 @@ int read_pdb_dir(struct pdb_dir_t *pdb_dir, struct pdb_header_t *pdb_header, FIL
 
 void print_pdb_header(struct pdb_header_t *pdb_header);
 void print_pdb_dir(struct pdb_dir_t *pdb_dir);
-void print_pdb_stream_info(struct pdb_dir_t *pdb_dir, struct pdb_header_t *pdb_header, FILE *in);
-void print_pdb_tpi_stream(struct pdb_dir_t *pdb_dir, struct pdb_header_t *pdb_header, FILE *in);
+
+void print_pdb_stream_info(
+  struct pdb_dir_t *pdb_dir,
+  struct pdb_header_t *pdb_header,
+  FILE *in);
+
+void print_pdb_tpi_stream(
+  struct pdb_dir_t *pdb_dir,
+  struct pdb_header_t *pdb_header,
+  FILE *in,
+  int index);
+
+void print_pdb_names(
+  struct pdb_dir_t *pdb_dir,
+  struct pdb_header_t *pdb_header,
+  FILE *in);
+
+void print_pdb_public(
+  struct pdb_dir_t *pdb_dir,
+  struct pdb_header_t *pdb_header,
+  FILE *in);
+
+void print_pdb_global(
+  struct pdb_dir_t *pdb_dir,
+  struct pdb_header_t *pdb_header,
+  FILE *in);
+
+// For debugging.
+void dump_pdb_stream(
+  struct pdb_dir_t *pdb_dir,
+  struct pdb_header_t *pdb_header,
+  FILE *in,
+  int index,
+  const char *filename);
 
 #endif
 

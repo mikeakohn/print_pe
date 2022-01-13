@@ -80,7 +80,13 @@ int main(int argc, char *argv[])
   read_pdb_dir(&pdb_dir, &pdb_header, in);
   print_pdb_dir(&pdb_dir);
   print_pdb_stream_info(&pdb_dir, &pdb_header, in);
-  print_pdb_tpi_stream(&pdb_dir, &pdb_header, in);
+  print_pdb_tpi_stream(&pdb_dir, &pdb_header, in, 2);
+  print_pdb_tpi_stream(&pdb_dir, &pdb_header, in, 4);
+  //print_pdb_names(&pdb_dir, &pdb_header, in);
+  //print_pdb_global(&pdb_dir, &pdb_header, in);
+  //print_pdb_global(&pdb_dir, &pdb_header, in);
+
+  dump_pdb_stream(&pdb_dir, &pdb_header, in, 4, "ipi.bin");
 
   free(pdb_dir.stream_sizes);
   free(pdb_dir.heap);

@@ -265,11 +265,12 @@ void print_pdb_stream_info(
 void print_pdb_tpi_stream(
   struct pdb_dir_t *pdb_dir,
   struct pdb_header_t *pdb_header,
-  FILE *in)
+  FILE *in,
+  int index)
 {
   struct pdb_tpi_header_t tpi;
 
-  read_data(pdb_dir, 2, pdb_header->block_size, in);
+  read_data(pdb_dir, index, pdb_header->block_size, in);
 
   uint8_t *data = pdb_dir->heap;
 
@@ -289,7 +290,7 @@ void print_pdb_tpi_stream(
   tpi.hash_adj_buffer_offset = get_int32(data + 48);
   tpi.hash_adj_buffer_length = get_uint32(data + 52);
 
-  printf(" -- TPI Stream --\n");
+  printf(" -- %s Stream --\n", index == 2 ? "TPI" : "IPI");
   printf("                   version: %d\n", tpi.version);
   printf("               header_size: %d\n", tpi.header_size);
   printf("          type_index_begin: %d\n", tpi.type_index_begin);
@@ -305,9 +306,10 @@ void print_pdb_tpi_stream(
   printf("index_offset_buffer_length: %d\n", tpi.index_offset_buffer_length);
   printf("    hash_adj_buffer_offset: %d\n", tpi.hash_adj_buffer_offset);
   printf("    hash_adj_buffer_length: %d\n", tpi.hash_adj_buffer_length);
+  printf("\n");
 
-#if 0
   int offset = 0;
+  int id, unknown, n;
   uint8_t *next = data + tpi.header_size;
 
   while (offset < tpi.type_record_bytes)
@@ -315,13 +317,171 @@ void print_pdb_tpi_stream(
     struct type_record_t *type_record = (struct type_record_t *)next;
     int total_length = type_record->length + 2;
 
-    printf(" %d 0x%04x\n", type_record->length, type_record->type);
+    switch (type_record->type)
+    {
+      case 0x1001:
+        printf(" %d 0x%04x MODIFIER\n",
+          type_record->length,
+          type_record->type);
+        break;
+      case 0x1002:
+        printf(" %d 0x%04x POINTER\n",
+          type_record->length,
+          type_record->type);
+        break;
+      case 0x1008:
+        printf(" %d 0x%04x PROCEDURE\n",
+          type_record->length,
+          type_record->type);
+        break;
+      case 0x1009:
+        printf(" %d 0x%04x MFUNCTION\n",
+          type_record->length,
+          type_record->type);
+        break;
+      case 0x1201:
+        printf(" %d 0x%04x ARGLIST\n",
+          type_record->length,
+          type_record->type);
+        break;
+      case 0x1203:
+        printf(" %d 0x%04x FIELDLIST\n",
+          type_record->length,
+          type_record->type);
+        break;
+      case 0x1206:
+        printf(" %d 0x%04x METHODLIST\n",
+          type_record->length,
+          type_record->type);
+        break;
+      case 0x1503:
+        printf(" %d 0x%04x ARRAY\n",
+          type_record->length,
+          type_record->type);
+        break;
+      case 0x1504:
+        printf(" %d 0x%04x CLASS %s\n",
+          type_record->length,
+          type_record->type,
+          next + 22);
+        break;
+      case 0x1505:
+        printf(" %d 0x%04x STRUCTURE %s\n",
+          type_record->length,
+          type_record->type,
+          next + 22);
+        //printf("offset=0x%04x\n", offset + 56);
+        break;
+      case 0x1507:
+        printf(" %d 0x%04x ENUM\n",
+          type_record->length,
+          type_record->type);
+        break;
+      case 0x1601:
+        id = get_uint32(next + 4);
+        unknown = get_uint32(next + 8);
+        printf(" %d 0x%04x FUNC_ID [%d][0x%08x]\n   %s\n",
+          type_record->length,
+          type_record->type,
+          id,
+          unknown,
+          next + 12);
+        break;
+      case 0x1602:
+        id = get_uint32(next + 4);
+        unknown = get_uint32(next + 8);
+        printf(" %d 0x%04x MFUNC_ID [%d][0x%08x]\n   %s\n",
+          type_record->length,
+          type_record->type,
+          id,
+          unknown,
+          next + 12);
+        break;
+      case 0x1605:
+        id = get_uint32(next + 4);
+        printf(" %d 0x%04x STRING_ID [%d]\n   %s\n",
+          type_record->length,
+          type_record->type,
+          id,
+          next + 8);
+        break;
+      case 0x1607:
+        printf(" %d 0x%04x UDT_MOD_SRC_LINE\n",
+          type_record->length,
+          type_record->type);
+        printf("  {");
+        for (n = 0; n < type_record->length - 2; n++)
+        {
+          printf(" %02x", next[n + 4]);
+        }
+        printf(" }\n");
+        break;
+      default:
+        printf(" %d 0x%04x\n", type_record->length, type_record->type);
+        // printf("offset=0x%04x\n", offset + 56);
+        break;
+    }
 
     next += total_length;
     offset += total_length;
   }
-#endif
 
   printf("\n\n");
+}
+
+void print_pdb_names(
+  struct pdb_dir_t *pdb_dir,
+  struct pdb_header_t *pdb_header,
+  FILE *in)
+{
+  //struct pdb_tpi_header_t tpi;
+
+  read_data(pdb_dir, 7, pdb_header->block_size, in);
+
+  //uint8_t *data = pdb_dir->heap;
+
+  printf("\n\n");
+}
+
+void print_pdb_public(
+  struct pdb_dir_t *pdb_dir,
+  struct pdb_header_t *pdb_header,
+  FILE *in)
+{
+  //struct pdb_tpi_header_t tpi;
+
+  read_data(pdb_dir, 9, pdb_header->block_size, in);
+
+  //uint8_t *data = pdb_dir->heap;
+
+  printf("\n\n");
+}
+
+void print_pdb_global(
+  struct pdb_dir_t *pdb_dir,
+  struct pdb_header_t *pdb_header,
+  FILE *in)
+{
+  read_data(pdb_dir, 10, pdb_header->block_size, in);
+
+  //uint8_t *data = pdb_dir->heap;
+
+  printf("\n\n");
+}
+
+void dump_pdb_stream(
+  struct pdb_dir_t *pdb_dir,
+  struct pdb_header_t *pdb_header,
+  FILE *in,
+  int index,
+  const char *filename)
+{
+  read_data(pdb_dir, index, pdb_header->block_size, in);
+
+  uint8_t *data = pdb_dir->heap;
+
+  FILE *fp = fopen(filename, "wb");
+  fwrite(data, pdb_dir->stream_sizes[index], 1, fp);
+  fclose(fp);
 }
 
