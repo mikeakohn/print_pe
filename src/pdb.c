@@ -24,6 +24,18 @@ static int calc_block_count(uint32_t size)
   return size / 4096;
 }
 
+static uint32_t *get_blocks(struct pdb_dir_t *pdb_dir, int index)
+{
+  int n, ptr = 0;
+
+  for (n = 0; n < index; n++)
+  {
+    ptr += calc_block_count(pdb_dir->stream_sizes[n]);
+  }
+
+  return &pdb_dir->stream_blocks[ptr];
+}
+
 int read_pdb_header(struct pdb_header_t *pdb_header, FILE *in)
 {
   uint8_t magic_2[] = { 0x1a, 0x44, 0x53, 0x00, 0x00, 0x00 };
@@ -147,21 +159,14 @@ void print_pdb_dir(struct pdb_dir_t *pdb_dir)
   int n, i;
 
   printf(" -- PDB Directory --\n");
-  printf("  stream_count: %d\n", pdb_dir->stream_count);
-  printf("  stream_sizes:\n");
-
-  for (n = 0; n < pdb_dir->stream_count; n++)
-  {
-    printf("      %d\n", pdb_dir->stream_sizes[n]);
-  }
-
+  printf("   stream_count: %d\n", pdb_dir->stream_count);
   printf("  stream_blocks:\n");
 
   for (n = 0; n < pdb_dir->stream_count; n++)
   {
     int count = calc_block_count(pdb_dir->stream_sizes[n]);
 
-    printf("  {");
+    printf("    %d: %6d {", n, pdb_dir->stream_sizes[n]);
 
     for (i = 0; i < count; i++)
     {
@@ -170,5 +175,34 @@ void print_pdb_dir(struct pdb_dir_t *pdb_dir)
 
     printf(" }\n");
   }
+}
+
+void print_pdb_stream_info(
+  struct pdb_dir_t *pdb_dir,
+  struct pdb_header_t *pdb_header,
+  FILE *in)
+{
+  long marker = ftell(in);
+  int i;
+
+  printf(" -- PDB Info Stream --\n");
+
+  uint32_t *blocks = get_blocks(pdb_dir, 1);
+
+  fseek(in, blocks[0] * pdb_header->block_size, SEEK_SET);
+
+  printf("     version: %d\n", read_uint32(in));
+  printf("   signature: %d\n", read_uint32(in));
+  printf("         age: %d\n", read_uint32(in));
+  printf("        guid:");
+
+  for (i = 0; i < 128; i++)
+  {
+    printf(" %02x", getc(in));
+  }
+
+  printf("\n\n");
+
+  fseek(in, marker, SEEK_SET);
 }
 

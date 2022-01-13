@@ -76,6 +76,7 @@ int main(int argc, char *argv[])
 
   read_pdb_dir(&pdb_dir, &pdb_header, in);
   print_pdb_dir(&pdb_dir);
+  print_pdb_stream_info(&pdb_dir, &pdb_header, in);
 
   free(pdb_dir.stream_sizes);
   fclose(in);
