@@ -36,6 +36,52 @@ static uint32_t *get_blocks(struct pdb_dir_t *pdb_dir, int index)
   return &pdb_dir->stream_blocks[ptr];
 }
 
+static void read_data(
+  struct pdb_dir_t *pdb_dir,
+  int index,
+  int block_size,
+  FILE *in)
+{
+  long marker = ftell(in);
+  uint32_t *blocks = get_blocks(pdb_dir, index);
+  int block_count = calc_block_count(pdb_dir->stream_sizes[index]);
+  int n, offset = 0, length;
+
+  for (n = 0; n < block_count; n++)
+  {
+    fseek(in, *blocks * block_size, SEEK_SET);
+    length = fread(pdb_dir->heap + offset, 4096, 1, in);
+
+    if (length == 0) { printf("Error: fread() 0 bytes.\n"); }
+
+    offset += 4096;
+    blocks++;
+  }
+
+  fseek(in, marker, SEEK_SET);
+}
+
+static uint16_t get_uint16(void *buffer)
+{
+  uint8_t *data = (uint8_t *)buffer;
+
+  return data[0] | (data[1] << 8);
+}
+
+static uint32_t get_uint32(void *buffer)
+{
+  uint8_t *data = (uint8_t *)buffer;
+
+  return data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
+}
+
+static int32_t get_int32(void *buffer)
+{
+  uint8_t *data = (uint8_t *)buffer;
+
+  return data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
+}
+
 int read_pdb_header(struct pdb_header_t *pdb_header, FILE *in)
 {
   uint8_t magic_2[] = { 0x1a, 0x44, 0x53, 0x00, 0x00, 0x00 };
@@ -88,6 +134,8 @@ int read_pdb_dir(
 
   block_bytes = pdb_header->block_size - 4;
 
+  int heap_length = 0;
+
   for (n = 0; n < pdb_dir->stream_count; n++)
   {
     if (block_bytes == 0)
@@ -100,6 +148,11 @@ int read_pdb_dir(
     }
 
     pdb_dir->stream_sizes[n] = read_uint32(in);
+
+    if (heap_length < pdb_dir->stream_sizes[n])
+    {
+      heap_length = pdb_dir->stream_sizes[n];
+    }
 
     block_bytes -= 4;
   }
@@ -128,6 +181,9 @@ int read_pdb_dir(
 
     block_bytes -= 4;
   }
+
+  heap_length = (heap_length + 4095) & 0xfffff000;
+  pdb_dir->heap = (uint8_t *)malloc(heap_length);
 
   fseek(in, marker, SEEK_SET);
 
@@ -204,5 +260,68 @@ void print_pdb_stream_info(
   printf("\n\n");
 
   fseek(in, marker, SEEK_SET);
+}
+
+void print_pdb_tpi_stream(
+  struct pdb_dir_t *pdb_dir,
+  struct pdb_header_t *pdb_header,
+  FILE *in)
+{
+  struct pdb_tpi_header_t tpi;
+
+  read_data(pdb_dir, 2, pdb_header->block_size, in);
+
+  uint8_t *data = pdb_dir->heap;
+
+  tpi.version = get_uint32(data + 0);
+  tpi.header_size = get_uint32(data + 4);
+  tpi.type_index_begin = get_uint32(data + 8);
+  tpi.type_index_end = get_uint32(data + 12);
+  tpi.type_record_bytes = get_uint32(data + 16);
+  tpi.hash_stream_index = get_uint16(data + 20);
+  tpi.hash_aux_stream_index = get_uint16(data + 22);
+  tpi.hash_key_size = get_uint32(data + 24);
+  tpi.num_hash_buckets = get_uint32(data + 28);
+  tpi.hash_value_buffer_offset = get_int32(data + 32);
+  tpi.hash_value_buffer_length = get_uint32(data + 36);
+  tpi.index_offset_buffer_offset = get_int32(data + 40);
+  tpi.index_offset_buffer_length = get_uint32(data + 44);
+  tpi.hash_adj_buffer_offset = get_int32(data + 48);
+  tpi.hash_adj_buffer_length = get_uint32(data + 52);
+
+  printf(" -- TPI Stream --\n");
+  printf("                   version: %d\n", tpi.version);
+  printf("               header_size: %d\n", tpi.header_size);
+  printf("          type_index_begin: %d\n", tpi.type_index_begin);
+  printf("            type_index_end: %d\n", tpi.type_index_end);
+  printf("         type_record_bytes: %d\n", tpi.type_record_bytes);
+  printf("         hash_stream_index: %d\n", tpi.hash_stream_index);
+  printf("     hash_aux_stream_index: %d\n", tpi.hash_aux_stream_index);
+  printf("             hash_key_size: %d\n", tpi.hash_key_size);
+  printf("          num_hash_buckets: %d\n", tpi.num_hash_buckets);
+  printf("  hash_value_buffer_offset: %d\n", tpi.hash_value_buffer_offset);
+  printf("  hash_value_buffer_length: %d\n", tpi.hash_value_buffer_length);
+  printf("index_offset_buffer_offset: %d\n", tpi.index_offset_buffer_offset);
+  printf("index_offset_buffer_length: %d\n", tpi.index_offset_buffer_length);
+  printf("    hash_adj_buffer_offset: %d\n", tpi.hash_adj_buffer_offset);
+  printf("    hash_adj_buffer_length: %d\n", tpi.hash_adj_buffer_length);
+
+#if 0
+  int offset = 0;
+  uint8_t *next = data + tpi.header_size;
+
+  while (offset < tpi.type_record_bytes)
+  {
+    struct type_record_t *type_record = (struct type_record_t *)next;
+    int total_length = type_record->length + 2;
+
+    printf(" %d 0x%04x\n", type_record->length, type_record->type);
+
+    next += total_length;
+    offset += total_length;
+  }
+#endif
+
+  printf("\n\n");
 }
 

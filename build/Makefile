@@ -28,12 +28,19 @@ OBJECTS_MINIDUMP= \
   minidump.o \
   minidump_stream_type.o
 
-default: $(OBJECTS) $(OBJECTS_MINIDUMP)
+OBJECTS_PDB= \
+  fileio.o \
+  pdb.o
+
+default: $(OBJECTS) $(OBJECTS_MINIDUMP) $(OBJECTS_PDB)
 	$(CC) -o ../print_pe ../src/print_pe.c \
 	   $(OBJECTS) \
 	   $(CFLAGS)
 	$(CC) -o ../print_minidump ../src/print_minidump.c \
 	   $(OBJECTS_MINIDUMP) \
+	   $(CFLAGS)
+	$(CC) -o ../print_pdb ../src/print_pdb.c \
+	   $(OBJECTS_PDB) \
 	   $(CFLAGS)
 
 %.o: %.c %.h

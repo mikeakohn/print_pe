@@ -25,6 +25,9 @@ int main(int argc, char *argv[])
   struct pdb_dir_t pdb_dir;
   uint32_t n;
 
+  memset(&pdb_header, 0, sizeof(pdb_header));
+  memset(&pdb_dir, 0, sizeof(pdb_dir));
+
   printf("\nprint_pdb (January 11, 2022)\n");
   printf("Copyright 2005-2022 - Michael Kohn  http://www.mikekohn.net/\n\n");
 
@@ -77,8 +80,10 @@ int main(int argc, char *argv[])
   read_pdb_dir(&pdb_dir, &pdb_header, in);
   print_pdb_dir(&pdb_dir);
   print_pdb_stream_info(&pdb_dir, &pdb_header, in);
+  print_pdb_tpi_stream(&pdb_dir, &pdb_header, in);
 
   free(pdb_dir.stream_sizes);
+  free(pdb_dir.heap);
   fclose(in);
 
   return 0;
