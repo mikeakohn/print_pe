@@ -156,6 +156,13 @@ int read_pdb_dir(
 
     pdb_dir->stream_sizes[n] = read_uint32(in);
 
+    // FIXME: For some reason a PDB used for testing this is reading in
+    // a stream size of -1.
+    if (pdb_dir->stream_sizes[n] == 0xffffffff)
+    {
+      pdb_dir->stream_sizes[n] = 0;
+    }
+
     if (heap_length < pdb_dir->stream_sizes[n])
     {
       heap_length = pdb_dir->stream_sizes[n];
@@ -246,7 +253,7 @@ void print_pdb_stream_info(
   FILE *in)
 {
   long marker = ftell(in);
-  int total_length = pdb_dir->stream_sizes[1];
+  //int total_length = pdb_dir->stream_sizes[1];
   int i;
 
   printf(" -- PDB Info Stream (index 1) --\n");
@@ -502,8 +509,60 @@ void print_pdb_dbi_stream(
   printf("optional_debug_header_size: %d\n", pdb_dbi->optional_debug_header_size);
   printf("         ec_substream_size: %d\n", pdb_dbi->ec_substream_size);
   printf("                     flags: %d\n", pdb_dbi->flags);
-  printf("                   machine: %d\n", pdb_dbi->machine);
+  printf("                   machine: 0x%04x\n", pdb_dbi->machine);
   printf("                   padding: %d\n", pdb_dbi->padding);
+
+  uint8_t *next = data + 64;
+  int count = 0;
+  uint32_t bytes = 0;
+  int i;
+
+  while (bytes < pdb_dbi->mod_info_size)
+  {
+    printf("       --- mod %d ---\n", count);
+    printf("            reserved_1: %d\n", get_uint32(next + 0));
+    printf("               section: %d\n", get_uint16(next + 4));
+    printf("             padding_1: %d\n", get_uint16(next + 6));
+    printf("                offset: %d\n", get_int32(next + 8));
+    printf("                  size: %d\n", get_int32(next + 12));
+    printf("       characteristics: 0x%08x\n", get_uint32(next + 16));
+    printf("          module_index: %d\n", get_uint16(next + 20));
+    printf("             padding_2: %d\n", get_uint16(next + 22));
+    printf("              data_crc: %d\n", get_uint32(next + 24));
+    printf("             reloc_crc: %d\n", get_uint32(next + 28));
+    printf("                 flags: %d\n", get_uint16(next + 32));
+    printf("  module_symbol_stream: %d\n", get_uint16(next + 34));
+    printf("      symbol_byte_size: %d\n", get_uint32(next + 36));
+    printf("         c11_byte_size: %d\n", get_uint32(next + 40));
+    printf("         c13_byte_size: %d\n", get_uint32(next + 44));
+    printf("     source_file_count: %d\n", get_uint16(next + 48));
+    printf("               padding: %d\n", get_uint16(next + 50));
+    printf("            reserved_2: %d\n", get_uint32(next + 52));
+    printf("source_file_name_index: %d\n", get_uint32(next + 56));
+    printf("   pdb_file_path_index: %d\n", get_uint32(next + 60));
+    printf("           module_name: ");
+
+    for (i = 64; next[i] != 0; i++)
+    {
+      printf("%c", next[i]);
+    }
+    printf("\n");
+
+    printf("      object_file_name: ");
+    i++;
+    for (;next[i] != 0; i++)
+    {
+      printf("%c", next[i]);
+    }
+    printf("\n");
+    i++;
+
+    i = (i + 3) & ~3;
+
+    bytes += i;
+    next += i;
+    count++;
+  }
 
   printf("\n\n");
 }

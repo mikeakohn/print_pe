@@ -79,6 +79,35 @@ struct pdb_dbi_t
   uint32_t padding;
 };
 
+struct section_contrib_entry_t
+{
+  uint16_t section;
+  uint16_t padding_1;
+  int32_t offset;
+  int32_t size;
+  uint32_t characteristics;
+  uint16_t module_index;
+  uint16_t padding_2;
+  uint32_t data_crc;
+  uint32_t reloc_crc;
+};
+
+struct mod_info_t
+{
+  uint32_t reserved_1;
+  struct section_contrib_entry_t entry;
+  uint16_t flags;
+  uint16_t module_symbol_stream;
+  uint32_t symbol_byte_size;
+  uint32_t c11_byte_size;
+  uint32_t c13_byte_size;
+  uint16_t source_file_count;
+  uint16_t padding;
+  uint32_t reserved_2;
+  uint32_t source_file_name_index;
+  uint32_t pdb_file_path_index;
+};
+
 struct type_record_t
 {
   uint16_t length;

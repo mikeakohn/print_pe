@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
   memset(&pdb_header, 0, sizeof(pdb_header));
   memset(&pdb_dir, 0, sizeof(pdb_dir));
 
-  printf("\nprint_pdb (January 11, 2022)\n");
+  printf("\nprint_pdb (January 15, 2022)\n");
   printf("Copyright 2005-2022 - Michael Kohn  http://www.mikekohn.net/\n\n");
 
   for (n = 1; n < argc; n++)
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
   //print_pdb_global(&pdb_dir, &pdb_header, in);
   //print_pdb_global(&pdb_dir, &pdb_header, in);
 
-  //dump_pdb_stream(&pdb_dir, &pdb_header, in, 1, "index_1.bin");
+  //dump_pdb_stream(&pdb_dir, &pdb_header, in, 3, "dbi.bin");
 
   free(pdb_dir.stream_sizes);
   free(pdb_dir.heap);
