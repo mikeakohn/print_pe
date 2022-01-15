@@ -528,8 +528,8 @@ void print_pdb_dbi_stream(
     printf("       characteristics: 0x%08x\n", get_uint32(next + 16));
     printf("          module_index: %d\n", get_uint16(next + 20));
     printf("             padding_2: %d\n", get_uint16(next + 22));
-    printf("              data_crc: %d\n", get_uint32(next + 24));
-    printf("             reloc_crc: %d\n", get_uint32(next + 28));
+    printf("              data_crc: %08x\n", get_uint32(next + 24));
+    printf("             reloc_crc: %08x\n", get_uint32(next + 28));
     printf("                 flags: %d\n", get_uint16(next + 32));
     printf("  module_symbol_stream: %d\n", get_uint16(next + 34));
     printf("      symbol_byte_size: %d\n", get_uint32(next + 36));
@@ -563,6 +563,107 @@ void print_pdb_dbi_stream(
     next += i;
     count++;
   }
+
+  uint32_t version = get_uint32(next + 0);
+
+  printf("    -- section contriubtion version: %08x\n", version);
+
+  int length = 28;
+  count = 0;
+  bytes = 4;
+  next += 4;
+
+  if (version == 0xeffe0000 + 20140516) { length += 4; }
+
+  while (bytes < pdb_dbi->section_contribution_size)
+  {
+    printf("       --- section contribution %d ---\n", count);
+    printf("               section: %d\n", get_uint16(next + 0));
+    printf("             padding_1: %d\n", get_uint16(next + 2));
+    printf("                offset: %d\n", get_int32(next + 4));
+    printf("                  size: %d\n", get_int32(next + 8));
+    printf("       characteristics: 0x%08x\n", get_uint32(next + 12));
+    printf("          module_index: %d\n", get_uint16(next + 16));
+    printf("             padding_2: %d\n", get_uint16(next + 18));
+    printf("              data_crc: 0x%08x\n", get_uint32(next + 20));
+    printf("             reloc_crc: 0x%08x\n", get_uint32(next + 24));
+
+    if (version == 0xeffe0000 + 20140516)
+    {
+      printf("            isect_coff: %d\n", get_uint32(next + 28));
+    }
+
+    bytes += length;
+    next += length;
+    count++;
+  }
+
+  printf("    -- section map count=%d log_count=%d\n",
+    get_uint16(next + 0),
+    get_uint16(next + 2));
+
+  count = 0;
+  bytes = 4;
+  next += 4;
+
+  while (bytes < pdb_dbi->section_map_size)
+  {
+    uint16_t flags = get_uint16(next + 0);
+    char temp[80];
+
+    sprintf(temp, "%c%c%c %s %c%c%c",
+      (flags & 1) != 0 ? 'r' : '-',
+      (flags & 2) != 0 ? 'w' : '-',
+      (flags & 4) != 0 ? 'e' : '-',
+      (flags & 8) != 0 ? "32" : "-",
+      (flags & 256) != 0 ? 'S' : '-',
+      (flags & 512) != 0 ? 'A' : '-',
+      (flags & 1024) != 0 ? 'G' : '-');
+
+    printf("       --- section map entry %d ---\n", count);
+    printf("                 flags: 0x%04x %s\n", flags, temp);
+    printf("                   ovl: %d\n", get_uint16(next + 2));
+    printf("                 group: %d\n", get_uint16(next + 4));
+    printf("                 frame: %d\n", get_uint16(next + 6));
+    printf("          section_name: %d\n", get_uint16(next + 8));
+    printf("            class_name: %d\n", get_uint16(next + 10));
+    printf("                offset: %d\n", get_uint32(next + 12));
+    printf("        section_length: %d\n", get_uint32(next + 16));
+
+    bytes += 20;
+    next += 20;
+    count++;
+  }
+
+  uint8_t *save = next;
+  int module_count = get_uint16(next + 0);
+  int source_file_count = get_uint16(next + 2);
+
+  printf("    -- file_info modules=%d source_files=%d\n",
+    module_count, source_file_count);
+
+  bytes = 4;
+  int offset = bytes + (module_count * 2);
+
+  for (i = 0; i < module_count; i++)
+  {
+    printf("   module: indices=%d file_counts=%d\n",
+      get_uint16(next + bytes), get_uint16(next + offset)); 
+    bytes += 2;
+    offset += 2;
+  }
+
+  next += module_count * 4;
+  uint8_t *names_buffer = save + (module_count * 4) + (source_file_count * 4) + 4;
+
+  for (i = 0; i < source_file_count; i++)
+  {
+    offset = get_uint32(next);
+    printf("    %04x: %s\n", offset, names_buffer + offset);
+    next += 4;
+  }
+
+  next = save + pdb_dbi->source_info_size;
 
   printf("\n\n");
 }
