@@ -68,6 +68,13 @@ static uint16_t get_uint16(void *buffer)
   return data[0] | (data[1] << 8);
 }
 
+static int16_t get_int16(void *buffer)
+{
+  uint8_t *data = (uint8_t *)buffer;
+
+  return data[0] | (data[1] << 8);
+}
+
 static uint32_t get_uint32(void *buffer)
 {
   uint8_t *data = (uint8_t *)buffer;
@@ -134,7 +141,7 @@ int read_pdb_dir(
 
   block_bytes = pdb_header->block_size - 4;
 
-  int heap_length = 0;
+  uint32_t heap_length = 0;
 
   for (n = 0; n < pdb_dir->stream_count; n++)
   {
@@ -239,9 +246,10 @@ void print_pdb_stream_info(
   FILE *in)
 {
   long marker = ftell(in);
+  int total_length = pdb_dir->stream_sizes[1];
   int i;
 
-  printf(" -- PDB Info Stream --\n");
+  printf(" -- PDB Info Stream (index 1) --\n");
 
   uint32_t *blocks = get_blocks(pdb_dir, 1);
 
@@ -252,12 +260,29 @@ void print_pdb_stream_info(
   printf("         age: %d\n", read_uint32(in));
   printf("        guid:");
 
-  for (i = 0; i < 128; i++)
+  for (i = 0; i < 16; i++)
   {
     printf(" %02x", getc(in));
   }
-
   printf("\n\n");
+
+  int length = read_uint32(in);
+
+  for (i = 0; i < length; i++)
+  {
+    int ch = getc(in);
+
+    if (ch == 0)
+    {
+      printf("\n");
+    }
+      else
+    {
+      printf("%c", ch);
+    }
+  }
+
+  printf("\n");
 
   fseek(in, marker, SEEK_SET);
 }
@@ -425,6 +450,60 @@ void print_pdb_tpi_stream(
     next += total_length;
     offset += total_length;
   }
+}
+
+void print_pdb_dbi_stream(
+  struct pdb_dir_t *pdb_dir,
+  struct pdb_header_t *pdb_header,
+  struct pdb_dbi_t *pdb_dbi,
+  FILE *in)
+{
+  read_data(pdb_dir, 3, pdb_header->block_size, in);
+
+  uint8_t *data = pdb_dir->heap;
+
+  pdb_dbi->version_signature = get_int32(data + 0);
+  pdb_dbi->version_header = get_uint32(data + 4);
+  pdb_dbi->age = get_uint32(data + 8);
+  pdb_dbi->global_stream_index = get_int16(data + 12);
+  pdb_dbi->build_number = get_int16(data + 14);
+  pdb_dbi->public_stream_index = get_int16(data + 16);
+  pdb_dbi->pdb_dll_version = get_int16(data + 18);
+  pdb_dbi->symbol_record_stream = get_int16(data + 20);
+  pdb_dbi->pdb_dll_rbld = get_int16(data + 22);
+  pdb_dbi->mod_info_size = get_int32(data + 24);
+  pdb_dbi->section_contribution_size = get_int32(data + 28);
+  pdb_dbi->section_map_size = get_int32(data + 32);
+  pdb_dbi->source_info_size = get_int32(data + 36);
+  pdb_dbi->type_server_size = get_int32(data + 40);
+  pdb_dbi->mfc_type_server_index = get_uint32(data + 44);
+  pdb_dbi->optional_debug_header_size = get_int32(data + 48);
+  pdb_dbi->ec_substream_size = get_int32(data + 52);
+  pdb_dbi->flags = get_int16(data + 56);
+  pdb_dbi->machine = get_uint16(data + 58);
+  pdb_dbi->padding = get_uint32(data + 60);
+
+  printf(" -- DBI Stream --\n");
+  printf("         version_signature: %d\n", pdb_dbi->version_signature);
+  printf("            version_header: %d\n", pdb_dbi->version_header);
+  printf("                       age: %d\n", pdb_dbi->age);
+  printf("       global_stream_index: %d\n", pdb_dbi->global_stream_index);
+  printf("              build_number: %d\n", pdb_dbi->build_number);
+  printf("       public_stream_index: %d\n", pdb_dbi->public_stream_index);
+  printf("           pdb_dll_version: %d\n", pdb_dbi->pdb_dll_version);
+  printf("      symbol_record_stream: %d\n", pdb_dbi->symbol_record_stream);
+  printf("              pdb_dll_rbld: %d\n", pdb_dbi->pdb_dll_rbld);
+  printf("             mod_info_size: %d\n", pdb_dbi->mod_info_size);
+  printf(" section_contribution_size: %d\n", pdb_dbi->section_contribution_size);
+  printf("          section_map_size: %d\n", pdb_dbi->section_map_size);
+  printf("          source_info_size: %d\n", pdb_dbi->source_info_size);
+  printf("          type_server_size: %d\n", pdb_dbi->type_server_size);
+  printf("     mfc_type_server_index: %d\n", pdb_dbi->mfc_type_server_index);
+  printf("optional_debug_header_size: %d\n", pdb_dbi->optional_debug_header_size);
+  printf("         ec_substream_size: %d\n", pdb_dbi->ec_substream_size);
+  printf("                     flags: %d\n", pdb_dbi->flags);
+  printf("                   machine: %d\n", pdb_dbi->machine);
+  printf("                   padding: %d\n", pdb_dbi->padding);
 
   printf("\n\n");
 }

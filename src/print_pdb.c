@@ -23,6 +23,7 @@ int main(int argc, char *argv[])
   const char *filename = NULL;
   struct pdb_header_t pdb_header;
   struct pdb_dir_t pdb_dir;
+  struct pdb_dbi_t pdb_dbi;
   uint32_t n;
 
   memset(&pdb_header, 0, sizeof(pdb_header));
@@ -82,11 +83,12 @@ int main(int argc, char *argv[])
   print_pdb_stream_info(&pdb_dir, &pdb_header, in);
   print_pdb_tpi_stream(&pdb_dir, &pdb_header, in, 2);
   print_pdb_tpi_stream(&pdb_dir, &pdb_header, in, 4);
+  print_pdb_dbi_stream(&pdb_dir, &pdb_header, &pdb_dbi, in);
   //print_pdb_names(&pdb_dir, &pdb_header, in);
   //print_pdb_global(&pdb_dir, &pdb_header, in);
   //print_pdb_global(&pdb_dir, &pdb_header, in);
 
-  dump_pdb_stream(&pdb_dir, &pdb_header, in, 4, "ipi.bin");
+  //dump_pdb_stream(&pdb_dir, &pdb_header, in, 1, "index_1.bin");
 
   free(pdb_dir.stream_sizes);
   free(pdb_dir.heap);

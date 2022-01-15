@@ -35,6 +35,7 @@ struct pdb_dir_t
   uint8_t *heap;
 };
 
+// The TPI and IPI headers are the same.
 struct pdb_tpi_header_t
 {
   uint32_t version;
@@ -52,6 +53,30 @@ struct pdb_tpi_header_t
   uint32_t index_offset_buffer_length;
   int32_t  hash_adj_buffer_offset;
   uint32_t hash_adj_buffer_length;
+};
+
+struct pdb_dbi_t
+{
+  int32_t  version_signature;
+  uint32_t version_header;
+  uint32_t age;
+  int16_t  global_stream_index;
+  uint16_t build_number;
+  int16_t  public_stream_index;
+  uint16_t pdb_dll_version;
+  uint16_t symbol_record_stream;
+  uint16_t pdb_dll_rbld;
+  int32_t  mod_info_size;
+  int32_t  section_contribution_size;
+  int32_t  section_map_size;
+  int32_t  source_info_size;
+  int32_t  type_server_size;
+  uint32_t mfc_type_server_index;
+  int32_t  optional_debug_header_size;
+  int32_t  ec_substream_size;
+  uint16_t flags;
+  uint16_t machine;
+  uint32_t padding;
 };
 
 struct type_record_t
@@ -76,6 +101,12 @@ void print_pdb_tpi_stream(
   struct pdb_header_t *pdb_header,
   FILE *in,
   int index);
+
+void print_pdb_dbi_stream(
+  struct pdb_dir_t *pdb_dir,
+  struct pdb_header_t *pdb_header,
+  struct pdb_dbi_t *pdb_dbi,
+  FILE *in);
 
 void print_pdb_names(
   struct pdb_dir_t *pdb_dir,
