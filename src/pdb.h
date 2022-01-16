@@ -33,6 +33,8 @@ struct pdb_dir_t
   uint32_t *stream_blocks;
 
   uint8_t *heap;
+  uint8_t *names;
+  uint32_t names_index;
 };
 
 // The TPI and IPI headers are the same.
@@ -114,6 +116,7 @@ struct type_record_t
   uint16_t type;
 };
 
+#if 0
 struct hash_entry_t
 {
   uint32_t key;
@@ -129,9 +132,11 @@ struct hash_t
   uint32_t deleted_bit_vector;
   struct hash_entry_t *hash_entry[];
 };
+#endif
 
 int read_pdb_header(struct pdb_header_t *pdb_header, FILE *in);
 int read_pdb_dir(struct pdb_dir_t *pdb_dir, struct pdb_header_t *pdb_header, FILE *in);
+int read_pdb_names(struct pdb_dir_t *pdb_dir, struct pdb_header_t *pdb_header, FILE *in);
 
 void print_pdb_header(struct pdb_header_t *pdb_header);
 void print_pdb_dir(struct pdb_dir_t *pdb_dir);

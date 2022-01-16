@@ -125,6 +125,7 @@ int main(int argc, char *argv[])
   }
 
   print_pdb_stream_info(&pdb_dir, &pdb_header, in);
+  read_pdb_names(&pdb_dir, &pdb_header, in);
 
   if (show_tpi != 0)
   {
@@ -152,6 +153,7 @@ int main(int argc, char *argv[])
 
   free(pdb_dir.stream_sizes);
   free(pdb_dir.heap);
+  free(pdb_dir.names);
   fclose(in);
 
   return 0;
