@@ -114,6 +114,22 @@ struct type_record_t
   uint16_t type;
 };
 
+struct hash_entry_t
+{
+  uint32_t key;
+  uint32_t value;
+  struct hash_entry_t *next;
+};
+
+struct hash_t
+{
+  uint32_t size;
+  uint32_t capacity;
+  uint32_t present_bit_vector;
+  uint32_t deleted_bit_vector;
+  struct hash_entry_t *hash_entry[];
+};
+
 int read_pdb_header(struct pdb_header_t *pdb_header, FILE *in);
 int read_pdb_dir(struct pdb_dir_t *pdb_dir, struct pdb_header_t *pdb_header, FILE *in);
 

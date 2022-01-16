@@ -11,6 +11,7 @@ This code falls under the LGPL license.
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 #include <inttypes.h>
 
@@ -88,6 +89,58 @@ static int32_t get_int32(void *buffer)
 
   return data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
 }
+
+#if 0
+static void load_hash(
+  struct hash_t *hash,
+  uint32_t size,
+  uint32_t capacity,
+  FILE *in)
+{
+  uint32_t heap_offset =
+     sizeof(struct hash_t) +
+    (sizeof(void *) * capacity);
+
+  hash->size = size;
+  hash->capacity = capacity;
+  hash->present_bit_vector = read_uint32(in);
+  hash->deleted_bit_vector = read_uint32(in);
+
+  int n;
+
+  for (n = 0; n < size; n++)
+  {
+    uint32_t key = read_uint32(in);
+    uint32_t value = read_uint32(in);
+
+    printf("read hash entry: %d %d\n", key, value);
+  }
+}
+
+static void dump_hash(struct hash_t *hash)
+{
+  int n;
+
+  printf(" hash: present_bit_vector=%d, deleted_bit_vector=%d\n",
+    hash->present_bit_vector,
+    hash->deleted_bit_vector);
+
+  for (n = 0; n < hash->capacity; n++)
+  {
+    struct hash_entry_t *entry = hash->hash_entry[n];
+
+    if (entry == NULL) { continue; }
+
+    printf(" %d:", n);
+
+    while (entry != NULL)
+    {
+      printf(" [%d->%d]", entry->key, entry->value);
+      entry = entry->next;
+    }
+  }
+}
+#endif
 
 int read_pdb_header(struct pdb_header_t *pdb_header, FILE *in)
 {
@@ -253,29 +306,34 @@ void print_pdb_stream_info(
   struct pdb_header_t *pdb_header,
   FILE *in)
 {
-  long marker = ftell(in);
   //int total_length = pdb_dir->stream_sizes[1];
   int i;
 
+  read_data(pdb_dir, 1, pdb_header->block_size, in);
+
+  uint8_t *data = pdb_dir->heap;
+
   printf(" -- PDB Info Stream (index 1) --\n");
 
-  uint32_t *blocks = get_blocks(pdb_dir, 1);
-
-  fseek(in, blocks[0] * pdb_header->block_size, SEEK_SET);
-
-  printf("     version: %d\n", read_uint32(in));
-  printf("   signature: %d\n", read_uint32(in));
-  printf("         age: %d\n", read_uint32(in));
+  printf("     version: %d\n", get_uint32(data + 0));
+  printf("   signature: %d\n", get_uint32(data + 4));
+  printf("         age: %d\n", get_uint32(data + 8));
   printf("        guid:");
 
   for (i = 0; i < 16; i++)
   {
-    printf(" %02x", getc(in));
+    printf(" %02x", data[i + 12]);
   }
   printf("\n\n");
 
-  int length = read_uint32(in);
+  int length = get_uint32(data + 28);
 
+printf("length=%d\n", length);
+
+  uint8_t *names = data + 32;
+  uint8_t *hash = names + length;
+
+#if 0
   for (i = 0; i < length; i++)
   {
     int ch = getc(in);
@@ -289,10 +347,89 @@ void print_pdb_stream_info(
       printf("%c", ch);
     }
   }
+#endif
+
+  uint32_t hash_size = get_uint32(hash + 0);
+  uint32_t hash_capacity = get_uint32(hash + 4);
+  uint32_t vector_words = get_uint32(hash + 8);
+  //uint32_t present_bit_vector = get_uint32(hash + 8);
+  //uint32_t deleted_bit_vector = get_uint32(hash + 12);
+
+  hash += 12;
+
+  const uint32_t *vector_bits = (uint32_t *)hash;
+  hash += vector_words * 4 * 2;
+
+printf("vector_bits: %02x %d\n", vector_bits[0], get_uint32(hash + 0));
+
+#if 0
+  int hash_storage = 
+     sizeof(struct hash_t) +
+    (sizeof(void *) * hash_capacity) +
+    (sizeof(struct hash_entry_t) * hash_size);
+
+  struct hash_t *hash = alloca(hash_storage);
+  memset(hash, 0, hash_storage);
+
+  load_hash(hash, hash_size, hash_capacity, in);
+  dump_hash(hash);
+#endif
+
+  printf("         hash_size: %d\n", hash_size);
+  printf("     hash_capacity: %d\n", hash_capacity);
+  printf("  bit_vector_count: %d\n", vector_words);
+
+  uint32_t bit_mask = 1;
+  int ptr = 0;
+
+#if 0
+int flag = 0;
+for (i = 0; i < length; i++)
+{
+  if (flag == 0) { printf("0x%02x: ", i); flag = 1; }
+  if (names[i] == 0)
+  {
+    flag = 0;
+    printf("\n");
+  }
+    else
+  {
+    printf("%c", names[i]);
+  }
+}
+printf("\n");
+#endif
+
+#if 0
+for (i = 0; i < hash_capacity * 2; i++)
+{
+printf("%d: 0x%04x\n", i, get_uint32(hash + (i * 4)));
+}
+#endif
+
+  //for (i = 0; i < hash_capacity; i++)
+  for (i = 0; i < hash_size; i++)
+  {
+    //if ((vector_bits[ptr] & bit_mask) != 0)
+    {
+      uint32_t key = get_uint32(hash + 0);
+      uint32_t value = get_uint32(hash + 4);
+      printf("%d: %s (%d/%02x) 0x%04x\n", i, names + key, key, key, value);
+      //printf("%d: (%d/%02x) 0x%04x\n", i, key, key, value);
+    }
+
+    hash += 8;
+
+    bit_mask = bit_mask << 1;
+
+    if (bit_mask == 0)
+    {
+      bit_mask = 1;
+      ptr++;
+    }
+  };
 
   printf("\n");
-
-  fseek(in, marker, SEEK_SET);
 }
 
 void print_pdb_tpi_stream(
