@@ -221,6 +221,7 @@ void print_pdb_header(struct pdb_header_t *pdb_header)
   printf("      num_dir_bytes: %d\n", pdb_header->number_of_dir_bytes);
   printf("           reserved: %d\n", pdb_header->reserved);
   printf("  block_map_address: %d\n", pdb_header->block_map_address);
+  printf("\n");
 }
 
 void print_pdb_dir(struct pdb_dir_t *pdb_dir)
@@ -664,6 +665,12 @@ void print_pdb_dbi_stream(
   }
 
   next = save + pdb_dbi->source_info_size;
+
+  // FIXME: Skiping Type Server Substream.
+  next += pdb_dbi->type_server_size;
+
+  // FIXME: Skiping EC Substream.
+  next += pdb_dbi->ec_substream_size;
 
   printf("\n\n");
 }

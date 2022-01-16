@@ -25,6 +25,12 @@ int main(int argc, char *argv[])
   struct pdb_dir_t pdb_dir;
   struct pdb_dbi_t pdb_dbi;
   uint32_t n;
+  uint8_t show_dir = 0;
+  uint8_t show_tpi = 0;
+  uint8_t show_ipi = 0;
+  uint8_t show_dbi = 0;
+  uint8_t dump_index = 0;
+  char *dump_filename = NULL;
 
   memset(&pdb_header, 0, sizeof(pdb_header));
   memset(&pdb_dir, 0, sizeof(pdb_dir));
@@ -36,6 +42,40 @@ int main(int argc, char *argv[])
   {
     if (argv[n][0] == '-')
     {
+      if (strcmp(argv[n], "-all") == 0)
+      {
+        show_dir = 1;
+        show_tpi = 1;
+        show_ipi = 1;
+      }
+        else
+      if (strcmp(argv[n], "-dir") == 0)
+      {
+        show_dir = 1;
+      }
+        else
+      if (strcmp(argv[n], "-tpi") == 0)
+      {
+        show_tpi = 1;
+      }
+        else
+      if (strcmp(argv[n], "-ipi") == 0)
+      {
+        show_ipi = 1;
+      }
+        else
+      if (strcmp(argv[n], "-dump") == 0)
+      {
+        if (n + 2 >= argc)
+        {
+          printf("Error: -dump requires a filename and index\n");
+          exit(1);
+        }
+
+        dump_filename = argv[++n];
+        dump_index = atoi(argv[++n]);
+      }
+        else
       {
         printf("Error: Unknown option %s\n", argv[n]);
         exit(1);
@@ -50,12 +90,11 @@ int main(int argc, char *argv[])
   if (filename == NULL)
   {
     printf("Usage: print_pe [options] <input file>\n");
-#if 0
-    printf("  -start <address>        (starting memory address to dump)\n");
-    printf("  -end <address>          (ending memory address to dump)\n");
-    printf("  -count <count>          (length of region to dump)\n");
-    printf("  -word_size <8/16/32/64> (word size of data to dump)\n");
-#endif
+    printf("  -all                     (Show all streams)\n");
+    printf("  -dir                     (Show directory stream)\n");
+    printf("  -tpi                     (Show TPI stream)\n");
+    printf("  -ipi                     (Show IPI stream)\n");
+    printf("  -dump <filename> <index> (Dump stream at index to filename)\n");
     exit(0);
   }
 
@@ -79,16 +118,37 @@ int main(int argc, char *argv[])
   pdb_dir.stream_sizes = (uint32_t *)malloc(pdb_header.number_of_dir_bytes);
 
   read_pdb_dir(&pdb_dir, &pdb_header, in);
-  print_pdb_dir(&pdb_dir);
+
+  if (show_dir != 0)
+  {
+    print_pdb_dir(&pdb_dir);
+  }
+
   print_pdb_stream_info(&pdb_dir, &pdb_header, in);
-  print_pdb_tpi_stream(&pdb_dir, &pdb_header, in, 2);
-  print_pdb_tpi_stream(&pdb_dir, &pdb_header, in, 4);
-  print_pdb_dbi_stream(&pdb_dir, &pdb_header, &pdb_dbi, in);
+
+  if (show_tpi != 0)
+  {
+    print_pdb_tpi_stream(&pdb_dir, &pdb_header, in, 2);
+  }
+
+  if (show_ipi != 0)
+  {
+    print_pdb_tpi_stream(&pdb_dir, &pdb_header, in, 4);
+  }
+
+  if (show_dbi != 0)
+  {
+    print_pdb_dbi_stream(&pdb_dir, &pdb_header, &pdb_dbi, in);
+  }
+
   //print_pdb_names(&pdb_dir, &pdb_header, in);
   //print_pdb_global(&pdb_dir, &pdb_header, in);
   //print_pdb_global(&pdb_dir, &pdb_header, in);
 
-  //dump_pdb_stream(&pdb_dir, &pdb_header, in, 3, "dbi.bin");
+  if (dump_filename != NULL)
+  {
+    dump_pdb_stream(&pdb_dir, &pdb_header, in, dump_index, dump_filename);
+  }
 
   free(pdb_dir.stream_sizes);
   free(pdb_dir.heap);
