@@ -622,7 +622,7 @@ void print_pdb_dbi_stream(
 
   while (bytes < pdb_dbi->mod_info_size)
   {
-    printf("       --- mod %d ---\n", count);
+    printf("       --- module %d ---\n", count);
     printf("            reserved_1: %d\n", get_uint32(next + 0));
     printf("               section: %d\n", get_uint16(next + 4));
     printf("             padding_1: %d\n", get_uint16(next + 6));

@@ -64,6 +64,11 @@ int main(int argc, char *argv[])
         show_ipi = 1;
       }
         else
+      if (strcmp(argv[n], "-dbi") == 0)
+      {
+        show_dbi = 1;
+      }
+        else
       if (strcmp(argv[n], "-dump") == 0)
       {
         if (n + 2 >= argc)
