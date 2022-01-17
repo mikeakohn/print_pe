@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2019 by Michael Kohn
+print_pe - Copyright 2005-2022 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -19,8 +19,9 @@ This code falls under the LGPL license.
 
 int section_header_read(struct section_header_t *section_header, FILE *in)
 {
+  memset(section_header->name, 0, sizeof(section_header->name));
   read_chars(in, section_header->name, 8);
-  section_header->Misc.PhysicalAddress = read_uint32(in);
+  section_header->VirtualSize = read_uint32(in);
   section_header->VirtualAddress = read_uint32(in);
   section_header->SizeOfRawData = read_uint32(in);
   section_header->PointerToRawData = read_uint32(in);
@@ -39,8 +40,8 @@ int section_header_print(struct section_header_t *section_header, int count)
   printf("Section Header %d\n",count);
   printf("---------------------------------------------\n");
   printf("      Section Name: %s\n",section_header->name);
-  printf("PhyslAddr/VirtSize: %d\n",section_header->Misc.PhysicalAddress);
-  printf("    VirtualAddress: %d\n",section_header->VirtualAddress);
+  printf("       VirtualSize: %d\n",section_header->VirtualSize);
+  printf("    VirtualAddress: 0x%04x\n",section_header->VirtualAddress);
   printf("     SizeOfRawData: %d\n",section_header->SizeOfRawData);
   printf("  PointerToRawData: %d\n",section_header->PointerToRawData);
   printf("  PtrToRelocations: %d\n",section_header->PointerToRelocations);

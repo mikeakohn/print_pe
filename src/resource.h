@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2019 by Michael Kohn
+print_pe - Copyright 2005-2022 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -47,7 +47,8 @@ int parse_resource_dir(
   struct section_header_t *section_header,
   int offset,
   int level,
-  int res_type);
+  int res_type,
+  int dump);
 
 int read_resource_data(
   FILE *in,

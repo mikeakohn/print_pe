@@ -35,16 +35,20 @@ int main(int argc, char *argv[])
   char filename[64];
   char pe_filename[1024];
   struct funct_t funct;
+  int dump = 0;
   int address_size = 4;
   int t, len;
 
-  printf("\nprint_pe (October 20, 2019) - The DLL, EXE, OCX Analyzer\n");
-  printf("Copyright 2005-2019 - Michael Kohn  http://www.mikekohn.net/\n\n");
+  printf("\nprint_pe (January 17, 2022) - The DLL, EXE, OCX Analyzer\n");
+  printf("Copyright 2005-2022 - Michael Kohn  http://www.mikekohn.net/\n\n");
 
   if (argc < 2)
   {
-    printf("Usage: print_pe [ options ] <input file>\n");
-    printf("       -modify <function name> <new return value>\n\n");
+    printf(
+       "Usage: print_pe [ options ] <input file>\n"
+       "       -modify <function> <new return value>  (modify function)\n"
+       "       -dump                                  (dump binary sections)\n"
+       "\n");
     exit(0);
   }
 
@@ -59,6 +63,11 @@ int main(int argc, char *argv[])
     {
       strcpy(funct.funct_name, argv[++t]);
       funct.funct_retvalue = atoi(argv[++t]);
+    }
+      else
+    if (strcasecmp(argv[t], "-dump") == 0)
+    {
+      dump = 1;
     }
       else
     {
@@ -80,12 +89,16 @@ int main(int argc, char *argv[])
   print_dos_header(&dos_header);
 
   len = dos_header.e_lfanew - ftell(in);
-  out = fopen("dos_code.bin","wb");
 
-  if (out != 0)
+  if (dump == 1)
   {
-    for (t = 0; t < len; t++) { putc(getc(in), out); }
-    fclose(out);
+    out = fopen("dos_code.bin", "wb");
+
+    if (out != NULL)
+    {
+      for (t = 0; t < len; t++) { putc(getc(in), out); }
+      fclose(out);
+    }
   }
 
   if (dos_header.e_lfanew == 0)
@@ -138,14 +151,23 @@ int main(int argc, char *argv[])
 
     if ((section_header.Characteristics & 0x20) != 0)
     {
-      sprintf(filename, "win_code_%d.bin", t);
-      rip_binary(in, filename, section_header.PointerToRawData, section_header.SizeOfRawData);
+      if (dump == 1)
+      {
+        sprintf(filename, "win_code_%d.bin", t);
+
+        rip_binary(
+          in,
+          filename,
+          section_header.PointerToRawData,
+          section_header.SizeOfRawData);
+      }
+
       vb_info_print(in, &optional_header, &section_header);
     }
       else
     if (strcmp(section_header.name, ".rsrc") == 0)
     {
-      parse_resource_dir(in, &section_header, 0, 0, 0);
+      parse_resource_dir(in, &section_header, 0, 0, 0, dump);
     }
 
     // Print imports
@@ -228,7 +250,14 @@ int main(int argc, char *argv[])
             &section_header);
 
           struct _clr_header clr_header;
-          read_clr_header(in, &clr_header, optional_header.directory_entry[14].virtual_address, optional_header.directory_entry[14].size, &section_header);
+
+          read_clr_header(
+            in,
+            &clr_header,
+            optional_header.directory_entry[14].virtual_address,
+            optional_header.directory_entry[14].size,
+            &section_header);
+
           print_clr_header(&clr_header);
         }
       }

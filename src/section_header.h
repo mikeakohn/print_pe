@@ -17,11 +17,7 @@ This code falls under the LGPL license.
 struct section_header_t
 {
   char name[10];
-  union
-  {
-    uint32_t PhysicalAddress;
-    uint32_t VirtualSize;
-  } Misc;
+  uint32_t VirtualSize;
   uint32_t VirtualAddress;
   uint32_t SizeOfRawData;
   uint32_t PointerToRawData;

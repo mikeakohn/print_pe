@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2019 by Michael Kohn
+print_pe - Copyright 2005-2022 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -23,9 +23,9 @@ int rip_binary(FILE *in, char *filename, int address, int size)
   long marker;
   int t;
 
-  out = fopen(filename,"wb");
+  out = fopen(filename, "wb");
 
-  if (out == 0)
+  if (out == NULL)
   {
     printf("Cannot open file %s for writing.\n\n",filename);
     return -1;

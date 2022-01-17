@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2015 by Michael Kohn
+print_pe - Copyright 2005-2022 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -137,7 +137,13 @@ int parse_version_info(FILE *in, long offset, int size)
   return 0;
 }
 
-int parse_resource_dir(FILE *in, struct section_header_t *section_header, int offset, int level, int res_type)
+int parse_resource_dir(
+  FILE *in,
+  struct section_header_t *section_header,
+  int offset,
+  int level,
+  int res_type,
+  int dump)
 {
   struct resource_dir_t resource_dir;
   struct resource_dir_entry_t resource_dir_entry;
@@ -151,37 +157,74 @@ int parse_resource_dir(FILE *in, struct section_header_t *section_header, int of
   offset = offset + 16;
 
   count = resource_dir.NumberOfNamedEntries + resource_dir.NumberOfIdEntries;
+
   for (t = 0; t < count; t++)
   {
-    read_resource_dir_entry(in, section_header->PointerToRawData, &resource_dir_entry, offset);
+    read_resource_dir_entry(
+      in,
+      section_header->PointerToRawData,
+      &resource_dir_entry,
+      offset);
+
     print_resource_dir_entry(&resource_dir_entry, level);
 
     if ((resource_dir_entry.OffsetToData & 0x80000000) == 0)
     {
-      read_resource_data(in, section_header->PointerToRawData, &resource_data, resource_dir_entry.OffsetToData);
+      read_resource_data(
+        in,
+        section_header->PointerToRawData,
+        &resource_data,
+        resource_dir_entry.OffsetToData);
+
       print_resource_data(&resource_data, level);
 
       sprintf(filename, "res%d.bin", resource_data.OffsetToData);
-      rip_binary(in, filename,section_header->PointerToRawData + (resource_data.OffsetToData - section_header->VirtualAddress), resource_data.Size);
+
+      if (dump == 1)
+      {
+        rip_binary(
+          in,
+          filename,
+          section_header->PointerToRawData + (resource_data.OffsetToData - section_header->VirtualAddress),
+          resource_data.Size);
+      }
 
       if (res_type == 0x10)
       {
-        parse_version_info(in, section_header->PointerToRawData + (resource_data.OffsetToData - section_header->VirtualAddress), resource_data.Size);
+        parse_version_info(
+          in,
+          section_header->PointerToRawData + (resource_data.OffsetToData - section_header->VirtualAddress),
+          resource_data.Size);
       }
 
       if (level == 0)
-      { print_resource_type(resource_dir_entry.Name, level); }
+      {
+        print_resource_type(resource_dir_entry.Name, level);
+      }
     }
       else
     {
       if (level == 0)
       {
         print_resource_type(resource_dir_entry.Name,level);
-        parse_resource_dir(in, section_header, (resource_dir_entry.OffsetToData & 0x7fffffff), level + 1, resource_dir_entry.Name);
+
+        parse_resource_dir(
+          in,
+          section_header,
+          resource_dir_entry.OffsetToData & 0x7fffffff,
+          level + 1,
+          resource_dir_entry.Name,
+          dump);
       }
         else
       {
-        parse_resource_dir(in, section_header, (resource_dir_entry.OffsetToData & 0x7fffffff), level + 1,res_type);
+        parse_resource_dir(
+          in,
+          section_header,
+          resource_dir_entry.OffsetToData & 0x7fffffff,
+          level + 1,
+          res_type,
+          dump);
       }
     }
 
@@ -227,7 +270,11 @@ int save_resource(FILE *in, char *filename, int addr)
   return 0;
 }
 
-int read_resource_dir_entry(FILE *in, int addr, struct resource_dir_entry_t *resource_dir_entry, int offset)
+int read_resource_dir_entry(
+  FILE *in,
+  int addr,
+  struct resource_dir_entry_t *resource_dir_entry,
+  int offset)
 {
 int marker;
 
@@ -238,16 +285,28 @@ int marker;
   resource_dir_entry->OffsetToData = read_uint32(in);
 
   if ((resource_dir_entry->Name & 0x80000000) != 0)
-  { read_unicode(in, addr + (resource_dir_entry->Name & 0x7fffffff), resource_dir_entry->RealName, 256); }
+  {
+    read_unicode(
+      in,
+      addr + (resource_dir_entry->Name & 0x7fffffff),
+      resource_dir_entry->RealName,
+      256);
+  }
     else
-  { resource_dir_entry->RealName[0] = 0; }
+  {
+    resource_dir_entry->RealName[0] = 0;
+  }
 
   fseek(in, marker, SEEK_SET);
 
   return 0;
 }
 
-int read_resource_data(FILE *in, int addr, struct resource_data_t *resource_data, int offset)
+int read_resource_data(
+  FILE *in,
+  int addr,
+  struct resource_data_t *resource_data,
+  int offset)
 {
   long marker;
 
@@ -264,7 +323,9 @@ int read_resource_data(FILE *in, int addr, struct resource_data_t *resource_data
   return 0;
 }
 
-int print_resource_dir_entry(struct resource_dir_entry_t *resource_dir_entry, int level)
+int print_resource_dir_entry(
+  struct resource_dir_entry_t *resource_dir_entry,
+  int level)
 {
   char indent[RES_INDENT_MAX];
 
@@ -273,15 +334,21 @@ int print_resource_dir_entry(struct resource_dir_entry_t *resource_dir_entry, in
   indent[level * RES_INDENT_UNIT] = 0;
 
   if ((resource_dir_entry->OffsetToData & 0x80000000) == 0)
-  { printf("%s-- Resource Dir Entry --\n", indent); }
+  {
+    printf("%s-- Resource Dir Entry --\n", indent);
+  }
     else
-  { printf("%s-- Resource Dir Entry (Dir) --\n", indent); }
+  {
+    printf("%s-- Resource Dir Entry (Dir) --\n", indent);
+  }
 
   printf("%s|             Name: 0x%08x", indent, resource_dir_entry->Name);
+
   if ((resource_dir_entry->Name&0x80000000) != 0)
   {
     printf("%s|(%s)", indent, resource_dir_entry->RealName);
   }
+
   printf("\n");
   printf("%s|     OffsetToData: 0x%08x\n", indent, resource_dir_entry->OffsetToData);
   printf("\n");
@@ -294,7 +361,7 @@ int print_resource_dir(struct resource_dir_t *resource_dir, int level)
   char indent[RES_INDENT_MAX];
 
   memset(indent, ' ', RES_INDENT_MAX);
-  if (level > RES_INDENT_LEVELS) level = RES_INDENT_LEVELS;
+  if (level > RES_INDENT_LEVELS) { level = RES_INDENT_LEVELS; }
   indent[level * RES_INDENT_UNIT] = 0;
 
   printf("%s|_______ Resource Directory ___\n",indent);
@@ -321,13 +388,19 @@ int print_resource_type(int id, int level)
   };
 
   memset(indent, ' ', RES_INDENT_MAX);
-  if (level > RES_INDENT_LEVELS) level = RES_INDENT_LEVELS;
+  if (level > RES_INDENT_LEVELS) { level = RES_INDENT_LEVELS; }
   indent[level*RES_INDENT_UNIT] = 0;
 
   printf("%s>> Resource Type: ", indent);
 
-  if (id < 0x17) { printf("%s\n", ids[id]); }
-  else { printf("???\n"); }
+  if (id < 0x17)
+  {
+    printf("%s\n", ids[id]);
+  }
+  else
+  {
+    printf("???\n");
+  }
 
   printf("\n");
 
@@ -339,7 +412,7 @@ int print_resource_data(struct resource_data_t *resource_data, int level)
   char indent[RES_INDENT_MAX];
 
   memset(indent, ' ', RES_INDENT_MAX);
-  if (level > RES_INDENT_LEVELS) level = RES_INDENT_LEVELS;
+  if (level > RES_INDENT_LEVELS) { level = RES_INDENT_LEVELS; }
   indent[level * RES_INDENT_UNIT] = 0;
 
   printf("%s-- Resource Data --\n", indent);
@@ -351,5 +424,4 @@ int print_resource_data(struct resource_data_t *resource_data, int level)
 
   return 0;
 }
-
 
