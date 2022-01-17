@@ -116,6 +116,17 @@ struct type_record_t
   uint16_t type;
 };
 
+// FIXME: Not sure what most of these are. For the purpose of dumping the
+// symbols, offset is the most important for now.
+struct symbol_record_t
+{
+  uint16_t length;
+  uint16_t type;
+  uint32_t section;
+  uint32_t offset;
+  uint16_t index;
+};
+
 #if 0
 struct hash_entry_t
 {
@@ -152,25 +163,22 @@ void print_pdb_tpi_stream(
   FILE *in,
   int index);
 
+void read_pdb_dbi_stream(
+  struct pdb_dir_t *pdb_dir,
+  struct pdb_header_t *pdb_header,
+  struct pdb_dbi_t *pdb_dbi,
+  FILE *in);
+
 void print_pdb_dbi_stream(
   struct pdb_dir_t *pdb_dir,
   struct pdb_header_t *pdb_header,
   struct pdb_dbi_t *pdb_dbi,
   FILE *in);
 
-void print_pdb_names(
+void print_pdb_symbols(
   struct pdb_dir_t *pdb_dir,
   struct pdb_header_t *pdb_header,
-  FILE *in);
-
-void print_pdb_public(
-  struct pdb_dir_t *pdb_dir,
-  struct pdb_header_t *pdb_header,
-  FILE *in);
-
-void print_pdb_global(
-  struct pdb_dir_t *pdb_dir,
-  struct pdb_header_t *pdb_header,
+  struct pdb_dbi_t *pdb_dbi,
   FILE *in);
 
 // For debugging.

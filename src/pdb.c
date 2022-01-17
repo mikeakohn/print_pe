@@ -562,7 +562,7 @@ void print_pdb_tpi_stream(
   }
 }
 
-void print_pdb_dbi_stream(
+void read_pdb_dbi_stream(
   struct pdb_dir_t *pdb_dir,
   struct pdb_header_t *pdb_header,
   struct pdb_dbi_t *pdb_dbi,
@@ -592,6 +592,47 @@ void print_pdb_dbi_stream(
   pdb_dbi->flags = get_int16(data + 56);
   pdb_dbi->machine = get_uint16(data + 58);
   pdb_dbi->padding = get_uint32(data + 60);
+}
+
+void print_pdb_dbi_stream(
+  struct pdb_dir_t *pdb_dir,
+  struct pdb_header_t *pdb_header,
+  struct pdb_dbi_t *pdb_dbi,
+  FILE *in)
+{
+  if (pdb_dbi->version_signature == 0)
+  {
+    read_pdb_dbi_stream(pdb_dir, pdb_header, pdb_dbi, in);
+  }
+
+  uint8_t *data = pdb_dir->heap;
+
+#if 0
+  read_data(pdb_dir, 3, pdb_header->block_size, in);
+
+  uint8_t *data = pdb_dir->heap;
+
+  pdb_dbi->version_signature = get_int32(data + 0);
+  pdb_dbi->version_header = get_uint32(data + 4);
+  pdb_dbi->age = get_uint32(data + 8);
+  pdb_dbi->global_stream_index = get_int16(data + 12);
+  pdb_dbi->build_number = get_int16(data + 14);
+  pdb_dbi->public_stream_index = get_int16(data + 16);
+  pdb_dbi->pdb_dll_version = get_int16(data + 18);
+  pdb_dbi->symbol_record_stream = get_int16(data + 20);
+  pdb_dbi->pdb_dll_rbld = get_int16(data + 22);
+  pdb_dbi->mod_info_size = get_int32(data + 24);
+  pdb_dbi->section_contribution_size = get_int32(data + 28);
+  pdb_dbi->section_map_size = get_int32(data + 32);
+  pdb_dbi->source_info_size = get_int32(data + 36);
+  pdb_dbi->type_server_size = get_int32(data + 40);
+  pdb_dbi->mfc_type_server_index = get_uint32(data + 44);
+  pdb_dbi->optional_debug_header_size = get_int32(data + 48);
+  pdb_dbi->ec_substream_size = get_int32(data + 52);
+  pdb_dbi->flags = get_int16(data + 56);
+  pdb_dbi->machine = get_uint16(data + 58);
+  pdb_dbi->padding = get_uint32(data + 60);
+#endif
 
   printf(" -- DBI Stream --\n");
   printf("         version_signature: %d\n", pdb_dbi->version_signature);
@@ -624,12 +665,12 @@ void print_pdb_dbi_stream(
   {
     printf("       --- module %d ---\n", count);
     printf("            reserved_1: %d\n", get_uint32(next + 0));
-    printf("               section: %d\n", get_uint16(next + 4));
+    printf("               section: %d\n", get_int16(next + 4));
     printf("             padding_1: %d\n", get_uint16(next + 6));
     printf("                offset: %d\n", get_int32(next + 8));
     printf("                  size: %d\n", get_int32(next + 12));
     printf("       characteristics: 0x%08x\n", get_uint32(next + 16));
-    printf("          module_index: %d\n", get_uint16(next + 20));
+    printf("          module_index: %d\n", get_int16(next + 20));
     printf("             padding_2: %d\n", get_uint16(next + 22));
     printf("              data_crc: %08x\n", get_uint32(next + 24));
     printf("             reloc_crc: %08x\n", get_uint32(next + 28));
@@ -681,7 +722,7 @@ void print_pdb_dbi_stream(
   while (bytes < pdb_dbi->section_contribution_size)
   {
     printf("       --- section contribution %d ---\n", count);
-    printf("               section: %d\n", get_uint16(next + 0));
+    printf("               section: %d\n", get_int16(next + 0));
     printf("             padding_1: %d\n", get_uint16(next + 2));
     printf("                offset: %d\n", get_int32(next + 4));
     printf("                  size: %d\n", get_int32(next + 8));
@@ -799,44 +840,95 @@ void print_pdb_dbi_stream(
   printf("\n\n");
 }
 
-void print_pdb_names(
+void print_pdb_symbols(
   struct pdb_dir_t *pdb_dir,
   struct pdb_header_t *pdb_header,
+  struct pdb_dbi_t *pdb_dbi,
   FILE *in)
 {
-  //struct pdb_tpi_header_t tpi;
+  if (pdb_dbi->version_signature == 0)
+  {
+    read_pdb_dbi_stream(pdb_dir, pdb_header, pdb_dbi, in);
+  }
 
-  read_data(pdb_dir, 7, pdb_header->block_size, in);
+  read_data(pdb_dir, pdb_dbi->symbol_record_stream, pdb_header->block_size, in);
 
-  //uint8_t *data = pdb_dir->heap;
+  struct symbol_record_t symbol_record;
+  int length = pdb_dir->stream_sizes[pdb_dbi->symbol_record_stream];
+  uint8_t *data = pdb_dir->heap;
+  uint8_t *next = data;
+  int n = 0;
 
-  printf("\n\n");
-}
+  printf("  -- Symbols --\n");
 
-void print_pdb_public(
-  struct pdb_dir_t *pdb_dir,
-  struct pdb_header_t *pdb_header,
-  FILE *in)
-{
-  //struct pdb_tpi_header_t tpi;
+  while (n < length)
+  {
+    int offset = 14;
 
-  read_data(pdb_dir, 9, pdb_header->block_size, in);
+    symbol_record.length = get_uint16(next + 0);
+    symbol_record.type = get_uint16(next + 2);
 
-  //uint8_t *data = pdb_dir->heap;
+    printf("       length: %d\n", symbol_record.length);
 
-  printf("\n\n");
-}
+    switch (symbol_record.type)
+    {
+      case 0x110e:
+        printf("  symbol_type: 0x%04x (PUB32)\n", symbol_record.type);
+        printf("      section: %d\n", get_int32(next+ 4));
+        printf("       offset: 0x%04x\n", get_uint32(next + 8));
+        printf("        index: %d\n", get_uint16(next + 12));
+        break;
+      case 0x1125:
+        printf("  symbol_type: 0x%04x (PROCREF)\n", symbol_record.type);
+        printf("      section: %d\n", get_int32(next+ 4));
+        printf("       offset: 0x%04x\n", get_uint32(next + 8));
+        printf("        index: %d\n", get_uint16(next + 12));
+        break;
+      case 0x1107:
+        printf("  symbol_type: 0x%04x (CONSTANT)\n", symbol_record.type);
+        printf("       offset: 0x%04x\n", get_uint32(next + 4));
+        printf("        index: %d\n", get_uint16(next + 8));
+        offset = 10;
+        break;
+      case 0x1108:
+        printf("  symbol_type: 0x%04x (UDT)\n", symbol_record.type);
+        printf("       offset: 0x%04x\n", get_uint32(next + 4));
+        offset = 8;
+        break;
+      case 0x110c:
+        printf("  symbol_type: 0x%04x (LDATA32)\n", symbol_record.type);
+        printf("      section: %d\n", get_int32(next+ 4));
+        printf("       offset: 0x%04x\n", get_uint32(next + 8));
+        printf("        index: %d\n", get_uint16(next + 12));
+        break;
+      case 0x110d:
+        printf("  symbol_type: 0x%04x (GDATA32)\n", symbol_record.type);
+        printf("      section: %d\n", get_int32(next+ 4));
+        printf("       offset: 0x%04x\n", get_uint32(next + 8));
+        printf("        index: %d\n", get_uint16(next + 12));
+        break;
+      case 0x1127:
+        printf("  symbol_type: 0x%04x (LPROCREF)\n", symbol_record.type);
+        printf("      section: %d\n", get_int32(next+ 4));
+        printf("       offset: 0x%04x\n", get_uint32(next + 8));
+        printf("        index: %d\n", get_uint16(next + 12));
+        break;
+      default:
+        printf("  symbol_type: 0x%04x (UNKNOWN)\n", symbol_record.type);
+        printf("      section: %d\n", get_int32(next+ 4));
+        printf("       offset: 0x%04x\n", get_uint32(next + 8));
+        printf("        index: %d\n", get_uint16(next + 12));
+        break;
+    }
 
-void print_pdb_global(
-  struct pdb_dir_t *pdb_dir,
-  struct pdb_header_t *pdb_header,
-  FILE *in)
-{
-  read_data(pdb_dir, 10, pdb_header->block_size, in);
+    printf("%s\n", next + offset);
+    printf(" --------\n");
 
-  //uint8_t *data = pdb_dir->heap;
+    int align = (symbol_record.length + 3) & ~3;
 
-  printf("\n\n");
+    next += align;
+    n += align;
+  }
 }
 
 void dump_pdb_stream(

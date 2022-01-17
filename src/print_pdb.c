@@ -29,14 +29,16 @@ int main(int argc, char *argv[])
   uint8_t show_tpi = 0;
   uint8_t show_ipi = 0;
   uint8_t show_dbi = 0;
+  uint8_t show_symbols = 0;
   uint8_t dump_index = 0;
   char *dump_filename = NULL;
 
   memset(&pdb_header, 0, sizeof(pdb_header));
   memset(&pdb_dir, 0, sizeof(pdb_dir));
+  memset(&pdb_dbi, 0, sizeof(pdb_dbi));
 
-  printf("\nprint_pdb (January 15, 2022)\n");
-  printf("Copyright 2005-2022 - Michael Kohn  http://www.mikekohn.net/\n\n");
+  printf("\nprint_pdb (January 17, 2022)\n");
+  printf("Copyright 2022 - Michael Kohn  http://www.mikekohn.net/\n\n");
 
   for (n = 1; n < argc; n++)
   {
@@ -69,6 +71,11 @@ int main(int argc, char *argv[])
         show_dbi = 1;
       }
         else
+      if (strcmp(argv[n], "-symbols") == 0)
+      {
+        show_symbols = 1;
+      }
+        else
       if (strcmp(argv[n], "-dump") == 0)
       {
         if (n + 2 >= argc)
@@ -99,6 +106,7 @@ int main(int argc, char *argv[])
     printf("  -dir                     (Show directory stream)\n");
     printf("  -tpi                     (Show TPI stream)\n");
     printf("  -ipi                     (Show IPI stream)\n");
+    printf("  -symbols                 (Show symbols)\n");
     printf("  -dump <filename> <index> (Dump stream at index to filename)\n");
     exit(0);
   }
@@ -147,9 +155,10 @@ int main(int argc, char *argv[])
     print_pdb_dbi_stream(&pdb_dir, &pdb_header, &pdb_dbi, in);
   }
 
-  //print_pdb_names(&pdb_dir, &pdb_header, in);
-  //print_pdb_global(&pdb_dir, &pdb_header, in);
-  //print_pdb_global(&pdb_dir, &pdb_header, in);
+  if (show_symbols != 0)
+  {
+    print_pdb_symbols(&pdb_dir, &pdb_header, &pdb_dbi, in);
+  }
 
   if (dump_filename != NULL)
   {
