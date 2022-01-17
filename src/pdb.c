@@ -728,8 +728,8 @@ void print_pdb_dbi_stream(
     printf("                   ovl: %d\n", get_uint16(next + 2));
     printf("                 group: %d\n", get_uint16(next + 4));
     printf("                 frame: %d\n", get_uint16(next + 6));
-    printf("          section_name: %d\n", get_uint16(next + 8));
-    printf("            class_name: %d\n", get_uint16(next + 10));
+    printf("          section_name: %d\n", get_int16(next + 8));
+    printf("            class_name: %d\n", get_int16(next + 10));
     printf("                offset: %d\n", get_uint32(next + 12));
     printf("        section_length: %d\n", get_uint32(next + 16));
 
@@ -773,6 +773,28 @@ void print_pdb_dbi_stream(
 
   // FIXME: Skiping EC Substream.
   next += pdb_dbi->ec_substream_size;
+
+  printf("       --- optional_debug ---\n");
+
+  if (pdb_dbi->optional_debug_header_size >= 22)
+  {
+    printf("                     fpo_data: %d\n", get_int16(next + 0));
+    printf("               exception data: %d\n", get_int16(next + 2));
+    printf("                   fixup_data: %d\n", get_int16(next + 4));
+    printf("             omap_to_src_data: %d\n", get_int16(next + 6));
+    printf("           omap_from_src_data: %d\n", get_int16(next + 8));
+    printf("          section_header_data: %d\n", get_int16(next + 10));
+    printf("                token_rid_map: %d\n", get_int16(next + 12));
+    printf("                        xdata: %d\n", get_int16(next + 14));
+    printf("                        pdata: %d\n", get_int16(next + 16));
+    printf("                 new_fpo_data: %d\n", get_int16(next + 18));
+    printf(" original_section_header_data: %d\n", get_int16(next + 20));
+    printf("\n");
+  }
+    else
+  {
+    printf("section size is only %d?\n", pdb_dbi->optional_debug_header_size);
+  }
 
   printf("\n\n");
 }
