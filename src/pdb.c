@@ -792,7 +792,7 @@ void print_pdb_dbi_stream(
   for (i = 0; i < module_count; i++)
   {
     printf("   module: indices=%d file_counts=%d\n",
-      get_uint16(next + bytes), get_uint16(next + offset)); 
+      get_uint16(next + bytes), get_uint16(next + offset));
     bytes += 2;
     offset += 2;
   }
@@ -851,11 +851,57 @@ void print_pdb_symbols(
     read_pdb_dbi_stream(pdb_dir, pdb_header, pdb_dbi, in);
   }
 
+  uint8_t *data = pdb_dir->heap;
+  uint32_t virtual_address = 0;
+
+  // Need to find .text section to find the offset to the code.
+  if (pdb_dbi->optional_debug_header_size != 0)
+  {
+    uint8_t *debug_section = data + 64 +
+      pdb_dbi->mod_info_size +
+      pdb_dbi->section_contribution_size +
+      pdb_dbi->section_map_size +
+      pdb_dbi->source_info_size +
+      pdb_dbi->type_server_size +
+      pdb_dbi->ec_substream_size;
+
+    int index = get_int16(debug_section + 10);
+    int length = pdb_dir->stream_sizes[index];
+    int n = 0;
+    uint8_t *next = pdb_dir->heap;
+    read_data(pdb_dir, index, pdb_header->block_size, in);
+
+    printf("  -- sections --\n");
+
+    while (n < length)
+    {
+      const char *name = (char *)next;
+      printf("                      name: %-8s\n", name);
+      printf("              virtual_size: 0x%08x\n", get_uint32(next + 8));
+      printf("           virtual_address: 0x%08x\n", get_uint32(next + 12));
+      printf("          size_of_raw_data: 0x%04x\n", get_uint32(next + 16));
+      printf("       pointer_to_raw_data: 0x%04x\n", get_uint32(next + 20));
+      printf("    pointer_to_relocations: 0x%04x\n", get_uint32(next + 24));
+      printf("   pointer_to_line_numbers: 0x%04x\n", get_uint32(next + 28));
+      printf("          relocation_count: %d\n", get_uint16(next + 32));
+      printf("         line_number_count: %d\n", get_uint16(next + 34));
+      printf("           characteristics: 0x%08x\n", get_uint32(next + 36));
+      printf("\n");
+
+      if (strncmp(name, ".text", 8) == 0)
+      {
+        virtual_address = get_uint32(next + 12);
+      }
+
+      n += 40;
+      next += 40;
+    }
+  }
+
   read_data(pdb_dir, pdb_dbi->symbol_record_stream, pdb_header->block_size, in);
 
   struct symbol_record_t symbol_record;
   int length = pdb_dir->stream_sizes[pdb_dbi->symbol_record_stream];
-  uint8_t *data = pdb_dir->heap;
   uint8_t *next = data;
   int n = 0;
 
@@ -875,7 +921,16 @@ void print_pdb_symbols(
       case 0x110e:
         printf("  symbol_type: 0x%04x (PUB32)\n", symbol_record.type);
         printf("      section: %d\n", get_int32(next+ 4));
-        printf("       offset: 0x%04x\n", get_uint32(next + 8));
+        if (virtual_address != 0)
+        {
+          printf("       offset: 0x%04x (address=0x%04x)\n",
+            get_uint32(next + 8),
+            get_uint32(next + 8) + virtual_address);
+        }
+          else
+        {
+          printf("       offset: 0x%04x\n", get_uint32(next + 8));
+        }
         printf("        index: %d\n", get_uint16(next + 12));
         break;
       case 0x1125:

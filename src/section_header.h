@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2019 by Michael Kohn
+print_pe - Copyright 2005-2022 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -16,7 +16,7 @@ This code falls under the LGPL license.
 
 struct section_header_t
 {
-  char name[9];
+  char name[10];
   union
   {
     uint32_t PhysicalAddress;
