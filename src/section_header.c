@@ -43,7 +43,7 @@ int section_header_print(struct section_header_t *section_header, int count)
   printf("       VirtualSize: %d\n",section_header->VirtualSize);
   printf("    VirtualAddress: 0x%04x\n",section_header->VirtualAddress);
   printf("     SizeOfRawData: %d\n",section_header->SizeOfRawData);
-  printf("  PointerToRawData: %d\n",section_header->PointerToRawData);
+  printf("  PointerToRawData: 0x%04x\n",section_header->PointerToRawData);
   printf("  PtrToRelocations: %d\n",section_header->PointerToRelocations);
   printf("  PtrToLinenumbers: %d\n",section_header->PointerToLinenumbers);
   printf("  NumOfRelocations: %d\n",section_header->NumberOfRelocations);

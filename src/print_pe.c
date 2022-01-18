@@ -170,13 +170,16 @@ int main(int argc, char *argv[])
       parse_resource_dir(in, &section_header, 0, 0, 0, dump);
     }
 
+    const uint32_t virtual_start = section_header.VirtualAddress;
+    const uint32_t virtual_end =
+      section_header.VirtualAddress +
+      section_header.SizeOfRawData;;
+
     // Print imports
     if (optional_header.directory_entry[1].size != 0)
     {
-      if (section_header.VirtualAddress <=
-          optional_header.directory_entry[1].virtual_address &&
-          optional_header.directory_entry[1].virtual_address <=
-             section_header.VirtualAddress + section_header.SizeOfRawData)
+      if (optional_header.directory_entry[1].virtual_address >= virtual_start &&
+          optional_header.directory_entry[1].virtual_address < virtual_end)
       {
         imports_print(
           in,
@@ -190,10 +193,8 @@ int main(int argc, char *argv[])
     // Print exports
     if (optional_header.directory_entry[0].size != 0)
     {
-      if (section_header.VirtualAddress <=
-          optional_header.directory_entry[0].virtual_address &&
-          optional_header.directory_entry[0].virtual_address <=
-          section_header.VirtualAddress + section_header.SizeOfRawData)
+      if (optional_header.directory_entry[0].virtual_address >= virtual_start &&
+          optional_header.directory_entry[0].virtual_address < virtual_end)
       {
         exports_print(
           in,
@@ -207,10 +208,8 @@ int main(int argc, char *argv[])
     // Debug section
     if (optional_header.directory_entry[6].size!= 0)
     {
-      if (section_header.VirtualAddress <=
-          optional_header.directory_entry[6].virtual_address &&
-          optional_header.directory_entry[6].virtual_address <=
-          section_header.VirtualAddress + section_header.SizeOfRawData)
+      if (optional_header.directory_entry[6].virtual_address >= virtual_start &&
+          optional_header.directory_entry[6].virtual_address < virtual_end)
       {
         debug_section_print(
           in,
@@ -223,10 +222,8 @@ int main(int argc, char *argv[])
     // COM Desc section
     if (optional_header.directory_entry[14].size != 0)
     {
-      if (section_header.VirtualAddress <=
-          optional_header.directory_entry[14].virtual_address &&
-          optional_header.directory_entry[14].virtual_address <=
-          section_header.VirtualAddress + section_header.SizeOfRawData)
+      if (optional_header.directory_entry[14].virtual_address >= virtual_start &&
+          optional_header.directory_entry[14].virtual_address < virtual_end)
       {
 
         int is_dot_net = imports_find(
