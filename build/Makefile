@@ -10,7 +10,6 @@ OBJECTS= \
   clsid.o \
   com.o \
   debug_directory.o \
-  debug_section.o \
   dos.o \
   exports.o \
   file_header.o \

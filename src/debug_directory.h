@@ -14,6 +14,8 @@ This code falls under the LGPL license.
 
 #include <stdint.h>
 
+#include "section_header.h"
+
 struct debug_directory_t
 {
   uint32_t Characteristics;
@@ -26,8 +28,11 @@ struct debug_directory_t
   uint32_t PointerToRawData;
 };
 
-int debug_directory_read(struct debug_directory_t *debug_directory, FILE *in);
-int debug_directory_print(struct debug_directory_t *debug_directory);
+int debug_directory_print(
+  FILE *in,
+  int addr,
+  int size,
+  struct section_header_t *section_header);
 
 #endif
 

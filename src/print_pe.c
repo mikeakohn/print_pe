@@ -14,7 +14,7 @@ This code falls under the LGPL license.
 #include <string.h>
 
 #include "cil.h"
-#include "debug_section.h"
+#include "debug_directory.h"
 #include "dos.h"
 #include "exports.h"
 #include "file_header.h"
@@ -211,7 +211,14 @@ int main(int argc, char *argv[])
       if (optional_header.directory_entry[6].virtual_address >= virtual_start &&
           optional_header.directory_entry[6].virtual_address < virtual_end)
       {
+#if 0
         debug_section_print(
+          in,
+          optional_header.directory_entry[6].virtual_address,
+          optional_header.directory_entry[6].size,
+          &section_header);
+#endif
+        debug_directory_print(
           in,
           optional_header.directory_entry[6].virtual_address,
           optional_header.directory_entry[6].size,
