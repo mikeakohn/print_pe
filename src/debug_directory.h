@@ -18,14 +18,14 @@ This code falls under the LGPL license.
 
 struct debug_directory_t
 {
-  uint32_t Characteristics;
-  uint32_t TimeDateStamp;
-  uint16_t MajorVersion;
-  uint16_t MinorVersion;
-  uint32_t Type;
-  uint32_t SizeOfData;
-  uint32_t AddressOfRawData;
-  uint32_t PointerToRawData;
+  uint32_t characteristics;
+  uint32_t time_date_stamp;
+  uint16_t major_version;
+  uint16_t minor_version;
+  uint32_t type;
+  uint32_t size_of_data;
+  uint32_t address_of_raw_data;
+  uint32_t pointer_to_raw_data;
 };
 
 int debug_directory_print(

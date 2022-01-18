@@ -21,14 +21,14 @@ static int debug_directory_entry_read(
   struct debug_directory_t *debug_directory,
   FILE *in)
 {
-  debug_directory->Characteristics = read_uint32(in);
-  debug_directory->TimeDateStamp = read_uint32(in);
-  debug_directory->MajorVersion = read_uint16(in);
-  debug_directory->MinorVersion = read_uint16(in);
-  debug_directory->Type = read_uint32(in);
-  debug_directory->SizeOfData = read_uint32(in);
-  debug_directory->AddressOfRawData = read_uint32(in);
-  debug_directory->PointerToRawData = read_uint32(in);
+  debug_directory->characteristics = read_uint32(in);
+  debug_directory->time_date_stamp = read_uint32(in);
+  debug_directory->major_version = read_uint16(in);
+  debug_directory->minor_version = read_uint16(in);
+  debug_directory->type = read_uint32(in);
+  debug_directory->size_of_data = read_uint32(in);
+  debug_directory->address_of_raw_data = read_uint32(in);
+  debug_directory->pointer_to_raw_data = read_uint32(in);
 
   return 0;
 }
@@ -51,15 +51,15 @@ static int debug_directory_entry_print(
     "RESERVED10"
   };
 
-  printf("   Characteristics: %d\n", debug_directory->Characteristics);
-  printf("     TimeDateStamp: %s", ctime((time_t *)&debug_directory->TimeDateStamp));
-  printf("      MajorVersion: %d\n", debug_directory->MajorVersion);
-  printf("      MinorVersion: %d\n", debug_directory->MinorVersion);
-  printf("              Type: %d (", debug_directory->Type);
+  printf("   Characteristics: %d\n", debug_directory->characteristics);
+  printf("     TimeDateStamp: %s", ctime((time_t *)&debug_directory->time_date_stamp));
+  printf("      MajorVersion: %d\n", debug_directory->major_version);
+  printf("      MinorVersion: %d\n", debug_directory->minor_version);
+  printf("              Type: %d (", debug_directory->type);
 
-  if (debug_directory->Type < 11)
+  if (debug_directory->type < 11)
   {
-    printf("%s", debug_types[debug_directory->Type]);
+    printf("%s", debug_types[debug_directory->type]);
   }
     else
   {
@@ -67,12 +67,47 @@ static int debug_directory_entry_print(
   }
 
   printf(")\n");
-  printf("        SizeOfData: %d\n", debug_directory->SizeOfData);
-  printf("  AddressOfRawData: %d\n", debug_directory->AddressOfRawData);
-  printf("  PointerToRawData: %d\n", debug_directory->PointerToRawData);
+  printf("        SizeOfData: %d\n", debug_directory->size_of_data);
+  printf("  AddressOfRawData: 0x%04x\n", debug_directory->address_of_raw_data);
+  printf("  PointerToRawData: 0x%04x\n", debug_directory->pointer_to_raw_data);
   printf("\n");
 
   return 0;
+}
+
+static void debug_directory_print_codeview(
+  struct debug_directory_t *debug_directory,
+  FILE *in)
+{
+  long marker = ftell(in);
+  uint8_t magic[4];
+  int n;
+
+  fseek(in, debug_directory->pointer_to_raw_data, SEEK_SET);
+  read_chars_bin(in, magic, 4);
+
+  if (memcmp(magic, "RSDS", 4) != 0) { return; }
+
+  printf("      GUID:");
+  for (n = 0; n < 16; n++)
+  {
+    printf(" %02x", getc(in));
+  }
+  printf("\n");
+
+  uint32_t age = read_uint32(in);
+  printf("       age: %d\n", age);
+  printf("  filename: ");
+
+  while (1)
+  {
+    int ch = getc(in);
+    if (ch == 0) { break; }
+    printf("%c", ch);
+  }
+  printf("\n\n");
+
+  fseek(in, marker, SEEK_SET);
 }
 
 int debug_directory_print(
@@ -95,10 +130,15 @@ int debug_directory_print(
 
   for (n = 0; n < size; n += 28)
   {
-    printf("  -- Debug Directory Entry %d --\n", n);
+    printf("  -- Debug Directory Entry %d --\n", n / 28);
 
     debug_directory_entry_read(&debug_directory, in);
     debug_directory_entry_print(&debug_directory);
+
+    if (debug_directory.type == 2)
+    {
+      debug_directory_print_codeview(&debug_directory, in);
+    }
   }
 
   fseek(in, marker, SEEK_SET);
