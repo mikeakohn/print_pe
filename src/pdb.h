@@ -179,7 +179,8 @@ void print_pdb_symbols(
   struct pdb_dir_t *pdb_dir,
   struct pdb_header_t *pdb_header,
   struct pdb_dbi_t *pdb_dbi,
-  FILE *in);
+  FILE *in,
+  uint8_t demangle_symbols);
 
 // For debugging.
 void dump_pdb_stream(

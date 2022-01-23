@@ -30,6 +30,7 @@ int main(int argc, char *argv[])
   uint8_t show_ipi = 0;
   uint8_t show_dbi = 0;
   uint8_t show_symbols = 0;
+  uint8_t demangle_symbols = 0;
   uint8_t dump_index = 0;
   char *dump_filename = NULL;
 
@@ -74,6 +75,11 @@ int main(int argc, char *argv[])
       if (strcmp(argv[n], "-symbols") == 0)
       {
         show_symbols = 1;
+      }
+        else
+      if (strcmp(argv[n], "-demangle") == 0)
+      {
+        demangle_symbols = 1;
       }
         else
       if (strcmp(argv[n], "-dump") == 0)
@@ -157,7 +163,7 @@ int main(int argc, char *argv[])
 
   if (show_symbols != 0)
   {
-    print_pdb_symbols(&pdb_dir, &pdb_header, &pdb_dbi, in);
+    print_pdb_symbols(&pdb_dir, &pdb_header, &pdb_dbi, in, demangle_symbols);
   }
 
   if (dump_filename != NULL)

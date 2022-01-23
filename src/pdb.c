@@ -851,7 +851,8 @@ void print_pdb_symbols(
   struct pdb_dir_t *pdb_dir,
   struct pdb_header_t *pdb_header,
   struct pdb_dbi_t *pdb_dbi,
-  FILE *in)
+  FILE *in,
+  uint8_t demangle_symbols)
 {
   if (pdb_dbi->version_signature == 0)
   {
@@ -985,11 +986,17 @@ void print_pdb_symbols(
 
     printf("%s\n", next + offset);
 
-#if 0
-    char demangled[1024];
-    int r = demangle((const char *)next + offset, demangled, sizeof(demangled));
-    if (r > 0) { printf("%s\n", demangled); }
-#endif
+    if (demangle_symbols == 1)
+    {
+      char demangled[1024];
+
+      int r = demangle(
+        (const char *)next + offset,
+        demangled,
+        sizeof(demangled));
+
+      if (r > 0) { printf("%s\n", demangled); }
+    }
 
     printf(" --------\n");
 

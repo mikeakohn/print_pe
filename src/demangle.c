@@ -16,6 +16,22 @@ This code falls under the LGPL license.
 
 #include "demangle.h"
 
+static int demangle_append(
+  const char *name,
+  char *demangled,
+  int offset,
+  int length)
+{
+  while (*name != 0)
+  {
+    if (offset >= length -1) { return offset; }
+    demangled[offset++] = *name;
+    name++;
+  }
+
+  return offset;
+}
+
 static int demangle_insert_name(
   const char *name,
   char *demangled,
@@ -25,6 +41,27 @@ static int demangle_insert_name(
   while (offset < length)
   {
     if (*name == 0 || *name == '@') { break; }
+
+    if (*name == '?')
+    {
+      switch (name[1])
+      {
+        case '0': break;
+        case '1': demangled[offset++] = '~'; break;
+        case '2':
+          offset = demangle_append("operator new ", demangled, offset, length);
+          break;
+        case '3':
+          offset = demangle_append("operator delete ", demangled, offset, length);
+          break;
+        // FIXME: Add the rest of these.
+        default: break;
+      }
+
+      name += 2;
+      continue;
+    }
+
     demangled[offset++] = *name;
     name++;
   }
