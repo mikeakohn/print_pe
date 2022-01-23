@@ -10,6 +10,7 @@ OBJECTS= \
   clsid.o \
   com.o \
   debug_directory.o \
+  demangle.o \
   dos.o \
   exports.o \
   file_header.o \
@@ -28,6 +29,7 @@ OBJECTS_MINIDUMP= \
   minidump_stream_type.o
 
 OBJECTS_PDB= \
+  demangle.o \
   fileio.o \
   pdb.o
 

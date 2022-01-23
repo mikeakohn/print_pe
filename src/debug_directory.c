@@ -48,7 +48,13 @@ static int debug_directory_entry_print(
     "OMAP_TO_SRC",
     "OMAP_FROM_SRC",
     "BORLAND",
-    "RESERVED10"
+    "RESERVED10",
+    "CLSID",
+    "VC_FEATURE",
+    "POGO",
+    "ILTCG",
+    "MPX",
+    "REPRO",
   };
 
   printf("   Characteristics: %d\n", debug_directory->characteristics);
@@ -57,7 +63,7 @@ static int debug_directory_entry_print(
   printf("      MinorVersion: %d\n", debug_directory->minor_version);
   printf("              Type: %d (", debug_directory->type);
 
-  if (debug_directory->type < 11)
+  if (debug_directory->type < sizeof(debug_types) / sizeof(char *))
   {
     printf("%s", debug_types[debug_directory->type]);
   }

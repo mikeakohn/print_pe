@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2019 by Michael Kohn
+print_pe - Copyright 2005-2022 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -52,26 +52,26 @@ int exports_print(
   export_dir.AddressOfNames = read_uint32(in);
   export_dir.AddressOfNameOrdinals = read_uint32(in);
 
-  printf("   Characteristics: 0x%08x\n",export_dir.Characteristics);
-  printf("     TimeDateStamp: %s",ctime((time_t *)&export_dir.TimeDateStamp));
-  printf("      MajorVersion: %d\n",export_dir.MajorVersion);
-  printf("      MinorVersion: %d\n",export_dir.MinorVersion);
+  printf("   Characteristics: 0x%08x\n", export_dir.Characteristics);
+  printf("     TimeDateStamp: %s", ctime((time_t *)&export_dir.TimeDateStamp));
+  printf("      MajorVersion: %d\n", export_dir.MajorVersion);
+  printf("      MinorVersion: %d\n", export_dir.MinorVersion);
   printf("              Name: ");
   print_string(in, (export_dir.Name - virtual_address) + raw_ptr);
   printf("\n");
-  printf("              Base: %d\n",export_dir.Base);
-  printf(" NumberOfFunctions: %d\n",export_dir.NumberOfFunctions);
-  printf("     NumberOfNames: %d\n",export_dir.NumberOfNames);
-  printf("AddressOfFunctions: %d\n",export_dir.AddressOfFunctions);
-  printf("    AddressOfNames: %d\n",export_dir.AddressOfNames);
-  printf("AddrOfNameOrdinals: %d\n",export_dir.AddressOfNameOrdinals);
+  printf("              Base: %d\n", export_dir.Base);
+  printf(" NumberOfFunctions: %d\n", export_dir.NumberOfFunctions);
+  printf("     NumberOfNames: %d\n", export_dir.NumberOfNames);
+  printf("AddressOfFunctions: 0x%04x\n", export_dir.AddressOfFunctions);
+  printf("    AddressOfNames: 0x%04x\n", export_dir.AddressOfNames);
+  printf("AddrOfNameOrdinals: 0x%04x\n", export_dir.AddressOfNameOrdinals);
   printf("\n");
 
   printf("     Function Name                   Address     Ordinal\n");
 
   for (t = 0; t < export_dir.NumberOfNames; t++)
   {
-    ptr = get_ptr(in, (export_dir.AddressOfNames-virtual_address) + raw_ptr + (t * 4));
+    ptr = get_ptr(in, (export_dir.AddressOfNames - virtual_address) + raw_ptr + (t * 4));
     get_string(in, func_name, (ptr - virtual_address) + raw_ptr);
 
     func_addr = get_ptr(in, (export_dir.AddressOfFunctions - virtual_address) + raw_ptr + (t * 4));

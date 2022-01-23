@@ -15,6 +15,7 @@ This code falls under the LGPL license.
 #include <stdint.h>
 #include <inttypes.h>
 
+#include "demangle.h"
 #include "fileio.h"
 #include "pdb.h"
 
@@ -361,6 +362,12 @@ void print_pdb_stream_info(
   printf("     hash_capacity: %d\n", hash_capacity);
   printf("  bit_vector_count: %d\n", vector_words);
   printf("\n");
+
+  printf("   index=0  /OldDirectory\n");
+  printf("   index=1  /PDB (Stream Information)\n");
+  printf("   index=2  /TPI (CodeView Type Records)\n");
+  printf("   index=3  /DBI (Debug)\n");
+  printf("   index=4  /IPI (CodeView Type Records)\n");
 
   // FIXME: According to some docs, the full hash is supposed to be in
   // the file. So the for loop below should be hash_capacity in length
@@ -977,6 +984,13 @@ void print_pdb_symbols(
     }
 
     printf("%s\n", next + offset);
+
+#if 0
+    char demangled[1024];
+    int r = demangle((const char *)next + offset, demangled, sizeof(demangled));
+    if (r > 0) { printf("%s\n", demangled); }
+#endif
+
     printf(" --------\n");
 
     int align = (symbol_record.length + 3) & ~3;

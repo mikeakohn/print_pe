@@ -1,6 +1,6 @@
 /*
 
-print_pe - Copyright 2005-2015 by Michael Kohn
+print_pe - Copyright 2005-2022 by Michael Kohn
 
 Webpage: http://www.mikekohn.net/
 Email: mike@mikekohn.net
@@ -61,14 +61,14 @@ int imports_print(
 
     if (import_dir.FunctionNameList == 0) { break; }
 
-    printf("  FunctionNameList: %d\n", import_dir.FunctionNameList);
+    printf("  FunctionNameList: 0x%04x\n", import_dir.FunctionNameList);
     printf("     TimeDateStamp: %s", ctime((time_t *)&import_dir.TimeDateStamp));
     printf("      ForwardChain: %d\n", import_dir.ForwardChain);
     get_string(in, name, import_dir.ModuleName);
     printf("        ModuleName: ");
     print_string(in, (import_dir.ModuleName - virtual_address) + raw_ptr);
     printf("\n");
-    printf("FunctionAddresList: %d\n", import_dir.FunctionAddressList);
+    printf("FunctionAddresList: 0x%04x\n", import_dir.FunctionAddressList);
     printf("\n");
 
     printf("     Function Name                   Address\n");
