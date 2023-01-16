@@ -1,8 +1,8 @@
 /*
 
-print_pe - Copyright 2005-2019 by Michael Kohn
+print_pe - Copyright 2005-2023 by Michael Kohn
 
-Webpage: http://www.mikekohn.net/
+Webpage: https://www.mikekohn.net/
 Email: mike@mikekohn.net
 
 This code falls under the LGPL license.
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
   int address_size = 4;
   int t, len;
 
-  printf("\nprint_pe (January 17, 2022) - The DLL, EXE, OCX Analyzer\n");
+  printf("\nprint_pe (January 15, 2023) - The DLL, EXE, OCX Analyzer\n");
   printf("Copyright 2005-2022 - Michael Kohn  http://www.mikekohn.net/\n\n");
 
   if (argc < 2)

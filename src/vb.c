@@ -1,8 +1,8 @@
 /*
 
-print_pe - Copyright 2005-2019 by Michael Kohn
+print_pe - Copyright 2005-2023 by Michael Kohn
 
-Webpage: http://www.mikekohn.net/
+Webpage: https://www.mikekohn.net/
 Email: mike@mikekohn.net
 
 This code falls under the LGPL license.
@@ -36,7 +36,7 @@ int vb_info_print(
   ptr = getc(in);
   /* Compiled VB executables / DLLs have a couple of entry point signitures. */
   /* 0x68, 0x90, 0x5A */
-  switch(ptr)
+  switch (ptr)
   {
     case 0x5a: /* 0x5A = POP EDX, this means the file might be a VB DLL or OCX. */
 	    /* The pointer to the VB5! data stuff is in the first exported function. Usually DllCanUnloadNow()
@@ -73,7 +73,7 @@ int vb_info_print(
   read_chars(in, vb_header.szVbMagic, 4);
 
   if (strcmp(vb_header.szVbMagic, "VB5!") != 0)
-  { 
+  {
     fseek(in, marker, SEEK_SET);
     return -1;
   }
@@ -154,7 +154,7 @@ int vb_info_print(
     {
       t = com_reg_data.bRegInfo;
 
-      while(1)
+      while (1)
       {
         reg_info_read(&reg_info, in, vb_header.lpComRegisterData - optional_header->ImageBase + t);
 
@@ -168,7 +168,7 @@ int vb_info_print(
       }
     }
   }
-  
+
   fseek(in, marker, SEEK_SET);
 
   return 0;

@@ -1,8 +1,8 @@
 /*
 
-print_pe - Copyright 2005-2015 by Michael Kohn
+print_pe - Copyright 2005-2023 by Michael Kohn
 
-Webpage: http://www.mikekohn.net/
+Webpage: https://www.mikekohn.net/
 Email: mike@mikekohn.net
 
 This code falls under the LGPL license.
@@ -22,9 +22,9 @@ void disasm_cil(uint8_t *buffer, int len)
 {
   int pc = 0;
 
-  while(pc < len)
+  while (pc < len)
   {
-    switch(buffer[pc])
+    switch (buffer[pc])
     {
       case 0: // 0x00: // nop(0x00)
       case 1: // 0x01: // break(0x01)
@@ -218,7 +218,7 @@ void disasm_cil(uint8_t *buffer, int len)
       case 223: // 0xDF: // stind.i(0xdf)
       case 224: // 0xE0: // conv.u(0xe0)
       case 254:
-        switch(buffer[pc + 1])
+        switch (buffer[pc + 1])
         {
           case 0: // 0x00: // arglist(0x00)
           case 1: // 0x01: // ceq(0x01)

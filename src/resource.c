@@ -1,8 +1,8 @@
 /*
 
-print_pe - Copyright 2005-2022 by Michael Kohn
+print_pe - Copyright 2005-2023 by Michael Kohn
 
-Webpage: http://www.mikekohn.net/
+Webpage: https://www.mikekohn.net/
 Email: mike@mikekohn.net
 
 This code falls under the LGPL license.
@@ -20,6 +20,8 @@ This code falls under the LGPL license.
 #define RES_INDENT_MAX 100
 #define RES_INDENT_UNIT 4
 #define RES_INDENT_LEVELS (RES_INDENT_MAX/RES_INDENT_UNIT-1)
+
+#define RT_VERSION 0x10
 
 /*
 
@@ -44,93 +46,163 @@ Resource Types:
 23: html
 */
 
-int parse_string_file_info(FILE *in)
+static int parse_unicode(FILE *in)
 {
-  int wLength,wValueLength,wType;
-  int len;
-  int ch,t;
+  int ch, w;
+  int len = 0;
 
-  /* wValueLength is WRONG if it's a string and VB6 created this file..
-     good job on quality control Microsoft.
-  */
-
-  wLength = read_uint16(in);
-  wValueLength = read_uint16(in);
-  wType = read_uint16(in);
-  len = 6;
-
-/*
-printf("wLength=%d\n", wLength);
-printf("wValueLength=%d\n", wValueLength);
-printf("wType=%d\n", wType);
-*/
-
-  if (wType != 1)
+  while (1)
   {
-    fseek(in, wLength - len, SEEK_CUR);
-    return wLength;
-  }
-
-  while(len < wLength)
-  {
+    w = getc(in);
     ch = getc(in);
-    if (ch == EOF) return 100000;
-    getc(in);
+    w |= (ch << 8);
+    len += 2;
+    if (w == 0 || ch == EOF) { break; }
 
-    len = len + 2;
-
-    if (ch == 0)
-    {
-      if (wValueLength != 0)
-      {
-        while((len % 4) != 0) { getc(in); len++; }
-        printf(": ");
-
-        for (t = 0; t < wValueLength; t++)
-        {
-          ch = getc(in);
-          getc(in);
-
-          len = len + 2;
-          if (ch == 0) break;
-          printf("%c", ch);
-        }
-      }
-
-      printf("\n");
-      while((len % 4) != 0) { getc(in); len++; }
-
-      while (len < wLength)
-      {
-        len = len + parse_string_file_info(in);
-      }
-
-      break;
-    }
-
-    printf("%c", ch);
+    printf("%c", w);
   }
+
+  printf("\n");
 
   return len;
 }
 
+static int read_padding(FILE *in, int len)
+{
+  int count = 0;
+
+  while ((len & 0x3) != 0)
+  {
+    getc(in);
+    count++;
+    len++;
+  }
+
+  return count;
+}
+
+static int parse_string(FILE *in)
+{
+  int wLength, wValueLength, wType, value;
+  int ptr;
+
+  wLength = read_uint16(in);
+  wValueLength = read_uint16(in);
+  wType = read_uint16(in);
+  ptr = 6;
+
+printf("wLength=%d\n", wLength);
+printf("wValueLength=%d\n", wValueLength);
+printf("wType=%d\n\n", wType);
+
+  ptr += parse_unicode(in);
+  ptr += read_padding(in, ptr);
+  ptr += parse_unicode(in);
+
+  return ptr;
+}
+
+static int parse_string_table(FILE *in, int length)
+{
+  int wLength, wValueLength, wType;
+  int ptr;
+
+  wLength = read_uint16(in);
+  wValueLength = read_uint16(in);
+  wType = read_uint16(in);
+  ptr = 6;
+
+printf("wLength=%d\n", wLength);
+printf("wValueLength=%d\n", wValueLength);
+printf("wType=%d\n\n", wType);
+
+  ptr += parse_unicode(in);
+  ptr += read_padding(in, ptr);
+  ptr += parse_string(in);
+
+  return ptr;
+}
+
+static int parse_string_file_info(FILE *in)
+{
+  int wLength, wValueLength, wType, children;
+  int ptr;
+
+  wLength = read_uint16(in);
+  wValueLength = read_uint16(in);
+  wType = read_uint16(in);
+  ptr = 6;
+
+printf("wLength=%d\n", wLength);
+printf("wValueLength=%d\n", wValueLength);
+printf("wType=%d\n\n", wType);
+
+  // REVIEW: The unicode here should read either StringFileInfo or
+  // VafFileInfo. It appears their structures are the same? Or no?
+  ptr += parse_unicode(in);
+  ptr += read_padding(in, ptr);
+
+  children = read_uint16(in);
+
+  ptr += parse_string_table(in, children);
+printf("children=%d\n\n", children);
+printf("---------------\n");
+
+#if 0
+  if (wType != 1)
+  {
+    fseek(in, wLength - ptr, SEEK_CUR);
+    return wLength;
+  }
+#endif
+
+
+  return ptr;
+}
+
 int parse_version_info(FILE *in, long offset, int size)
 {
+  struct fixed_file_info_t fixed_file_info;
   long marker;
   int wLength;
+  int wValueLength;
+  int wType;
   int len;
 
   marker = ftell(in);
   fseek(in, offset, SEEK_SET);
 
   wLength = read_uint16(in);
-  fseek(in, offset + 0x5c, SEEK_SET);
+  wValueLength = read_uint16(in);
+  wType = read_uint16(in);
 
-  len = 0x5c;
-  while(len < wLength)
-  {
-    len = len + parse_string_file_info(in);
-  }
+printf("wLength=%d\n", wLength);
+printf("wValueLength=%d\n", wValueLength);
+printf("wType=%d\n", wType);
+printf("offset=0x%lx\n", offset);
+
+  len = 6;
+  len += parse_unicode(in);
+
+#if 0
+fseek(in, offset, SEEK_SET);
+//char buffer[2192];
+char buffer[wLength];
+fread(buffer, 1, sizeof(buffer), in);
+fclose(in);
+
+FILE *fp = fopen("vs_versionfinfo.bin", "wb");
+fwrite(buffer, 1, sizeof(buffer), fp);
+fclose(fp);
+exit(0);
+#endif
+
+  len += read_padding(in, len);
+  len += read_fixed_file_info(in, &fixed_file_info);
+  print_fixed_file_info(&fixed_file_info);
+
+  len += read_padding(in, len);
+  len += parse_string_file_info(in);
 
   fseek(in, marker, SEEK_SET);
 
@@ -170,6 +242,7 @@ int parse_resource_dir(
 
     if ((resource_dir_entry.OffsetToData & 0x80000000) == 0)
     {
+      // High bit 0: Address of a resource data entry (a leaf).
       read_resource_data(
         in,
         section_header->PointerToRawData,
@@ -189,7 +262,7 @@ int parse_resource_dir(
           resource_data.Size);
       }
 
-      if (res_type == 0x10)
+      if (res_type == RT_VERSION)
       {
         parse_version_info(
           in,
@@ -204,9 +277,11 @@ int parse_resource_dir(
     }
       else
     {
+      // High bit 1: The lower 31 bits are the address of another
+      // resource directory table (the next level down).
       if (level == 0)
       {
-        print_resource_type(resource_dir_entry.Name,level);
+        print_resource_type(resource_dir_entry.Name, level);
 
         parse_resource_dir(
           in,
@@ -323,6 +398,25 @@ int read_resource_data(
   return 0;
 }
 
+int read_fixed_file_info(FILE *in, struct fixed_file_info_t *fixed_file_info)
+{
+  fixed_file_info->Signature = read_uint32(in);
+  fixed_file_info->StrucVersion = read_uint32(in);
+  fixed_file_info->FileVersionMS = read_uint32(in);
+  fixed_file_info->FileVersionLS = read_uint32(in);
+  fixed_file_info->ProductVersionMS = read_uint32(in);
+  fixed_file_info->ProductVersionLS = read_uint32(in);
+  fixed_file_info->FileFlagsMask = read_uint32(in);
+  fixed_file_info->FileFlags = read_uint32(in);
+  fixed_file_info->FileOS = read_uint32(in);
+  fixed_file_info->FileType = read_uint32(in);
+  fixed_file_info->FileSubtype = read_uint32(in);
+  fixed_file_info->FileDateMS = read_uint32(in);
+  fixed_file_info->FileDateLS = read_uint32(in);
+
+  return 13 * sizeof(uint32_t);
+}
+
 int print_resource_dir_entry(
   struct resource_dir_entry_t *resource_dir_entry,
   int level)
@@ -423,5 +517,26 @@ int print_resource_data(struct resource_data_t *resource_data, int level)
   printf("\n");
 
   return 0;
+}
+
+int print_fixed_file_info(struct fixed_file_info_t *fixed_file_info)
+{
+   printf("         Signature: 0x%08x\n", fixed_file_info->Signature);
+   printf("      StrucVersion: %d.%d\n",
+     fixed_file_info->StrucVersion >> 16,
+     fixed_file_info->StrucVersion & 0xffff);
+   printf("     FileVersionMS: %d\n", fixed_file_info->FileVersionMS);
+   printf("     FileVersionLS: %d\n", fixed_file_info->FileVersionLS);
+   printf("  ProductVersionMS: %d\n", fixed_file_info->ProductVersionMS);
+   printf("  ProductVersionLS: %d\n", fixed_file_info->ProductVersionLS);
+   printf("     FileFlagsMask: 0x%08x\n", fixed_file_info->FileFlagsMask);
+   printf("         FileFlags: 0x%08x\n", fixed_file_info->FileFlags);
+   printf("            FileOS: %d\n", fixed_file_info->FileOS);
+   printf("          FileType: %d\n", fixed_file_info->FileType);
+   printf("       FileSubtype: %d\n", fixed_file_info->FileSubtype);
+   printf("        FileDateMS: %d\n", fixed_file_info->FileDateMS);
+   printf("        FileDateLS: %d\n", fixed_file_info->FileDateLS);
+
+   return 0;
 }
 

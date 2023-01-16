@@ -1,8 +1,8 @@
 /*
 
-print_pe - Copyright 2005-2022 by Michael Kohn
+print_pe - Copyright 2005-2023 by Michael Kohn
 
-Webpage: http://www.mikekohn.net/
+Webpage: https://www.mikekohn.net/
 Email: mike@mikekohn.net
 
 This code falls under the LGPL license.
@@ -29,7 +29,7 @@ int rip_binary(FILE *in, char *filename, int address, int size)
   {
     printf("Cannot open file %s for writing.\n\n",filename);
     return -1;
-  } 
+  }
 
   marker = ftell(in);
   fseek(in, address, SEEK_SET);
@@ -56,14 +56,14 @@ int read_unicode(FILE *in, int address, char *s, int max_chars)
   t = 0;
   len = read_uint16(in);
 
-  while(t<len)
+  while (t < len)
   {
     getc(in);
     ch = getc(in);
-    if (ch == EOF || ch == 0) break;
+    if (ch == EOF || ch == 0) { break; }
     s[t++] = ch;
 
-    if (t == max_chars - 1) break;
+    if (t == max_chars - 1) { break; }
   }
 
   s[t] = 0;

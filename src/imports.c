@@ -1,8 +1,8 @@
 /*
 
-print_pe - Copyright 2005-2022 by Michael Kohn
+print_pe - Copyright 2005-2023 by Michael Kohn
 
-Webpage: http://www.mikekohn.net/
+Webpage: https://www.mikekohn.net/
 Email: mike@mikekohn.net
 
 This code falls under the LGPL license.
@@ -55,7 +55,7 @@ int imports_print(
 
   total_size = 0;
 
-  while(total_size < size)
+  while (total_size < size)
   {
     import_dir_read(&import_dir, in);
 
@@ -75,7 +75,7 @@ int imports_print(
 
     t = 0;
 
-    while(1)
+    while (1)
     {
       func_addr = get_ptr(in, (import_dir.FunctionAddressList - virtual_address) + raw_ptr + t);
 
@@ -123,7 +123,7 @@ int imports_find(
 
   total_size = 0;
 
-  while(total_size < size)
+  while (total_size < size)
   {
     import_dir_read(&import_dir, in);
 
@@ -131,7 +131,7 @@ int imports_find(
 
     t = 0;
 
-    while(1)
+    while (1)
     {
       func_addr = get_ptr(in, (import_dir.FunctionAddressList - virtual_address) + raw_ptr + t);
 

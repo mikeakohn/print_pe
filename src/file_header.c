@@ -1,8 +1,8 @@
 /*
 
-print_pe - Copyright 2005-2019 by Michael Kohn
+print_pe - Copyright 2005-2023 by Michael Kohn
 
-Webpage: http://www.mikekohn.net/
+Webpage: https://www.mikekohn.net/
 Email: mike@mikekohn.net
 
 This code falls under the LGPL license.
@@ -38,7 +38,7 @@ int file_header_print(struct file_header_t *file_header)
 
   const char *machine;
 
-  switch(file_header->Machine)
+  switch (file_header->Machine)
   {
     case 0x14c: machine = "i386"; break;
     case 0x14d: machine = "i486"; break;

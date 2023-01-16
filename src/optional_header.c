@@ -1,8 +1,8 @@
 /*
 
-print_pe - Copyright 2005-2019 by Michael Kohn
+print_pe - Copyright 2005-2023 by Michael Kohn
 
-Webpage: http://www.mikekohn.net/
+Webpage: https://www.mikekohn.net/
 Email: mike@mikekohn.net
 
 This code falls under the LGPL license.
@@ -138,7 +138,7 @@ int optional_header_print(struct optional_header_t *optional_header)
 
   const char *magic;
 
-  switch(optional_header->Magic)
+  switch (optional_header->Magic)
   {
     case 0x10b: magic = "PE32 32 Bit Exe"; break;
     case 0x20b: magic = "PE32+ 64 Bit Exe"; break;
@@ -172,7 +172,7 @@ int optional_header_print(struct optional_header_t *optional_header)
 
   const char *subsystem;
 
-  switch(optional_header->Subsystem)
+  switch (optional_header->Subsystem)
   {
     case 1: subsystem = "Native"; break;
     case 2: subsystem = "GUI"; break;

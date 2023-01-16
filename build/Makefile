@@ -1,6 +1,6 @@
 
 #CC=gcc
-CFLAGS=-Wall -O3
+CFLAGS=-Wall -g
 #CC=i386-mingw32msvc-gcc
 #PATH=/opt/xmingw/bin:/usr/bin
 VPATH=../src

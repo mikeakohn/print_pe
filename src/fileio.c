@@ -1,8 +1,8 @@
 /*
 
-print_pe - Copyright 2005-2019 by Michael Kohn
+print_pe - Copyright 2005-2023 by Michael Kohn
 
-Webpage: http://www.mikekohn.net/
+Webpage: https://www.mikekohn.net/
 Email: mike@mikekohn.net
 
 This code falls under the LGPL license.
@@ -94,7 +94,7 @@ int print_string(FILE *in, int addr)
   marker = ftell(in);
   fseek(in, addr, SEEK_SET);
 
-  while(1)
+  while (1)
   {
     ch = getc(in);
     if (ch == EOF || ch == 0) { break; }
@@ -118,7 +118,7 @@ int get_string(FILE *in, char *s, int addr)
 
   t = 0;
 
-  while(1)
+  while (1)
   {
     ch = getc(in);
     if (ch == EOF || ch == 0) { break; }

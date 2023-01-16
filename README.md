@@ -2,7 +2,7 @@
 print_pe / print_minidump / print_pdb
 
 Author: Michael Kohn
-   Web: http://www.mikekohn.net/
+   Web: https://www.mikekohn.net/
 
 Tools for dumping the contents of Window executables, MiniDump crash files,
 and PDB files.
