@@ -86,7 +86,7 @@ int read_fixed_file_info(FILE *in, struct fixed_file_info_t *fixed_file_info);
 int print_resource_data(struct resource_data_t *resource_data, int level);
 int print_resource_type(int id, int level);
 int print_resource_dir(struct resource_dir_t *resource_dir, int level);
-int print_resource_dir_entry(struct resource_dir_entry_t *resource_dir_entry, int level);
+int print_resource_dir_entry(struct resource_dir_entry_t *resource_dir_entry, int level, int count);
 int print_fixed_file_info(struct fixed_file_info_t *fixed_file_info);
 
 #endif

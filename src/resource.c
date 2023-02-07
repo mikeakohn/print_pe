@@ -46,10 +46,11 @@ Resource Types:
 23: html
 */
 
-static int parse_unicode(FILE *in)
+static int parse_unicode(FILE *in, char *key, int length)
 {
   int ch, w;
   int len = 0;
+  int ptr = 0;
 
   while (1)
   {
@@ -60,8 +61,10 @@ static int parse_unicode(FILE *in)
     if (w == 0 || ch == EOF) { break; }
 
     printf("%c", w);
+    if (ptr < length -1) { key[ptr++] = w; }
   }
 
+  key[ptr] = 0;
   printf("\n");
 
   return len;
@@ -81,108 +84,131 @@ static int read_padding(FILE *in, int len)
   return count;
 }
 
+static int read_struct_info(
+  FILE *in,
+  uint16_t *wLength,
+  uint16_t *wValueLength,
+  uint16_t *wType,
+  char *szKey,
+  int szKey_length)
+{
+  int len = 6;
+
+  *wLength = read_uint16(in);
+  *wValueLength = read_uint16(in);
+  *wType = read_uint16(in);
+
+  printf("   wLength=%d\n", *wLength);
+  printf("   wValueLength=%d\n", *wValueLength);
+  printf("   wType=%d %s\n", *wType, *wType == 0 ? "(binary)" : "(text)");
+  printf("   szKey=");
+  len += parse_unicode(in, szKey, szKey_length);
+  len += read_padding(in, len);
+  printf("\n");
+
+  return len;
+}
+
 static int parse_string(FILE *in)
 {
-  int wLength, wValueLength, wType, value;
-  int ptr;
+  uint16_t wLength, wValueLength, wType;
+  char szKey[128];
+  int len, n;
 
-  wLength = read_uint16(in);
-  wValueLength = read_uint16(in);
-  wType = read_uint16(in);
-  ptr = 6;
+  printf("    -- String --\n");
+  len = read_struct_info(in, &wLength, &wValueLength, &wType, szKey, sizeof(szKey));
 
-printf("wLength=%d\n", wLength);
-printf("wValueLength=%d\n", wValueLength);
-printf("wType=%d\n\n", wType);
+  printf("   value=");
 
-  ptr += parse_unicode(in);
-  ptr += read_padding(in, ptr);
-  ptr += parse_unicode(in);
+  for (n = 0; n < wValueLength; n++)
+  {
+    int w = getc(in);
+    int ch = getc(in);
+    w |= (ch << 8);
 
-  return ptr;
+    printf("%c", w);
+
+    len += 2;
+  }
+
+  printf("\n\n");
+
+  len += read_padding(in, len);
+
+  return len;
 }
 
 static int parse_string_table(FILE *in, int length)
 {
-  int wLength, wValueLength, wType;
-  int ptr;
+  uint16_t wLength, wValueLength, wType;
+  char szKey[128];
+  int len;
 
-  wLength = read_uint16(in);
-  wValueLength = read_uint16(in);
-  wType = read_uint16(in);
-  ptr = 6;
+  printf("    -- StringTable --\n");
+  len = read_struct_info(in, &wLength, &wValueLength, &wType, szKey, sizeof(szKey));
 
-printf("wLength=%d\n", wLength);
-printf("wValueLength=%d\n", wValueLength);
-printf("wType=%d\n\n", wType);
+  while (len < wLength)
+  {
+    len += parse_string(in);
+  }
 
-  ptr += parse_unicode(in);
-  ptr += read_padding(in, ptr);
-  ptr += parse_string(in);
-
-  return ptr;
+  return len;
 }
 
-static int parse_string_file_info(FILE *in)
+static int parse_var(FILE *in, int length)
 {
-  int wLength, wValueLength, wType, children;
-  int ptr;
+  uint16_t wLength, wValueLength, wType;
+  char szKey[128];
+  int len;
 
-  wLength = read_uint16(in);
-  wValueLength = read_uint16(in);
-  wType = read_uint16(in);
-  ptr = 6;
+  printf("    -- Var --\n");
+  len = read_struct_info(in, &wLength, &wValueLength, &wType, szKey, sizeof(szKey));
 
-printf("wLength=%d\n", wLength);
-printf("wValueLength=%d\n", wValueLength);
-printf("wType=%d\n\n", wType);
+  printf("   value=%d\n\n", read_uint32(in));
 
-  // REVIEW: The unicode here should read either StringFileInfo or
-  // VafFileInfo. It appears their structures are the same? Or no?
-  ptr += parse_unicode(in);
-  ptr += read_padding(in, ptr);
+  len += 4;
 
-  children = read_uint16(in);
+  return len;
+}
 
-  ptr += parse_string_table(in, children);
-printf("children=%d\n\n", children);
-printf("---------------\n");
+static int parse_x_file_info(FILE *in)
+{
+  uint16_t wLength, wValueLength, wType;
+  char szKey[128];
+  int len;
 
-#if 0
-  if (wType != 1)
+  printf("   -- StringFileInfo --\n");
+  len = read_struct_info(in, &wLength, &wValueLength, &wType, szKey, sizeof(szKey));
+
+  if (strcmp(szKey, "StringFileInfo") == 0)
   {
-    fseek(in, wLength - ptr, SEEK_CUR);
-    return wLength;
+    len += parse_string_table(in, wLength);
   }
-#endif
+    else
+  if (strcmp(szKey, "VarFileInfo") == 0)
+  {
+    len += parse_var(in, wLength);
+  }
+    else
+  {
+    len += wLength - 4;
+  }
 
-
-  return ptr;
+  return len;
 }
 
 int parse_version_info(FILE *in, long offset, int size)
 {
   struct fixed_file_info_t fixed_file_info;
   long marker;
-  int wLength;
-  int wValueLength;
-  int wType;
+  uint16_t wLength, wValueLength, wType;
+  char szKey[128];
   int len;
 
   marker = ftell(in);
   fseek(in, offset, SEEK_SET);
 
-  wLength = read_uint16(in);
-  wValueLength = read_uint16(in);
-  wType = read_uint16(in);
-
-printf("wLength=%d\n", wLength);
-printf("wValueLength=%d\n", wValueLength);
-printf("wType=%d\n", wType);
-printf("offset=0x%lx\n", offset);
-
-  len = 6;
-  len += parse_unicode(in);
+  len = read_struct_info(in, &wLength, &wValueLength, &wType, szKey, sizeof(szKey));
 
 #if 0
 fseek(in, offset, SEEK_SET);
@@ -200,9 +226,12 @@ exit(0);
   len += read_padding(in, len);
   len += read_fixed_file_info(in, &fixed_file_info);
   print_fixed_file_info(&fixed_file_info);
-
   len += read_padding(in, len);
-  len += parse_string_file_info(in);
+
+  while (len < wLength)
+  {
+    len += parse_x_file_info(in);
+  }
 
   fseek(in, marker, SEEK_SET);
 
@@ -238,7 +267,7 @@ int parse_resource_dir(
       &resource_dir_entry,
       offset);
 
-    print_resource_dir_entry(&resource_dir_entry, level);
+    print_resource_dir_entry(&resource_dir_entry, level, t);
 
     if ((resource_dir_entry.OffsetToData & 0x80000000) == 0)
     {
@@ -351,7 +380,7 @@ int read_resource_dir_entry(
   struct resource_dir_entry_t *resource_dir_entry,
   int offset)
 {
-int marker;
+  long marker;
 
   marker = ftell(in);
   fseek(in, addr + offset, SEEK_SET);
@@ -419,7 +448,8 @@ int read_fixed_file_info(FILE *in, struct fixed_file_info_t *fixed_file_info)
 
 int print_resource_dir_entry(
   struct resource_dir_entry_t *resource_dir_entry,
-  int level)
+  int level,
+  int count)
 {
   char indent[RES_INDENT_MAX];
 
@@ -429,11 +459,11 @@ int print_resource_dir_entry(
 
   if ((resource_dir_entry->OffsetToData & 0x80000000) == 0)
   {
-    printf("%s-- Resource Dir Entry --\n", indent);
+    printf("%s-- Resource Dir Entry [%d] --\n", indent, count);
   }
     else
   {
-    printf("%s-- Resource Dir Entry (Dir) --\n", indent);
+    printf("%s-- Resource Dir Entry (Dir) [%d] --\n", indent, count);
   }
 
   printf("%s|             Name: 0x%08x", indent, resource_dir_entry->Name);
@@ -521,21 +551,51 @@ int print_resource_data(struct resource_data_t *resource_data, int level)
 
 int print_fixed_file_info(struct fixed_file_info_t *fixed_file_info)
 {
+   const char *file_os;
+   const char *file_type;
+
+   switch (fixed_file_info->FileOS)
+   {
+     case 0x00000000: file_os = "(UNKNOWN)"; break;
+     case 0x00000001: file_os = "(WIN16)"; break;
+     case 0x00000002: file_os = "(PM32)"; break;
+     case 0x00000004: file_os = "(WIN32)"; break;
+     case 0x00010000: file_os = "(DOS)"; break;
+     case 0x00020000: file_os = "(OS216)"; break;
+     case 0x00030000: file_os = "(OS232)"; break;
+     case 0x00040000: file_os = "(NT)"; break;
+     default: file_os = "()"; break;
+   }
+
+   switch (fixed_file_info->FileType)
+   {
+     case 0x00000000: file_type = "(UNKNOWN)"; break;
+     case 0x00000001: file_type = "(Application)"; break;
+     case 0x00000002: file_type = "(DLL)"; break;
+     case 0x00000003: file_type = "(DRV)"; break;
+     case 0x00000004: file_type = "(FONT)"; break;
+     case 0x00000005: file_type = "(VXD)"; break;
+     case 0x00000007: file_type = "(STATIC_LIB)"; break;
+     default: file_type = "()"; break;
+   }
+
+   printf("        -- VS_FIXEDFILEINFO --\n");
    printf("         Signature: 0x%08x\n", fixed_file_info->Signature);
    printf("      StrucVersion: %d.%d\n",
      fixed_file_info->StrucVersion >> 16,
      fixed_file_info->StrucVersion & 0xffff);
-   printf("     FileVersionMS: %d\n", fixed_file_info->FileVersionMS);
-   printf("     FileVersionLS: %d\n", fixed_file_info->FileVersionLS);
-   printf("  ProductVersionMS: %d\n", fixed_file_info->ProductVersionMS);
-   printf("  ProductVersionLS: %d\n", fixed_file_info->ProductVersionLS);
+   printf("     FileVersionMS: 0x%x\n", fixed_file_info->FileVersionMS);
+   printf("     FileVersionLS: 0x%x\n", fixed_file_info->FileVersionLS);
+   printf("  ProductVersionMS: 0x%x\n", fixed_file_info->ProductVersionMS);
+   printf("  ProductVersionLS: 0x%x\n", fixed_file_info->ProductVersionLS);
    printf("     FileFlagsMask: 0x%08x\n", fixed_file_info->FileFlagsMask);
    printf("         FileFlags: 0x%08x\n", fixed_file_info->FileFlags);
-   printf("            FileOS: %d\n", fixed_file_info->FileOS);
-   printf("          FileType: %d\n", fixed_file_info->FileType);
+   printf("            FileOS: %d %s\n", fixed_file_info->FileOS, file_os);
+   printf("          FileType: %d %s\n", fixed_file_info->FileType, file_type);
    printf("       FileSubtype: %d\n", fixed_file_info->FileSubtype);
    printf("        FileDateMS: %d\n", fixed_file_info->FileDateMS);
    printf("        FileDateLS: %d\n", fixed_file_info->FileDateLS);
+   printf("\n");
 
    return 0;
 }
