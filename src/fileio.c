@@ -86,6 +86,28 @@ int read_chars_bin(FILE *in, uint8_t *s, int count)
   return 0;
 }
 
+int read_uint32_be(FILE *in)
+{
+  int c;
+
+  c = getc(in) << 24;
+  c |= getc(in) << 16;
+  c |= getc(in) << 8;
+  c |= getc(in);
+
+  return c;
+}
+
+int read_uint16_be(FILE *in)
+{
+  int c;
+
+  c = getc(in) << 8;
+  c |= getc(in);
+
+  return c;
+}
+
 int print_string(FILE *in, int addr)
 {
   int marker;

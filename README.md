@@ -17,6 +17,7 @@ Features:
   instead of running code.
 * Dump information from Windows minidump (core) crash file.
 * Dump information, including symbol addresses, from debug pdb files.
+* Dump information from .lib files.
 
 TODO:
 * Dump .NET headers
@@ -45,7 +46,7 @@ of the file type:
     ./print_minidump filename.dmp
 
 How to use print_pdb
--------------------------
+--------------------
 
 Since print_pdb has a lot of information, there are command line arguments
 for filtering out which sections are displayed.
@@ -68,4 +69,15 @@ another tool (maybe a hex editor) there is a -dump option. For example,
 to dump the DBI debug information (which is always index 3):
 
     ./print_pdb -dump dbi.bin 3 filename.pdb
+
+How to use print_lib
+--------------------
+
+    ./print_lib filename.lib
+
+Notes
+-----
+
+It's possible that there is more data that can be extracted from these files.
+If something is missing let me know and it can be added.
 

@@ -21,6 +21,9 @@ int read_uint8(FILE *in);
 int read_chars(FILE *in, char *s, int count);
 int read_chars_bin(FILE *in, uint8_t *s, int count);
 
+int read_uint32_be(FILE *in);
+int read_uint16_be(FILE *in);
+
 int print_string(FILE *in, int addr);
 int get_string(FILE *in, char *s, int addr);
 int get_ptr(FILE *in, int addr);

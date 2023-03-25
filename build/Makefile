@@ -43,6 +43,9 @@ default: $(OBJECTS) $(OBJECTS_MINIDUMP) $(OBJECTS_PDB)
 	$(CC) -o ../print_pdb ../src/print_pdb.c \
 	   $(OBJECTS_PDB) \
 	   $(CFLAGS)
+	$(CC) -o ../print_lib ../src/print_lib.c \
+	   $(OBJECTS_PDB) \
+	   $(CFLAGS)
 
 %.o: %.c %.h
 	$(CC) -c $< -o $*.o $(CFLAGS)

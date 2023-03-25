@@ -1,6 +1,8 @@
 
 *.o
 *.swp
+print_pdb
 print_pe
+print_lib
 print_minidump
 
