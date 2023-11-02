@@ -138,6 +138,9 @@ int main(int argc, char *argv[])
       case STREAM_MEMORY_LIST:
         print_minidump_memory_list(in);
         break;
+      case STREAM_MEMORY_INFO_LIST:
+        print_minidump_memory_info_list(in);
+        break;
       case STREAM_EXCEPTION:
         print_minidump_exception(in);
         break;

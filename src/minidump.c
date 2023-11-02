@@ -429,6 +429,19 @@ void print_minidump_module_list(FILE *in)
 
 void print_minidump_memory_list(FILE *in)
 {
+  uint32_t number_of_memory_ranges = read_uint32(in);
+  uint64_t start_of_memory_range = read_uint64(in);
+  uint32_t data_size = read_uint32(in);
+  uint64_t relative_virtual_address = read_uint64(in);
+
+  printf("   number_of_memory_ranges: %u\n", number_of_memory_ranges);
+  printf("     start_of_memory_range: 0x%lx\n", start_of_memory_range);
+  printf("                 data_size: %d\n", data_size);
+  printf("  relative_virtual_address: 0x%lx\n", relative_virtual_address);
+}
+
+void print_minidump_memory_info_list(FILE *in)
+{
   uint64_t n;
   uint32_t size_of_headers = read_uint32(in);
   uint32_t size_of_entry = read_uint32(in);
@@ -436,10 +449,17 @@ void print_minidump_memory_list(FILE *in)
 
   printf("   size_of_headers: %u\n", size_of_headers);
   printf("     size_of_entry: %u\n", size_of_entry);
+  printf(" number_of_entries: %ld\n", number_of_entries);
 
   for (n = 0; n < number_of_entries; n++)
   {
     uint64_t marker = ftell(in);
+
+    if (feof(in) != 0)
+    {
+       printf("Error: Premature end of file?\n");
+       break;
+    }
 
     printf("  -- Memory Info %ld --\n", n);
 
